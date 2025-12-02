@@ -112,8 +112,8 @@
                 v-model="sortBy"
                 @change="sortMovies"
               >
-                <option value="date">📅 Recent</option>
-                <option value="title">🔤 Alphabetical</option>
+                <option value="date">Recent</option>
+                <option value="title">Alphabetical</option>
               </select>
             </div>
           </div>
@@ -193,13 +193,13 @@
                   <h3 class="movie-title" :title="movie.title">
                     {{ movie.title }}
                   </h3>
-                  <button
+                  <!-- <button
                     class="movie-delete-btn"
                     @click.stop="deleteMovie(movie._id)"
                     title="Delete movie"
                   >
                     🗑️
-                  </button>
+                  </button> -->
                 </div>
                 <div class="movie-meta">
                   <span class="movie-date">{{
