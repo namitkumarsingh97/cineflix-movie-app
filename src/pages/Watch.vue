@@ -7,7 +7,9 @@
         <div class="video-player-section">
           <div class="video-player-wrapper">
             <!-- Iframe for movies -->
-            <div v-if="video && video.iframe" v-html="video.iframe" class="watch-iframe-player"></div>
+            <div v-if="video && video.iframe" class="watch-iframe-container">
+              <div v-html="video.iframe" class="watch-iframe-player"></div>
+            </div>
             <!-- Video tag for S3 videos -->
             <video
               v-else-if="video && video.url"
@@ -101,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { videosApi } from '../api/videos';
 import { moviesApi } from '../api/movies';
@@ -218,9 +220,32 @@ function handleVideoLoaded() {
   // Video metadata loaded
 }
 
+function processIframe() {
+  // Process iframe after it's inserted via v-html
+  if (video.value && video.value.iframe) {
+    nextTick(() => {
+      const iframe = document.querySelector('.watch-iframe-player iframe');
+      if (iframe) {
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.maxWidth = '100%';
+        iframe.style.maxHeight = '100%';
+        iframe.style.border = 'none';
+        iframe.style.display = 'block';
+      }
+    });
+  }
+}
+
+// Watch for video changes to process iframe
+watch(() => video.value, () => {
+  processIframe();
+}, { deep: true });
+
 onMounted(async () => {
   await Promise.all([loadVideos(), loadMovies()]);
   await loadVideo();
+  processIframe();
 });
 </script>
 
@@ -271,7 +296,7 @@ onMounted(async () => {
   object-fit: contain;
 }
 
-.watch-iframe-player {
+.watch-iframe-container {
   position: absolute;
   top: 0;
   left: 0;
@@ -283,14 +308,28 @@ onMounted(async () => {
   justify-content: center;
 }
 
+.watch-iframe-player {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
 .watch-iframe-player iframe {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
   max-height: 100% !important;
   border: none !important;
-  display: block;
-  position: relative;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  object-fit: contain;
+  box-sizing: border-box;
 }
 
 .video-info-section {
