@@ -294,9 +294,9 @@ import axios from "axios";
 // Use localhost in development mode, Vercel URL in production
 // Note: Vite requires VITE_ prefix for env variables
 // Force localhost when running locally (development mode)
-const API_URL = import.meta.env.DEV 
-  ? "http://localhost:5000/api"  // Always use localhost in dev mode
-  : (import.meta.env.VITE_API_URL || "http://localhost:5000/api");
+const API_URL = import.meta.env.DEV
+  ? "https://cineflix-api-rho.vercel.app/api" // Always use localhost in dev mode
+  : import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 // Log API URL for debugging
 console.log("API URL:", API_URL);
