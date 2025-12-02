@@ -32,22 +32,6 @@
           <span class="movie-count">({{ filteredMovies.length }})</span>
         </h2>
         <div class="header-controls">
-          <div class="view-toggle">
-            <button
-              :class="['view-btn', { active: viewMode === 'grid' }]"
-              @click="viewMode = 'grid'"
-              title="Grid View"
-            >
-              <Grid3x3 :size="18" />
-            </button>
-            <button
-              :class="['view-btn', { active: viewMode === 'list' }]"
-              @click="viewMode = 'list'"
-              title="List View"
-            >
-              <List :size="18" />
-            </button>
-          </div>
           <div class="dropdown">
             <select
               class="dropdown-select"
@@ -65,83 +49,14 @@
 
       <div
         v-else-if="filteredMovies.length > 0"
-        :class="['movies-container', viewMode]"
+        class="youtube-videos-grid"
       >
-        <div
+        <MovieCard
           v-for="movie in paginatedItems"
           :key="movie._id"
-          :id="`movie-${movie._id}`"
-          class="movie-card"
-          @mouseenter="hoveredMovie = movie._id"
-          @mouseleave="handleMouseLeave(movie._id)"
-        >
-          <div class="movie-card-inner">
-            <div class="movie-poster">
-              <!-- Thumbnail/Poster -->
-              <div v-if="playingMovie !== movie._id" class="movie-thumbnail">
-                <img
-                  :src="getThumbnail(movie)"
-                  :alt="movie.title"
-                  @error="handleThumbnailError"
-                  class="thumbnail-image"
-                />
-                <div
-                  class="movie-overlay"
-                  v-if="
-                    hoveredMovie === movie._id || playingMovie === movie._id
-                  "
-                >
-                  <button
-                    class="play-overlay-btn"
-                    @click="playMovieInCard(movie._id)"
-                  >
-                    <Play :size="20" fill="currentColor" />
-                    <span>Play</span>
-                  </button>
-                </div>
-              </div>
-              <!-- Video Player (replaces thumbnail when playing) -->
-              <div v-else class="movie-player">
-                <div class="iframe-wrapper-inline">
-                  <div v-html="movie.iframe"></div>
-                  <div v-if="movie.error" class="iframe-error">
-                    <AlertTriangle :size="32" class="error-icon" />
-                    <p>Failed to load video</p>
-                    <div class="error-actions">
-                      <button class="retry-btn" @click="retryIframe(movie)">
-                        <RefreshCw :size="16" />
-                        <span>Retry</span>
-                      </button>
-                      <button
-                        class="open-external-btn"
-                        @click="openExternal(movie.iframeSrc)"
-                      >
-                        <span>Open in Browser</span>
-                      </button>
-                    </div>
-                  </div>
-                  <button class="close-player-btn" @click="stopPlaying">
-                    <X :size="16" />
-                    <span>Close</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-header">
-                <h3 class="movie-title" :title="movie.title">
-                  {{ movie.title }}
-                </h3>
-              </div>
-              <div class="movie-meta">
-                <span class="movie-date">
-                  <Calendar :size="14" />
-                  <span>{{ formatDate(movie.createdAt) }}</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+          :movie="movie"
+          @click="navigateToMovie"
+        />
       </div>
 
       <div v-else class="empty-state">
@@ -186,23 +101,20 @@
 
 <script setup>
 import { ref, onMounted, inject, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useMovies } from "../composables/useMovies";
 import { usePagination } from "../composables/usePagination";
-import { formatDate } from "../utils/date";
-import { getThumbnail } from "../utils/video";
 import Loader from "../components/Loader.vue";
+import MovieCard from "../components/MovieCard.vue";
 import {
   Film,
-  Play,
-  X,
-  AlertTriangle,
   Grid3x3,
   List,
   ChevronLeft,
   ChevronRight,
-  Calendar,
-  RefreshCw,
 } from "lucide-vue-next";
+
+const router = useRouter();
 
 // Get search query and refresh trigger from parent
 const searchQuery = inject("searchQuery", ref(""));
@@ -230,53 +142,15 @@ const {
 
 // Local state
 const viewMode = ref("grid");
-const hoveredMovie = ref(null);
-const playingMovie = ref(null);
 
 // Methods
 function sortMovies() {
   // Sorting is handled by computed property
 }
 
-function playMovieInCard(movieId) {
-  playingMovie.value = movieId;
-  const element = document.getElementById(`movie-${movieId}`);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-}
-
-function stopPlaying() {
-  playingMovie.value = null;
-}
-
-function handleMouseLeave(movieId) {
-  if (playingMovie.value !== movieId) {
-    hoveredMovie.value = null;
-  }
-}
-
-function handleThumbnailError(event) {
-  event.target.style.display = "none";
-  event.target.parentElement.style.background = "var(--gradient-hero)";
-}
-
-function retryIframe(movie) {
-  movie.error = false;
-}
-
-function openExternal(url) {
-  window.open(url, "_blank");
-}
-
-function scrollToMovie(movieId) {
-  const element = document.getElementById(`movie-${movieId}`);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => {
-      playMovieInCard(movieId);
-    }, 500);
-  }
+function navigateToMovie(movie) {
+  // Navigate to watch page with movie ID
+  router.push(`/watch/${movie._id}`);
 }
 
 onMounted(() => {
