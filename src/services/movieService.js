@@ -38,7 +38,7 @@ export const movieService = {
   },
 
   // Create movie
-  async createMovie(title, iframeCode) {
+  async createMovie(title, iframeCode, category = '') {
     if (!title?.trim()) {
       throw new Error('Please enter a movie title');
     }
@@ -49,11 +49,17 @@ export const movieService = {
 
     const { iframe, iframeSrc } = this.parseIframeCode(iframeCode);
 
-    const response = await moviesApi.create({
+    const data = {
       title: title.trim(),
       iframe,
       iframeSrc,
-    });
+    };
+
+    if (category) {
+      data.category = category;
+    }
+
+    const response = await moviesApi.create(data);
 
     return response.data;
   },

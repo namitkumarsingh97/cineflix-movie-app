@@ -2,7 +2,7 @@
   <div class="app-container">
     <main class="main-content">
       <!-- Top Navbar -->
-      <nav class="navbar">
+      <nav v-if="!isAdminRoute" class="navbar">
         <div class="navbar-container">
           <div class="navbar-left">
             <button
@@ -19,13 +19,23 @@
             </div>
             <ul class="navbar-nav">
               <li class="navbar-nav-item">
-                <router-link to="/" class="navbar-link" active-class="active" @click="closeMobileMenu">
+                <router-link
+                  to="/"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
                   <Home :size="16" />
                   <span>Home</span>
                 </router-link>
               </li>
               <li class="navbar-nav-item">
-                <router-link to="/videos" class="navbar-link" active-class="active" @click="closeMobileMenu">
+                <router-link
+                  to="/videos"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
                   <TrendingUp :size="16" />
                   <span>Videos</span>
                 </router-link>
@@ -37,10 +47,15 @@
                 </a>
               </li>
               <li class="navbar-nav-item">
-                <a href="#" class="navbar-link" @click="closeMobileMenu">
+                <router-link
+                  to="/stories"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
                   <Heart :size="16" />
                   <span>Stories</span>
-                </a>
+                </router-link>
               </li>
             </ul>
           </div>
@@ -66,12 +81,60 @@
             >
               <RefreshCw :size="20" />
             </button>
-            <button
+            <!-- Admin Profile Menu (if logged in) -->
+            <div v-if="isAdminLoggedIn" class="profile-menu-wrapper">
+              <button
+                class="profile-menu-btn"
+                @click="toggleAdminMenu"
+                title="Admin Menu"
+              >
+                <User :size="20" />
+              </button>
+              <div v-if="adminMenuOpen" class="profile-menu-dropdown">
+                <div class="profile-menu-header">
+                  <div class="profile-menu-avatar">
+                    <Shield :size="18" />
+                  </div>
+                  <div class="profile-menu-info">
+                    <span class="profile-menu-name">{{
+                      adminId || "Admin"
+                    }}</span>
+                    <span class="profile-menu-role">Administrator</span>
+                  </div>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <router-link
+                  to="/admin/panel"
+                  class="profile-menu-item"
+                  @click="closeAdminMenu"
+                >
+                  <Shield :size="16" />
+                  <span>Admin Panel</span>
+                </router-link>
+                <button
+                  class="profile-menu-item logout-item"
+                  @click="handleAdminLogout"
+                >
+                  <LogOut :size="16" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+            <!-- Admin Login Link (if not logged in) -->
+            <router-link
+              v-else
+              to="/admin/login"
+              class="navbar-link admin-link"
+            >
+              <Shield :size="16" />
+              <span>Admin</span>
+            </router-link>
+            <!-- <button
               class="navbar-btn add-movie-btn"
               @click="$emit('addMovie')"
             >
               <span class="btn-text">Add Movie</span>
-            </button>
+            </button> -->
           </div>
         </div>
       </nav>
@@ -84,10 +147,7 @@
       ></div>
 
       <!-- Mobile Menu -->
-      <div
-        class="mobile-menu"
-        :class="{ 'mobile-menu-open': mobileMenuOpen }"
-      >
+      <div class="mobile-menu" :class="{ 'mobile-menu-open': mobileMenuOpen }">
         <div class="mobile-menu-header">
           <div class="mobile-menu-logo">
             <Film :size="24" />
@@ -98,11 +158,21 @@
           </button>
         </div>
         <nav class="mobile-menu-nav">
-          <router-link to="/" class="mobile-menu-link" active-class="active" @click="closeMobileMenu">
+          <router-link
+            to="/"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
             <Home :size="20" />
             <span>Home</span>
           </router-link>
-          <router-link to="/videos" class="mobile-menu-link" active-class="active" @click="closeMobileMenu">
+          <router-link
+            to="/videos"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
             <TrendingUp :size="20" />
             <span>Videos</span>
           </router-link>
@@ -110,10 +180,33 @@
             <FolderOpen :size="20" />
             <span>Categories</span>
           </a>
-          <a href="#" class="mobile-menu-link" @click="closeMobileMenu">
+          <router-link
+            to="/stories"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
             <Heart :size="20" />
             <span>Stories</span>
-          </a>
+          </router-link>
+          <router-link
+            v-if="isAdminLoggedIn"
+            to="/admin/panel"
+            class="mobile-menu-link"
+            @click="closeMobileMenu"
+          >
+            <Shield :size="20" />
+            <span>Admin Panel</span>
+          </router-link>
+          <router-link
+            v-else
+            to="/admin/login"
+            class="mobile-menu-link"
+            @click="closeMobileMenu"
+          >
+            <Shield :size="20" />
+            <span>Admin</span>
+          </router-link>
         </nav>
       </div>
 
@@ -122,7 +215,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer v-if="!isAdminRoute" class="footer">
       <div class="footer-container">
         <div class="footer-content">
           <div class="footer-section">
@@ -197,7 +290,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import {
   Film,
   Search,
@@ -212,31 +306,94 @@ import {
   Youtube,
   Menu,
   X,
-} from 'lucide-vue-next';
+  Shield,
+  User,
+  LogOut,
+} from "lucide-vue-next";
+
+const router = useRouter();
+const route = useRoute();
 
 defineProps({
   modelValue: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
-defineEmits(['update:modelValue', 'refresh', 'addMovie']);
+defineEmits(["update:modelValue", "refresh", "addMovie"]);
 
 const mobileMenuOpen = ref(false);
+const adminMenuOpen = ref(false);
+const isAdminLoggedIn = ref(false);
+const adminId = ref("");
+
+const isAdminRoute = computed(() => {
+  return route.path.startsWith('/admin');
+});
+
+onMounted(() => {
+  checkAdminStatus();
+  // Check admin status periodically
+  const interval = setInterval(checkAdminStatus, 1000);
+  window._adminStatusInterval = interval;
+
+  // Close admin menu when clicking outside
+  const handleClickOutside = (event) => {
+    if (!event.target.closest(".profile-menu-wrapper")) {
+      adminMenuOpen.value = false;
+    }
+  };
+  document.addEventListener("click", handleClickOutside);
+  window._adminMenuClickHandler = handleClickOutside;
+});
+
+onUnmounted(() => {
+  if (window._adminStatusInterval) {
+    clearInterval(window._adminStatusInterval);
+    delete window._adminStatusInterval;
+  }
+  if (window._adminMenuClickHandler) {
+    document.removeEventListener("click", window._adminMenuClickHandler);
+    delete window._adminMenuClickHandler;
+  }
+});
+
+function checkAdminStatus() {
+  const token = localStorage.getItem("adminToken");
+  const id = localStorage.getItem("adminId");
+  isAdminLoggedIn.value = !!token;
+  adminId.value = id || "";
+}
+
+function toggleAdminMenu() {
+  adminMenuOpen.value = !adminMenuOpen.value;
+}
+
+function closeAdminMenu() {
+  adminMenuOpen.value = false;
+}
+
+function handleAdminLogout() {
+  localStorage.removeItem("adminToken");
+  localStorage.removeItem("adminId");
+  isAdminLoggedIn.value = false;
+  adminId.value = "";
+  adminMenuOpen.value = false;
+  router.push("/");
+}
 
 function closeMobileMenu() {
   mobileMenuOpen.value = false;
-  document.body.style.overflow = '';
+  document.body.style.overflow = "";
 }
 
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value;
   if (mobileMenuOpen.value) {
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   } else {
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
   }
 }
 </script>
-
