@@ -41,10 +41,15 @@
                 </router-link>
               </li>
               <li class="navbar-nav-item">
-                <a href="#" class="navbar-link" @click="closeMobileMenu">
+                <router-link
+                  to="/categories"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
                   <FolderOpen :size="16" />
                   <span>Categories</span>
-                </a>
+                </router-link>
               </li>
               <li class="navbar-nav-item">
                 <router-link
@@ -176,10 +181,15 @@
             <TrendingUp :size="20" />
             <span>Videos</span>
           </router-link>
-          <a href="#" class="mobile-menu-link" @click="closeMobileMenu">
+          <router-link
+            to="/categories"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
             <FolderOpen :size="20" />
             <span>Categories</span>
-          </a>
+          </router-link>
           <router-link
             to="/stories"
             class="mobile-menu-link"

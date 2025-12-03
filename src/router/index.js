@@ -4,6 +4,8 @@ import Videos from '../pages/Videos.vue'
 import Watch from '../pages/Watch.vue'
 import Stories from '../pages/Stories.vue'
 import StoryDetail from '../pages/StoryDetail.vue'
+import Categories from '../pages/Categories.vue'
+import CategoryDetail from '../pages/CategoryDetail.vue'
 import AdminLogin from '../pages/AdminLogin.vue'
 import AdminPanel from '../pages/AdminPanel.vue'
 
@@ -32,6 +34,16 @@ const routes = [
     path: '/story/:id',
     name: 'StoryDetail',
     component: StoryDetail
+  },
+  {
+    path: '/categories',
+    name: 'Categories',
+    component: Categories
+  },
+  {
+    path: '/category/:category',
+    name: 'CategoryDetail',
+    component: CategoryDetail
   },
   {
     path: '/admin/login',
