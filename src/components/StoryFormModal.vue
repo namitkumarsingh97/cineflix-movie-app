@@ -287,13 +287,6 @@ const imageUrl = ref("");
 const imageFile = ref(null);
 const imageFilePreview = ref(null);
 const imagePreview = ref(true);
-const contentTextarea = ref(null);
-const showImageModal = ref(false);
-const imageType = ref("url");
-const imageUrl = ref("");
-const imageFile = ref(null);
-const imageFilePreview = ref(null);
-const imagePreview = ref(true);
 
 watch(
   () => props.story,
