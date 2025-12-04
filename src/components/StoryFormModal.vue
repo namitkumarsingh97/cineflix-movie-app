@@ -83,7 +83,10 @@
               ref="contentTextarea"
             ></textarea>
             <div class="content-help">
-              <span class="char-count">{{ formData.content.length }} characters</span>
+              <span class="char-count">
+                {{ formData.content.length }} characters
+                <span v-if="contentSizeWarning" class="size-warning">(Large content - may cause issues)</span>
+              </span>
               <span class="help-text">Use [IMAGE:url] or [IMG:url] to insert images</span>
             </div>
           </div>
@@ -288,6 +291,13 @@ const imageFile = ref(null);
 const imageFilePreview = ref(null);
 const imagePreview = ref(true);
 
+// Content size warning (approximately 3.5MB to warn before 4MB limit)
+const contentSizeWarning = computed(() => {
+  // Rough estimate: 1 character ≈ 1 byte, but with UTF-8 encoding it can be more
+  // Warning at ~3.5MB (3,500,000 characters) to give buffer before 4MB limit
+  return formData.value.content.length > 3500000;
+});
+
 watch(
   () => props.story,
   (newStory) => {
@@ -460,10 +470,14 @@ async function handleSave() {
     emit("saved");
     close();
   } catch (err) {
-    error.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      "Failed to save story. Please try again.";
+    if (err.response?.status === 413) {
+      error.value = "Story content is too large. Please reduce the content size or split it into multiple parts. Maximum size is approximately 4MB.";
+    } else {
+      error.value =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Failed to save story. Please try again.";
+    }
   } finally {
     saving.value = false;
   }
@@ -629,6 +643,12 @@ async function handleSave() {
   font-size: 12px;
   color: var(--text-secondary);
   text-align: right;
+}
+
+.size-warning {
+  color: #f59e0b;
+  font-weight: 600;
+  margin-left: 8px;
 }
 
 .status-options {
