@@ -45,6 +45,21 @@
           </div>
 
           <div class="form-group">
+            <label for="editStars">
+              <Star :size="16" />
+              <span>Stars/Actors (comma-separated)</span>
+            </label>
+            <input
+              type="text"
+              id="editStars"
+              v-model="movieData.stars"
+              placeholder="e.g., Actor Name 1, Actor Name 2"
+              class="form-input"
+            />
+            <small class="form-hint">Enter star names separated by commas</small>
+          </div>
+
+          <div class="form-group">
             <label for="editIframeCode">
               <Video :size="16" />
               <span>Iframe Code *</span>
@@ -173,6 +188,7 @@ import {
   AlertCircle,
   Edit,
   Link,
+  Star,
 } from "lucide-vue-next";
 import apiClient from "../plugins/axios";
 
@@ -222,6 +238,7 @@ const categories = [
 const movieData = ref({
   title: "",
   category: "",
+  stars: "",
   iframeCode: "",
   thumbnailFile: null,
   thumbnailUrl: "",
@@ -237,9 +254,18 @@ watch(
   () => props.movie,
   (newMovie) => {
     if (newMovie) {
+      // Convert stars array to comma-separated string
+      let starsString = "";
+      if (newMovie.stars && Array.isArray(newMovie.stars)) {
+        starsString = newMovie.stars.join(", ");
+      } else if (newMovie.stars && typeof newMovie.stars === "string") {
+        starsString = newMovie.stars;
+      }
+      
       movieData.value = {
         title: newMovie.title || "",
         category: newMovie.category || "",
+        stars: starsString,
         iframeCode: newMovie.iframe || "",
         thumbnailFile: null,
         thumbnailUrl: newMovie.thumbnail || "",
@@ -292,6 +318,7 @@ function resetForm() {
   movieData.value = {
     title: "",
     category: "",
+    stars: "",
     iframeCode: "",
     thumbnailFile: null,
     thumbnailUrl: "",
@@ -348,10 +375,19 @@ async function handleSave() {
       style="border: none;"
     ></iframe>`;
 
+    // Prepare stars array
+    let starsArray = [];
+    if (movieData.value.stars && movieData.value.stars.trim()) {
+      starsArray = movieData.value.stars.split(',').map(s => s.trim()).filter(s => s);
+    }
+
     if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
       const formData = new FormData();
       formData.append("title", movieData.value.title.trim());
       formData.append("category", movieData.value.category || "");
+      if (starsArray.length > 0) {
+        formData.append("stars", JSON.stringify(starsArray));
+      }
       formData.append("iframe", iframeHtml);
       formData.append("iframeSrc", iframeSrc);
       formData.append("thumbnail", movieData.value.thumbnailFile);
@@ -362,7 +398,7 @@ async function handleSave() {
         },
       });
     } else {
-      await apiClient.put(`/movies/${props.movie._id}`, {
+      const updateData = {
         title: movieData.value.title.trim(),
         category: movieData.value.category || "",
         iframe: iframeHtml,
@@ -371,7 +407,12 @@ async function handleSave() {
           thumbnailType.value === "url" && movieData.value.thumbnailUrl.trim()
             ? movieData.value.thumbnailUrl.trim()
             : undefined,
-      });
+      };
+      if (starsArray.length > 0) {
+        updateData.stars = starsArray;
+      }
+      
+      await apiClient.put(`/movies/${props.movie._id}`, updateData);
     }
 
     emit("saved");
@@ -502,6 +543,14 @@ async function handleSave() {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+}
+
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 .thumbnail-options {
