@@ -26,11 +26,11 @@
             @error="handleThumbnailError"
           />
           <div v-else class="category-thumbnail-placeholder">
-            <FolderOpen :size="48" />
+            <FolderOpen :size="80" />
           </div>
           <div class="category-overlay">
             <div class="category-overlay-content">
-              <FolderOpen :size="24" />
+              <FolderOpen :size="48" />
               <span>Browse</span>
             </div>
           </div>
@@ -109,13 +109,13 @@ function handleThumbnailError(event) {
 <style scoped>
 .categories-page {
   min-height: calc(100vh - 200px);
-  padding: 40px;
-  max-width: 1400px;
+  padding: 60px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
 .categories-header {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
   text-align: center;
 }
 
@@ -140,14 +140,45 @@ function handleThumbnailError(event) {
   margin: 0;
 }
 
+/* Responsive Grid Layout for Categories */
+.categories-page :deep(.youtube-videos-grid) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+/* Tablet - 2 columns */
+@media (min-width: 768px) {
+  .categories-page :deep(.youtube-videos-grid) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+/* Large screens - 2-3 columns (fewer columns = bigger cards) */
+@media (min-width: 1024px) {
+  .categories-page :deep(.youtube-videos-grid) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .categories-page :deep(.youtube-videos-grid) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+}
+
 .category-card {
   cursor: pointer;
   width: 100%;
   transition: all 0.3s ease;
+  padding: 8px;
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px);
 }
 
 .category-thumbnail-wrapper {
@@ -155,9 +186,9 @@ function handleThumbnailError(event) {
   width: 100%;
   padding-top: 56.25%; /* 16:9 aspect ratio */
   background: var(--dark-lighter);
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .category-thumbnail-img {
@@ -204,21 +235,22 @@ function handleThumbnailError(event) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   color: white;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 20px;
 }
 
 .category-info-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+  padding: 8px 0;
 }
 
 .category-title-text {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
   line-height: 1.4;
@@ -232,10 +264,10 @@ function handleThumbnailError(event) {
 .category-meta-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 8px;
-  font-size: 13px;
+  gap: 8px 16px;
+  font-size: 18px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .category-count-text {
@@ -260,8 +292,18 @@ function handleThumbnailError(event) {
   margin-bottom: 12px;
 }
 
-/* Tablet - show 2 cards per row */
-@media (min-width: 481px) and (max-width: 768px) {
+/* Responsive adjustments for padding and header */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .categories-page {
+    padding: 30px;
+  }
+
+  .categories-header h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 767px) {
   .categories-page {
     padding: 20px;
   }
@@ -269,23 +311,8 @@ function handleThumbnailError(event) {
   .categories-header h1 {
     font-size: 28px;
   }
-
-
-  .category-card {
-    padding: 20px;
-  }
-
-  .category-icon {
-    width: 56px;
-    height: 56px;
-  }
-
-  .category-name {
-    font-size: 16px;
-  }
 }
 
-/* Small screens - show 1 card per row */
 @media (max-width: 480px) {
   .categories-page {
     padding: 16px;
@@ -293,20 +320,6 @@ function handleThumbnailError(event) {
 
   .categories-header h1 {
     font-size: 24px;
-  }
-
-
-  .category-card {
-    padding: 18px;
-  }
-
-  .category-icon {
-    width: 52px;
-    height: 52px;
-  }
-
-  .category-name {
-    font-size: 15px;
   }
 }
 </style>

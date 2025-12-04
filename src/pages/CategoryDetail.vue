@@ -7,7 +7,7 @@
       </button>
       <div class="category-title-section">
         <div class="category-icon-large">
-          <FolderOpen :size="32" />
+          <FolderOpen :size="48" />
         </div>
         <div>
           <h1 class="category-title">{{ categoryName || 'Uncategorized' }}</h1>
@@ -95,29 +95,29 @@ function goBack() {
 <style scoped>
 .category-detail-page {
   min-height: calc(100vh - 200px);
-  padding: 40px;
-  max-width: 1400px;
+  padding: 60px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
 .category-header {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 }
 
 .back-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 10px;
+  padding: 12px 20px;
   background: var(--dark-lighter);
   border: 1px solid rgba(255, 0, 110, 0.2);
-  border-radius: 10px;
+  border-radius: 12px;
   color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .back-btn:hover {
@@ -129,13 +129,13 @@ function goBack() {
 .category-title-section {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .category-icon-large {
-  width: 80px;
-  height: 80px;
-  border-radius: 16px;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
   background: var(--gradient-primary);
   display: flex;
   align-items: center;
@@ -146,22 +146,82 @@ function goBack() {
 }
 
 .category-title {
-  font-size: 32px;
+  font-size: 42px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
 }
 
 .category-meta {
-  font-size: 16px;
+  font-size: 20px;
   color: var(--text-secondary);
   margin: 0;
 }
 
 .movies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+/* Tablet - 2 columns */
+@media (min-width: 768px) {
+  .movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+/* Large screens - 2-3 columns (fewer columns = bigger cards) */
+@media (min-width: 1024px) {
+  .movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .movies-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+}
+
+/* Larger card styling for MovieCard components */
+.category-detail-page :deep(.youtube-video-card) {
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+.category-detail-page :deep(.youtube-video-card):hover {
+  transform: translateY(-8px);
+}
+
+.category-detail-page :deep(.video-thumbnail-wrapper) {
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.category-detail-page :deep(.video-title-text) {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.category-detail-page :deep(.video-meta-info) {
+  font-size: 17px;
+  gap: 6px 12px;
+}
+
+.category-detail-page :deep(.avatar-circle) {
+  width: 48px;
+  height: 48px;
+  font-size: 18px;
+}
+
+.category-detail-page :deep(.video-info-section) {
+  gap: 16px;
 }
 
 .empty-state {
@@ -200,29 +260,61 @@ function goBack() {
   box-shadow: var(--shadow-hover);
 }
 
-@media (max-width: 768px) {
+/* Responsive adjustments for padding and header */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .category-detail-page {
+    padding: 30px;
+  }
+
+  .category-title {
+    font-size: 36px;
+  }
+
+  .category-meta {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 767px) {
   .category-detail-page {
     padding: 20px;
+  }
+
+  .category-header {
+    margin-bottom: 40px;
   }
 
   .category-title-section {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 20px;
   }
 
   .category-icon-large {
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .category-title {
+    font-size: 28px;
+  }
+
+  .category-meta {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-detail-page {
+    padding: 16px;
   }
 
   .category-title {
     font-size: 24px;
   }
 
-  .movies-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
+  .category-meta {
+    font-size: 14px;
   }
 }
 </style>
