@@ -1,0 +1,115 @@
+{
+  "common": {
+    "home": "首页",
+    "videos": "视频",
+    "categories": "分类",
+    "stories": "故事",
+    "search": "搜索电影...",
+    "admin": "管理员",
+    "refresh": "刷新",
+    "loading": "加载中...",
+    "noResults": "未找到结果",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭",
+    "back": "返回",
+    "next": "下一个",
+    "previous": "上一个",
+    "random": "随机",
+    "filters": "筛选",
+    "clear": "清除",
+    "apply": "应用"
+  },
+  "home": {
+    "title": "首页",
+    "trending": "热门",
+    "recentlyAdded": "最近添加",
+    "continueWatching": "继续观看",
+    "allMovies": "所有电影",
+    "featured": "精选",
+    "watchNow": "立即以高质量观看",
+    "movieCount": "{count} 部电影",
+    "showing": "显示 {start}-{end}，共 {total} 部电影"
+  },
+  "watch": {
+    "views": "{count} {count, plural, =1 {次观看} other {次观看}}",
+    "likes": "喜欢",
+    "dislikes": "不喜欢",
+    "share": "分享",
+    "download": "下载",
+    "comments": "{count} {count, plural, =1 {条评论} other {条评论}}",
+    "addComment": "添加评论...",
+    "yourName": "您的姓名（可选）",
+    "postComment": "评论",
+    "posting": "发布中...",
+    "noComments": "还没有评论。成为第一个评论的人！",
+    "relatedContent": "相关内容",
+    "upNext": "接下来",
+    "playbackSpeed": "速度",
+    "browse": "浏览"
+  },
+  "categories": {
+    "title": "分类",
+    "subtitle": "按分类浏览电影",
+    "noCategories": "未找到分类",
+    "noCategoriesDesc": "添加电影后，分类将显示在这里。",
+    "movies": "{count} {count, plural, =1 {部电影} other {部电影}}"
+  },
+  "category": {
+    "title": "分类",
+    "moviesInCategory": "此分类中有 {count} {count, plural, =1 {部电影} other {部电影}}",
+    "backToCategories": "返回分类",
+    "noMovies": "未找到电影",
+    "noMoviesDesc": "此分类中还没有电影。"
+  },
+  "search": {
+    "filters": "高级筛选",
+    "category": "分类",
+    "allCategories": "所有分类",
+    "sortBy": "排序方式",
+    "recent": "最近添加",
+    "alphabetical": "标题 (A-Z)",
+    "popular": "最受欢迎",
+    "views": "观看最多",
+    "dateRange": "日期范围",
+    "allTime": "全部时间",
+    "today": "今天",
+    "thisWeek": "本周",
+    "thisMonth": "本月",
+    "thisYear": "今年"
+  },
+  "ageVerification": {
+    "title": "需要年龄验证",
+    "subtitle": "此网站包含成人内容。您必须年满18岁才能访问。",
+    "question": "要验证您的年龄，请解决这个简单的数学问题：",
+    "enterAnswer": "输入您的答案",
+    "verify": "验证年龄",
+    "verifying": "验证中...",
+    "error": "答案错误。请重试。",
+    "footer": "进入此网站即表示您确认您至少年满18岁并同意查看成人内容。"
+  },
+  "download": {
+    "title": "下载",
+    "downloading": "下载中...",
+    "downloadComplete": "下载完成",
+    "downloadFailed": "下载失败",
+    "downloadQueue": "下载队列",
+    "noDownloads": "无下载",
+    "remove": "删除",
+    "open": "打开",
+    "downloadForOffline": "下载以供离线观看"
+  },
+  "preferences": {
+    "title": "偏好设置",
+    "language": "语言",
+    "categoryPreferences": "分类偏好",
+    "selectCategories": "选择您喜欢的分类",
+    "savePreferences": "保存偏好设置",
+    "preferencesSaved": "偏好设置已成功保存"
+  }
+}
+

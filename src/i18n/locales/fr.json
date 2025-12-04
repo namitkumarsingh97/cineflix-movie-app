@@ -1,0 +1,115 @@
+{
+  "common": {
+    "home": "Accueil",
+    "videos": "Vidéos",
+    "categories": "Catégories",
+    "stories": "Histoires",
+    "search": "Rechercher des films...",
+    "admin": "Admin",
+    "refresh": "Actualiser",
+    "loading": "Chargement...",
+    "noResults": "Aucun résultat trouvé",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "random": "Aléatoire",
+    "filters": "Filtres",
+    "clear": "Effacer",
+    "apply": "Appliquer"
+  },
+  "home": {
+    "title": "Accueil",
+    "trending": "Tendances",
+    "recentlyAdded": "Récemment Ajouté",
+    "continueWatching": "Continuer à Regarder",
+    "allMovies": "Tous les Films",
+    "featured": "En Vedette",
+    "watchNow": "Regarder maintenant en haute qualité",
+    "movieCount": "{count} films",
+    "showing": "Affichage {start}-{end} sur {total} films"
+  },
+  "watch": {
+    "views": "{count} {count, plural, =1 {vue} other {vues}}",
+    "likes": "J'aime",
+    "dislikes": "Je n'aime pas",
+    "share": "Partager",
+    "download": "Télécharger",
+    "comments": "{count} {count, plural, =1 {Commentaire} other {Commentaires}}",
+    "addComment": "Ajouter un commentaire...",
+    "yourName": "Votre nom (optionnel)",
+    "postComment": "Commenter",
+    "posting": "Publication...",
+    "noComments": "Pas encore de commentaires. Soyez le premier à commenter !",
+    "relatedContent": "Contenu Associé",
+    "upNext": "À Suivre",
+    "playbackSpeed": "Vitesse",
+    "browse": "Parcourir"
+  },
+  "categories": {
+    "title": "Catégories",
+    "subtitle": "Parcourir les films par catégorie",
+    "noCategories": "Aucune catégorie trouvée",
+    "noCategoriesDesc": "Les catégories apparaîtront ici une fois que des films seront ajoutés.",
+    "movies": "{count} {count, plural, =1 {film} other {films}}"
+  },
+  "category": {
+    "title": "Catégorie",
+    "moviesInCategory": "{count} {count, plural, =1 {film} other {films}} dans cette catégorie",
+    "backToCategories": "Retour aux Catégories",
+    "noMovies": "Aucun film trouvé",
+    "noMoviesDesc": "Il n'y a pas encore de films dans cette catégorie."
+  },
+  "search": {
+    "filters": "Filtres Avancés",
+    "category": "Catégorie",
+    "allCategories": "Toutes les Catégories",
+    "sortBy": "Trier Par",
+    "recent": "Récemment Ajouté",
+    "alphabetical": "Titre (A-Z)",
+    "popular": "Le Plus Populaire",
+    "views": "Le Plus Vu",
+    "dateRange": "Plage de Dates",
+    "allTime": "Tout le Temps",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette Semaine",
+    "thisMonth": "Ce Mois",
+    "thisYear": "Cette Année"
+  },
+  "ageVerification": {
+    "title": "Vérification d'Âge Requise",
+    "subtitle": "Ce site Web contient du contenu pour adultes. Vous devez avoir 18 ans ou plus pour accéder.",
+    "question": "Pour vérifier votre âge, veuillez résoudre ce simple problème mathématique :",
+    "enterAnswer": "Entrez votre réponse",
+    "verify": "Vérifier l'Âge",
+    "verifying": "Vérification...",
+    "error": "Réponse incorrecte. Veuillez réessayer.",
+    "footer": "En entrant sur ce site, vous confirmez que vous avez au moins 18 ans et acceptez de voir du contenu pour adultes."
+  },
+  "download": {
+    "title": "Télécharger",
+    "downloading": "Téléchargement...",
+    "downloadComplete": "Téléchargement Terminé",
+    "downloadFailed": "Échec du Téléchargement",
+    "downloadQueue": "File d'Attente de Téléchargement",
+    "noDownloads": "Aucun téléchargement",
+    "remove": "Supprimer",
+    "open": "Ouvrir",
+    "downloadForOffline": "Télécharger pour Visualisation Hors Ligne"
+  },
+  "preferences": {
+    "title": "Préférences",
+    "language": "Langue",
+    "categoryPreferences": "Préférences de Catégorie",
+    "selectCategories": "Sélectionnez vos catégories préférées",
+    "savePreferences": "Enregistrer les Préférences",
+    "preferencesSaved": "Préférences enregistrées avec succès"
+  }
+}
+

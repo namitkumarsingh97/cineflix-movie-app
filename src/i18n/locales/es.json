@@ -1,0 +1,115 @@
+{
+  "common": {
+    "home": "Inicio",
+    "videos": "Videos",
+    "categories": "Categorías",
+    "stories": "Historias",
+    "search": "Buscar películas...",
+    "admin": "Admin",
+    "refresh": "Actualizar",
+    "loading": "Cargando...",
+    "noResults": "No se encontraron resultados",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "random": "Aleatorio",
+    "filters": "Filtros",
+    "clear": "Limpiar",
+    "apply": "Aplicar"
+  },
+  "home": {
+    "title": "Inicio",
+    "trending": "Tendencias",
+    "recentlyAdded": "Agregado Recientemente",
+    "continueWatching": "Continuar Viendo",
+    "allMovies": "Todas las Películas",
+    "featured": "Destacado",
+    "watchNow": "Ver ahora en alta calidad",
+    "movieCount": "{count} películas",
+    "showing": "Mostrando {start}-{end} de {total} películas"
+  },
+  "watch": {
+    "views": "{count} {count, plural, =1 {vista} other {vistas}}",
+    "likes": "Me gusta",
+    "dislikes": "No me gusta",
+    "share": "Compartir",
+    "download": "Descargar",
+    "comments": "{count} {count, plural, =1 {Comentario} other {Comentarios}}",
+    "addComment": "Agregar un comentario...",
+    "yourName": "Tu nombre (opcional)",
+    "postComment": "Comentar",
+    "posting": "Publicando...",
+    "noComments": "Aún no hay comentarios. ¡Sé el primero en comentar!",
+    "relatedContent": "Contenido Relacionado",
+    "upNext": "A continuación",
+    "playbackSpeed": "Velocidad",
+    "browse": "Explorar"
+  },
+  "categories": {
+    "title": "Categorías",
+    "subtitle": "Explorar películas por categoría",
+    "noCategories": "No se encontraron categorías",
+    "noCategoriesDesc": "Las categorías aparecerán aquí una vez que se agreguen películas.",
+    "movies": "{count} {count, plural, =1 {película} other {películas}}"
+  },
+  "category": {
+    "title": "Categoría",
+    "moviesInCategory": "{count} {count, plural, =1 {película} other {películas}} en esta categoría",
+    "backToCategories": "Volver a Categorías",
+    "noMovies": "No se encontraron películas",
+    "noMoviesDesc": "Aún no hay películas en esta categoría."
+  },
+  "search": {
+    "filters": "Filtros Avanzados",
+    "category": "Categoría",
+    "allCategories": "Todas las Categorías",
+    "sortBy": "Ordenar Por",
+    "recent": "Agregado Recientemente",
+    "alphabetical": "Título (A-Z)",
+    "popular": "Más Popular",
+    "views": "Más Vistas",
+    "dateRange": "Rango de Fechas",
+    "allTime": "Todo el Tiempo",
+    "today": "Hoy",
+    "thisWeek": "Esta Semana",
+    "thisMonth": "Este Mes",
+    "thisYear": "Este Año"
+  },
+  "ageVerification": {
+    "title": "Verificación de Edad Requerida",
+    "subtitle": "Este sitio web contiene contenido para adultos. Debes tener 18 años o más para acceder.",
+    "question": "Para verificar tu edad, por favor resuelve este simple problema matemático:",
+    "enterAnswer": "Ingresa tu respuesta",
+    "verify": "Verificar Edad",
+    "verifying": "Verificando...",
+    "error": "Respuesta incorrecta. Por favor intenta de nuevo.",
+    "footer": "Al ingresar a este sitio, confirmas que tienes al menos 18 años de edad y aceptas ver contenido para adultos."
+  },
+  "download": {
+    "title": "Descargar",
+    "downloading": "Descargando...",
+    "downloadComplete": "Descarga Completa",
+    "downloadFailed": "Descarga Fallida",
+    "downloadQueue": "Cola de Descargas",
+    "noDownloads": "Sin descargas",
+    "remove": "Eliminar",
+    "open": "Abrir",
+    "downloadForOffline": "Descargar para Ver Sin Conexión"
+  },
+  "preferences": {
+    "title": "Preferencias",
+    "language": "Idioma",
+    "categoryPreferences": "Preferencias de Categoría",
+    "selectCategories": "Selecciona tus categorías preferidas",
+    "savePreferences": "Guardar Preferencias",
+    "preferencesSaved": "Preferencias guardadas exitosamente"
+  }
+}
+

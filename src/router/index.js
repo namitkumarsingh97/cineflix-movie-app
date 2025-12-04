@@ -6,6 +6,8 @@ import Stories from '../pages/Stories.vue'
 import StoryDetail from '../pages/StoryDetail.vue'
 import Categories from '../pages/Categories.vue'
 import CategoryDetail from '../pages/CategoryDetail.vue'
+import Stars from '../pages/Stars.vue'
+import StarDetail from '../pages/StarDetail.vue'
 import AdminLogin from '../pages/AdminLogin.vue'
 import AdminPanel from '../pages/AdminPanel.vue'
 
@@ -44,6 +46,16 @@ const routes = [
     path: '/category/:category',
     name: 'CategoryDetail',
     component: CategoryDetail
+  },
+  {
+    path: '/stars',
+    name: 'Stars',
+    component: Stars
+  },
+  {
+    path: '/star/:star',
+    name: 'StarDetail',
+    component: StarDetail
   },
   {
     path: '/admin/login',

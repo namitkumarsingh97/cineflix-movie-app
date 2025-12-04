@@ -1,0 +1,115 @@
+{
+  "common": {
+    "home": "Startseite",
+    "videos": "Videos",
+    "categories": "Kategorien",
+    "stories": "Geschichten",
+    "search": "Filme suchen...",
+    "admin": "Admin",
+    "refresh": "Aktualisieren",
+    "loading": "Lädt...",
+    "noResults": "Keine Ergebnisse gefunden",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Vorherige",
+    "random": "Zufällig",
+    "filters": "Filter",
+    "clear": "Löschen",
+    "apply": "Anwenden"
+  },
+  "home": {
+    "title": "Startseite",
+    "trending": "Trending",
+    "recentlyAdded": "Kürzlich Hinzugefügt",
+    "continueWatching": "Weiter Schauen",
+    "allMovies": "Alle Filme",
+    "featured": "Empfohlen",
+    "watchNow": "Jetzt in hoher Qualität ansehen",
+    "movieCount": "{count} Filme",
+    "showing": "Zeige {start}-{end} von {total} Filmen"
+  },
+  "watch": {
+    "views": "{count} {count, plural, =1 {Aufruf} other {Aufrufe}}",
+    "likes": "Gefällt mir",
+    "dislikes": "Gefällt mir nicht",
+    "share": "Teilen",
+    "download": "Herunterladen",
+    "comments": "{count} {count, plural, =1 {Kommentar} other {Kommentare}}",
+    "addComment": "Einen Kommentar hinzufügen...",
+    "yourName": "Ihr Name (optional)",
+    "postComment": "Kommentieren",
+    "posting": "Wird veröffentlicht...",
+    "noComments": "Noch keine Kommentare. Seien Sie der Erste, der kommentiert!",
+    "relatedContent": "Verwandte Inhalte",
+    "upNext": "Als Nächstes",
+    "playbackSpeed": "Geschwindigkeit",
+    "browse": "Durchsuchen"
+  },
+  "categories": {
+    "title": "Kategorien",
+    "subtitle": "Filme nach Kategorie durchsuchen",
+    "noCategories": "Keine Kategorien gefunden",
+    "noCategoriesDesc": "Kategorien werden hier angezeigt, sobald Filme hinzugefügt wurden.",
+    "movies": "{count} {count, plural, =1 {Film} other {Filme}}"
+  },
+  "category": {
+    "title": "Kategorie",
+    "moviesInCategory": "{count} {count, plural, =1 {Film} other {Filme}} in dieser Kategorie",
+    "backToCategories": "Zurück zu Kategorien",
+    "noMovies": "No movies found",
+    "noMoviesDesc": "Es gibt noch keine Filme in dieser Kategorie."
+  },
+  "search": {
+    "filters": "Erweiterte Filter",
+    "category": "Kategorie",
+    "allCategories": "Alle Kategorien",
+    "sortBy": "Sortieren Nach",
+    "recent": "Kürzlich Hinzugefügt",
+    "alphabetical": "Titel (A-Z)",
+    "popular": "Am Beliebtesten",
+    "views": "Am Meisten Angesehen",
+    "dateRange": "Datumsbereich",
+    "allTime": "Alle Zeiten",
+    "today": "Heute",
+    "thisWeek": "Diese Woche",
+    "thisMonth": "Diesen Monat",
+    "thisYear": "Dieses Jahr"
+  },
+  "ageVerification": {
+    "title": "Altersverifizierung Erforderlich",
+    "subtitle": "Diese Website enthält Inhalte für Erwachsene. Sie müssen mindestens 18 Jahre alt sein, um zuzugreifen.",
+    "question": "Um Ihr Alter zu überprüfen, lösen Sie bitte diese einfache Mathematikaufgabe:",
+    "enterAnswer": "Geben Sie Ihre Antwort ein",
+    "verify": "Alter Überprüfen",
+    "verifying": "Wird überprüft...",
+    "error": "Falsche Antwort. Bitte versuchen Sie es erneut.",
+    "footer": "Durch den Zugriff auf diese Website bestätigen Sie, dass Sie mindestens 18 Jahre alt sind und damit einverstanden sind, Inhalte für Erwachsene anzusehen."
+  },
+  "download": {
+    "title": "Herunterladen",
+    "downloading": "Wird heruntergeladen...",
+    "downloadComplete": "Download Abgeschlossen",
+    "downloadFailed": "Download Fehlgeschlagen",
+    "downloadQueue": "Download-Warteschlange",
+    "noDownloads": "Keine Downloads",
+    "remove": "Entfernen",
+    "open": "Öffnen",
+    "downloadForOffline": "Für Offline-Ansicht Herunterladen"
+  },
+  "preferences": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "categoryPreferences": "Kategoriepräferenzen",
+    "selectCategories": "Wählen Sie Ihre bevorzugten Kategorien",
+    "savePreferences": "Einstellungen Speichern",
+    "preferencesSaved": "Einstellungen erfolgreich gespeichert"
+  }
+}
+

@@ -5,16 +5,16 @@
         <div class="warning-icon">
           <AlertTriangle :size="48" />
         </div>
-        <h1 class="verification-title">Age Verification Required</h1>
+        <h1 class="verification-title">{{ $t('ageVerification.title') }}</h1>
         <p class="verification-subtitle">
-          This website contains adult content. You must be 18 years or older to access.
+          {{ $t('ageVerification.subtitle') }}
         </p>
       </div>
 
       <div class="verification-content">
         <div class="verification-question">
           <p class="question-text">
-            To verify your age, please solve this simple math problem:
+            {{ $t('ageVerification.question') }}
           </p>
           <div class="math-problem">
             <span class="math-expression">
@@ -27,13 +27,13 @@
           <input
             v-model="userAnswer"
             type="number"
-            placeholder="Enter your answer"
+            :placeholder="$t('ageVerification.enterAnswer')"
             class="answer-input"
             @keyup.enter="verifyAge"
             autofocus
           />
           <p v-if="showError" class="error-message">
-            {{ errorMessage }}
+            {{ $t('ageVerification.error') }}
           </p>
         </div>
 
@@ -43,14 +43,13 @@
             @click="verifyAge"
             :disabled="!userAnswer || verifying"
           >
-            {{ verifying ? 'Verifying...' : 'Verify Age' }}
+            {{ verifying ? $t('ageVerification.verifying') : $t('ageVerification.verify') }}
           </button>
         </div>
 
         <div class="verification-footer">
           <p class="footer-text">
-            By entering this site, you confirm that you are at least 18 years of age
-            and agree to view adult content.
+            {{ $t('ageVerification.footer') }}
           </p>
         </div>
       </div>
@@ -60,7 +59,10 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { AlertTriangle } from 'lucide-vue-next';
+
+const { t } = useI18n();
 
 const isVerified = ref(false);
 const userAnswer = ref('');
@@ -92,7 +94,6 @@ function generateMathProblem() {
 function verifyAge() {
   if (!userAnswer.value) {
     showError.value = true;
-    errorMessage.value = 'Please enter an answer';
     return;
   }
 
@@ -114,7 +115,6 @@ function verifyAge() {
     } else {
       // Wrong answer - show error and generate new problem
       showError.value = true;
-      errorMessage.value = 'Incorrect answer. Please try again.';
       mathProblem.value = generateMathProblem();
       userAnswer.value = '';
       verifying.value = false;

@@ -3,9 +3,9 @@
     <div class="categories-header">
       <h1>
         <FolderOpen :size="28" />
-        <span>Categories</span>
+        <span>{{ $t('categories.title') }}</span>
       </h1>
-      <p class="categories-subtitle">Browse movies by category</p>
+      <p class="categories-subtitle">{{ $t('categories.subtitle') }}</p>
     </div>
 
     <Loader v-if="loading" message="Loading categories..." />
@@ -40,7 +40,7 @@
             {{ category.name || 'Uncategorized' }}
           </h3>
           <div class="category-meta-info">
-            <span class="category-count-text">{{ category.count }} {{ category.count === 1 ? 'movie' : 'movies' }}</span>
+            <span class="category-count-text">{{ $t('categories.movies', { count: category.count }) }}</span>
           </div>
         </div>
       </div>
@@ -48,8 +48,8 @@
 
     <div v-else class="empty-state">
       <FolderOpen :size="64" />
-      <h3>No categories found</h3>
-      <p>Categories will appear here once movies are added.</p>
+      <h3>{{ $t('categories.noCategories') }}</h3>
+      <p>{{ $t('categories.noCategoriesDesc') }}</p>
     </div>
   </div>
 </template>
@@ -57,9 +57,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { FolderOpen, ChevronRight } from 'lucide-vue-next';
 import apiClient from '../plugins/axios';
 import Loader from '../components/Loader.vue';
+
+const { t } = useI18n();
 
 const router = useRouter();
 

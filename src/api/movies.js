@@ -30,5 +30,11 @@ export const moviesApi = {
   
   // Get comments
   getComments: (id) => apiClient.get(`/movies/${id}/comments`),
+
+  // Get categories
+  getCategories: () => apiClient.get('/movies/categories'),
+
+  // Get stars/actors
+  getStars: () => apiClient.get('/movies/stars'),
 };
 

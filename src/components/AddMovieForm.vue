@@ -35,6 +35,21 @@
       </div>
 
       <div class="form-group">
+        <label for="stars">
+          <Star :size="16" />
+          <span>Stars/Actors (comma-separated)</span>
+        </label>
+        <input
+          type="text"
+          id="stars"
+          v-model="movieData.stars"
+          placeholder="e.g., Actor Name 1, Actor Name 2"
+          class="form-input"
+        />
+        <small class="form-hint">Enter star names separated by commas</small>
+      </div>
+
+      <div class="form-group">
         <label for="iframeCode">
           <Video :size="16" />
           <span>Iframe Code *</span>
@@ -159,6 +174,7 @@ import {
   FolderOpen,
   AlertCircle,
   Link,
+  Star,
 } from "lucide-vue-next";
 import apiClient from "../plugins/axios";
 
@@ -197,6 +213,7 @@ const categories = [
 const movieData = ref({
   title: "",
   category: "",
+  stars: "",
   iframeCode: "",
   thumbnailFile: null,
   thumbnailUrl: "",
@@ -250,6 +267,7 @@ function resetForm() {
   movieData.value = {
     title: "",
     category: "",
+    stars: "",
     iframeCode: "",
     thumbnailFile: null,
     thumbnailUrl: "",
@@ -333,11 +351,20 @@ async function handleSave() {
       style="border: none;"
     ></iframe>`;
 
+    // Prepare stars array
+    let starsArray = [];
+    if (movieData.value.stars && movieData.value.stars.trim()) {
+      starsArray = movieData.value.stars.split(',').map(s => s.trim()).filter(s => s);
+    }
+
     // Create FormData for file upload or JSON for URL
     if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
       const formData = new FormData();
       formData.append("title", movieData.value.title.trim());
       formData.append("category", movieData.value.category);
+      if (starsArray.length > 0) {
+        formData.append("stars", JSON.stringify(starsArray));
+      }
       formData.append("iframe", iframeHtml);
       formData.append("iframeSrc", iframeSrc);
       formData.append("thumbnail", movieData.value.thumbnailFile);
@@ -354,13 +381,18 @@ async function handleSave() {
       }
     } else {
       // Use JSON for URL thumbnail
-      const response = await apiClient.post("/movies", {
+      const requestData = {
         title: movieData.value.title.trim(),
         category: movieData.value.category,
         iframe: iframeHtml,
         iframeSrc: iframeSrc,
         thumbnail: movieData.value.thumbnailUrl.trim(),
-      });
+      };
+      if (starsArray.length > 0) {
+        requestData.stars = starsArray;
+      }
+
+      const response = await apiClient.post("/movies", requestData);
 
       if (response.data.success) {
         emit("saved");
@@ -441,6 +473,14 @@ async function handleSave() {
 .form-input::placeholder,
 .form-textarea::placeholder {
   color: var(--text-secondary);
+}
+
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 .thumbnail-options {

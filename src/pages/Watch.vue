@@ -13,14 +13,34 @@
             <!-- Video tag for S3 videos -->
             <video
               v-else-if="video && video.url"
+              ref="videoPlayer"
               :src="video.url"
               controls
               autoplay
               class="watch-video-player"
               @loadedmetadata="handleVideoLoaded"
+              @timeupdate="handleTimeUpdate"
+              @play="handlePlay"
+              @pause="handlePause"
             >
               Your browser does not support the video tag.
             </video>
+            
+            <!-- Playback Speed Control -->
+            <div v-if="video && video.url && videoPlayer" class="playback-controls">
+              <div class="speed-control">
+                <label>{{ $t('watch.playbackSpeed') }}:</label>
+                <select v-model="playbackSpeed" @change="changePlaybackSpeed" class="speed-select">
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1">1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="1.75">1.75x</option>
+                  <option value="2">2x</option>
+                </select>
+              </div>
+            </div>
             <Loader v-else message="Loading video..." />
           </div>
 
@@ -48,7 +68,24 @@
                 </button>
                 <button class="action-btn" @click="handleDownload">
                   <Download :size="20" />
-                  <span>Download</span>
+                  <span>{{ $t('watch.download') }}</span>
+                </button>
+                <button 
+                  v-if="video.url" 
+                  class="action-btn download-offline-btn" 
+                  @click="downloadForOffline"
+                  :title="$t('download.downloadForOffline')"
+                >
+                  <Download :size="20" />
+                  <span>{{ $t('download.downloadForOffline') }}</span>
+                </button>
+                <button 
+                  class="action-btn" 
+                  :class="{ active: isFavorite }"
+                  @click="handleFavorite"
+                  title="Add to favorites"
+                >
+                  <Heart :size="20" :fill="isFavorite ? 'currentColor' : 'none'" />
                 </button>
                 <button class="action-btn">
                   <MoreVertical :size="20" />
@@ -72,9 +109,22 @@
               </div>
             </div>
 
+            <!-- Related Content Section -->
+            <div v-if="relatedContent.length > 0" class="related-section">
+              <h2 class="related-title">Related Content</h2>
+              <div class="related-grid">
+                <MovieCard
+                  v-for="item in relatedContent"
+                  :key="item._id"
+                  :movie="item"
+                  @click="navigateToVideo(item)"
+                />
+              </div>
+            </div>
+
             <!-- Comments Section -->
             <div class="comments-section">
-              <h2 class="comments-title">{{ comments.length }} {{ comments.length === 1 ? 'Comment' : 'Comments' }}</h2>
+              <h2 class="comments-title">{{ $t('watch.comments', { count: comments.length }) }}</h2>
               
               <!-- Comment Form -->
               <div class="comment-form">
@@ -82,13 +132,13 @@
                   <input
                     v-model="commentAuthor"
                     type="text"
-                    placeholder="Your name (optional)"
+                    :placeholder="$t('watch.yourName')"
                     class="comment-author-input"
                     maxlength="50"
                   />
                   <textarea
                     v-model="commentText"
-                    placeholder="Add a comment..."
+                    :placeholder="$t('watch.addComment')"
                     class="comment-text-input"
                     rows="3"
                     maxlength="1000"
@@ -101,16 +151,16 @@
                     @click="submitComment"
                     :disabled="!commentText.trim() || submittingComment"
                   >
-                    {{ submittingComment ? 'Posting...' : 'Comment' }}
+                    {{ submittingComment ? $t('watch.posting') : $t('watch.postComment') }}
                   </button>
                 </div>
               </div>
 
               <!-- Comments List -->
               <div class="comments-list">
-                <div v-if="loadingComments" class="comments-loading">Loading comments...</div>
+                <div v-if="loadingComments" class="comments-loading">{{ $t('common.loading') }}</div>
                 <div v-else-if="comments.length === 0" class="no-comments">
-                  <p>No comments yet. Be the first to comment!</p>
+                  <p>{{ $t('watch.noComments') }}</p>
                 </div>
                 <div v-else class="comment-item" v-for="comment in comments" :key="comment._id || comment.createdAt">
                   <div class="comment-avatar">
@@ -165,6 +215,9 @@ import { videosApi } from '../api/videos';
 import { moviesApi } from '../api/movies';
 import { useVideos } from '../composables/useVideos';
 import { useMovies } from '../composables/useMovies';
+import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
+import { useDownloads } from '../composables/useDownloads';
+import { useI18n } from 'vue-i18n';
 import VideoCard from '../components/VideoCard.vue';
 import MovieCard from '../components/MovieCard.vue';
 import Loader from '../components/Loader.vue';
@@ -174,6 +227,7 @@ import {
   Share2,
   Download,
   MoreVertical,
+  Heart,
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -192,6 +246,13 @@ const loadingComments = ref(false);
 const commentText = ref('');
 const commentAuthor = ref('');
 const submittingComment = ref(false);
+const videoPlayer = ref(null);
+const playbackSpeed = ref(1);
+const { addToHistory, updateProgress } = useWatchHistory();
+const { isFavorited, toggleFavorite } = useFavorites();
+const { downloadForOffline: downloadOffline } = useDownloads();
+const { t } = useI18n();
+const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
 
 const recommendations = computed(() => {
   if (isMovie.value) {
@@ -201,6 +262,27 @@ const recommendations = computed(() => {
     // Show other videos as recommendations
     return videos.value.filter(v => v.id !== videoId.value).slice(0, 10);
   }
+});
+
+// Related content (same category or similar)
+const relatedContent = computed(() => {
+  if (!video.value || !isMovie.value) return [];
+  
+  const currentCategory = video.value.category;
+  const related = movies.value.filter(m => 
+    m._id !== videoId.value && 
+    m.category === currentCategory
+  );
+  
+  // If not enough in same category, add random movies
+  if (related.length < 6) {
+    const random = movies.value
+      .filter(m => m._id !== videoId.value && m.category !== currentCategory)
+      .slice(0, 6 - related.length);
+    return [...related, ...random].slice(0, 6);
+  }
+  
+  return related.slice(0, 6);
 });
 
 // Watch for route changes
@@ -226,6 +308,14 @@ async function loadVideo() {
         video.value = videoResponse.data.data;
         isMovie.value = false;
         loading.value = false;
+        // Add to watch history
+        addToHistory({
+          id: video.value.id,
+          title: video.value.title,
+          thumbnail: video.value.thumbnail,
+          type: 'video',
+          category: video.value.category
+        });
         // Increment view for videos
         try {
           await videosApi.incrementView?.(videoId.value);
@@ -244,6 +334,14 @@ async function loadVideo() {
       if (movieResponse.data.success || movieResponse.data) {
         video.value = movieResponse.data.data || movieResponse.data;
         isMovie.value = true;
+        // Add to watch history
+        addToHistory({
+          id: video.value._id,
+          title: video.value.title,
+          thumbnail: video.value.thumbnail,
+          type: 'movie',
+          category: video.value.category
+        });
         // Increment view for movies
         try {
           await moviesApi.incrementView(videoId.value);
@@ -358,7 +456,28 @@ function handleDownload() {
     // For iframe videos, open in new tab
     window.open(video.value.iframeSrc, '_blank');
   } else {
-    alert('Download not available for this video');
+    alert(t('download.downloadFailed'));
+  }
+}
+
+async function downloadForOffline() {
+  if (!video.value || !video.value.url) {
+    alert(t('download.downloadFailed'));
+    return;
+  }
+
+  try {
+    await downloadOffline({
+      id: video.value._id || video.value.id,
+      title: video.value.title,
+      url: video.value.url,
+      thumbnail: video.value.thumbnail,
+      type: isMovie.value ? 'movie' : 'video'
+    });
+    alert(t('download.downloadComplete'));
+  } catch (error) {
+    console.error('Download error:', error);
+    alert(t('download.downloadFailed'));
   }
 }
 
@@ -425,6 +544,46 @@ function getInitials(name) {
 
 function handleVideoLoaded() {
   // Video metadata loaded
+  if (videoPlayer.value) {
+    videoPlayer.value.playbackRate = playbackSpeed.value;
+  }
+}
+
+function changePlaybackSpeed() {
+  if (videoPlayer.value) {
+    videoPlayer.value.playbackRate = parseFloat(playbackSpeed.value);
+  }
+}
+
+function handleTimeUpdate() {
+  if (videoPlayer.value && video.value) {
+    const currentTime = videoPlayer.value.currentTime;
+    const duration = videoPlayer.value.duration;
+    if (duration > 0) {
+      const progress = Math.round((currentTime / duration) * 100);
+      updateProgress(video.value._id || video.value.id, progress, duration);
+    }
+  }
+}
+
+function handlePlay() {
+  // Video started playing
+}
+
+function handlePause() {
+  // Video paused
+}
+
+function handleFavorite() {
+  if (video.value) {
+    toggleFavorite({
+      id: video.value._id || video.value.id,
+      title: video.value.title,
+      thumbnail: video.value.thumbnail,
+      type: isMovie.value ? 'movie' : 'video',
+      category: video.value.category
+    });
+  }
 }
 
 function processIframe() {
@@ -882,6 +1041,77 @@ onMounted(async () => {
 
 .action-btn.active:hover {
   background: var(--primary-dark);
+}
+
+.download-offline-btn {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.download-offline-btn:hover {
+  background: var(--primary-dark);
+}
+
+/* Playback Speed Control */
+.playback-controls {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--dark-lighter);
+  border-radius: 8px;
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.speed-control label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.speed-select {
+  padding: 6px 12px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.speed-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Related Content Section */
+.related-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.related-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .related-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {

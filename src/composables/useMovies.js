@@ -23,6 +23,7 @@ export function useMovies(initialSearchQuery = ref('')) {
   const filteredMovies = computed(() => {
     let filtered = movies.value;
 
+    // Search filter
     if (searchQuery.value.trim()) {
       const query = searchQuery.value.toLowerCase();
       filtered = filtered.filter((movie) =>
@@ -30,12 +31,24 @@ export function useMovies(initialSearchQuery = ref('')) {
       );
     }
 
+    // Category filter (can be extended)
+    // This would be passed from parent component
+
+    // Sort
     if (sortBy.value === 'title') {
       filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortBy.value === 'date') {
       filtered = [...filtered].sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
+    } else if (sortBy.value === 'popular') {
+      filtered = [...filtered].sort((a, b) => {
+        const aScore = (a.views || 0) + (a.likes || 0) * 2;
+        const bScore = (b.views || 0) + (b.likes || 0) * 2;
+        return bScore - aScore;
+      });
+    } else if (sortBy.value === 'views') {
+      filtered = [...filtered].sort((a, b) => (b.views || 0) - (a.views || 0));
     }
 
     return filtered;

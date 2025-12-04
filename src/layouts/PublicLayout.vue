@@ -1,6 +1,10 @@
 <template>
   <div class="app-container">
-    <main class="main-content">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-to-main" @click.prevent="skipToMain">
+      {{ $t('accessibility.skipToContent') }}
+    </a>
+    <main id="main-content" class="main-content" role="main">
       <!-- Top Navbar -->
       <nav v-if="!isAdminRoute" class="navbar">
         <div class="navbar-container">
@@ -53,6 +57,17 @@
               </li>
               <li class="navbar-nav-item">
                 <router-link
+                  to="/stars"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
+                  <Star :size="16" />
+                  <span>Stars</span>
+                </router-link>
+              </li>
+              <li class="navbar-nav-item">
+                <router-link
                   to="/stories"
                   class="navbar-link"
                   active-class="active"
@@ -66,23 +81,60 @@
           </div>
 
           <div class="navbar-center">
-            <div class="navbar-search">
+            <div class="navbar-search" :class="{ 'has-suggestions': showSuggestions && suggestions.length > 0 }">
               <Search :size="18" class="search-icon" />
               <input
                 type="text"
-                placeholder="Search movies..."
+                :placeholder="$t('common.search')"
                 class="search-input"
                 :value="modelValue"
-                @input="$emit('update:modelValue', $event.target.value)"
+                @input="handleSearchInput"
+                @focus="showSuggestions = true"
+                @blur="handleBlur"
+                @keydown.enter="selectFirstSuggestion"
+                @keydown.down.prevent="navigateSuggestions(1)"
+                @keydown.up.prevent="navigateSuggestions(-1)"
+                ref="searchInput"
               />
+              <!-- Search Suggestions Dropdown -->
+              <div v-if="showSuggestions && suggestions.length > 0" class="search-suggestions">
+                <div
+                  v-for="(suggestion, index) in suggestions"
+                  :key="index"
+                  class="suggestion-item"
+                  :class="{ active: selectedIndex === index }"
+                  @mousedown="selectSuggestion(suggestion)"
+                  @mouseenter="selectedIndex = index"
+                >
+                  <Search :size="14" />
+                  <span>{{ suggestion }}</span>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="navbar-right">
+            <LanguageSwitcher />
+            <button
+              class="navbar-btn preferences-btn"
+              @click="showPreferences = true"
+              title="Preferences"
+              aria-label="Open preferences"
+            >
+              <Settings :size="20" />
+            </button>
+            <button
+              class="navbar-btn accessibility-btn"
+              @click="showAccessibility = true"
+              title="Accessibility Settings"
+              aria-label="Open accessibility settings"
+            >
+              <Accessibility :size="20" />
+            </button>
             <button
               class="navbar-btn refresh-btn"
               @click="$emit('refresh')"
-              title="Refresh"
+              :title="$t('common.refresh')"
             >
               <RefreshCw :size="20" />
             </button>
@@ -191,6 +243,15 @@
             <span>Categories</span>
           </router-link>
           <router-link
+            to="/stars"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
+            <Star :size="20" />
+            <span>Stars</span>
+          </router-link>
+          <router-link
             to="/stories"
             class="mobile-menu-link"
             active-class="active"
@@ -223,6 +284,22 @@
       <!-- Router View -->
       <router-view />
     </main>
+
+    <!-- Preferences Modal -->
+    <PreferencesModal
+      :show="showPreferences"
+      :categories="availableCategories"
+      @close="showPreferences = false"
+    />
+
+    <!-- Accessibility Settings -->
+    <AccessibilitySettings
+      :show="showAccessibility"
+      @close="showAccessibility = false"
+    />
+
+    <!-- PWA Install Prompt -->
+    <PWAInstallPrompt />
 
     <!-- Footer -->
     <footer v-if="!isAdminRoute" class="footer">
@@ -300,8 +377,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useMovies } from "../composables/useMovies";
 import {
   Film,
   Search,
@@ -309,6 +387,7 @@ import {
   Home,
   TrendingUp,
   FolderOpen,
+  Star,
   Heart,
   Facebook,
   Twitter,
@@ -319,24 +398,129 @@ import {
   Shield,
   User,
   LogOut,
+  Settings,
+  Accessibility,
 } from "lucide-vue-next";
+import LanguageSwitcher from "../components/LanguageSwitcher.vue";
+import PreferencesModal from "../components/PreferencesModal.vue";
+import AccessibilitySettings from "../components/AccessibilitySettings.vue";
+import PWAInstallPrompt from "../components/PWAInstallPrompt.vue";
+import { useAccessibility } from "../composables/useAccessibility";
 
 const router = useRouter();
 const route = useRoute();
 
-defineProps({
+const props = defineProps({
   modelValue: {
     type: String,
     default: "",
   },
 });
 
-defineEmits(["update:modelValue", "refresh", "addMovie"]);
+const emit = defineEmits(["update:modelValue", "refresh", "addMovie"]);
 
 const mobileMenuOpen = ref(false);
 const adminMenuOpen = ref(false);
 const isAdminLoggedIn = ref(false);
 const adminId = ref("");
+const showPreferences = ref(false);
+const showAccessibility = ref(false);
+const { skipToMain } = useAccessibility();
+
+// Get available categories for preferences
+const availableCategories = computed(() => {
+  const categories = new Set();
+  movies.value.forEach(movie => {
+    if (movie.category) {
+      categories.add(movie.category);
+    }
+  });
+  return Array.from(categories).sort();
+});
+
+// Search autocomplete
+const searchQuery = inject("searchQuery", ref(""));
+const { movies, loadMovies } = useMovies(searchQuery);
+const showSuggestions = ref(false);
+const suggestions = ref([]);
+const selectedIndex = ref(-1);
+const searchInput = ref(null);
+
+// Load movies on mount for autocomplete
+onMounted(() => {
+  loadMovies();
+});
+
+// Generate search suggestions
+const generateSuggestions = (query) => {
+  if (!query || query.length < 2) {
+    suggestions.value = [];
+    return;
+  }
+
+  const queryLower = query.toLowerCase();
+  const suggestionsSet = new Set();
+  
+  // Add movie titles
+  movies.value.forEach(movie => {
+    if (movie.title && movie.title.toLowerCase().includes(queryLower)) {
+      suggestionsSet.add(movie.title);
+    }
+    // Add stars
+    if (movie.stars && Array.isArray(movie.stars)) {
+      movie.stars.forEach(star => {
+        if (star && star.toLowerCase().includes(queryLower)) {
+          suggestionsSet.add(star);
+        }
+      });
+    }
+  });
+  
+  // Convert to array and limit to 5 suggestions
+  suggestions.value = Array.from(suggestionsSet).slice(0, 5);
+};
+
+const handleSearchInput = (event) => {
+  const value = event.target.value;
+  emit("update:modelValue", value);
+  generateSuggestions(value);
+  showSuggestions.value = true;
+  selectedIndex.value = -1;
+};
+
+const selectSuggestion = (suggestion) => {
+  emit("update:modelValue", suggestion);
+  showSuggestions.value = false;
+  suggestions.value = [];
+  searchInput.value?.focus();
+};
+
+const selectFirstSuggestion = () => {
+  if (suggestions.value.length > 0 && selectedIndex.value >= 0) {
+    selectSuggestion(suggestions.value[selectedIndex.value]);
+  } else if (suggestions.value.length > 0) {
+    selectSuggestion(suggestions.value[0]);
+  }
+};
+
+const navigateSuggestions = (direction) => {
+  if (suggestions.value.length === 0) return;
+  
+  selectedIndex.value += direction;
+  
+  if (selectedIndex.value < 0) {
+    selectedIndex.value = suggestions.value.length - 1;
+  } else if (selectedIndex.value >= suggestions.value.length) {
+    selectedIndex.value = 0;
+  }
+};
+
+const handleBlur = () => {
+  // Delay to allow click on suggestion
+  setTimeout(() => {
+    showSuggestions.value = false;
+  }, 200);
+};
 
 const isAdminRoute = computed(() => {
   return route.path.startsWith('/admin');
