@@ -2,23 +2,17 @@
   <div v-if="show" class="preferences-modal-overlay" @click.self="close">
     <div class="preferences-modal">
       <div class="modal-header">
-        <h2>{{ $t('preferences.title') }}</h2>
+        <h2>Preferences</h2>
         <button class="close-btn" @click="close">
           <X :size="24" />
         </button>
       </div>
 
       <div class="modal-content">
-        <!-- Language Preference -->
-        <div class="preference-section">
-          <h3>{{ $t('preferences.language') }}</h3>
-          <LanguageSwitcher />
-        </div>
-
         <!-- Category Preferences -->
         <div class="preference-section">
-          <h3>{{ $t('preferences.categoryPreferences') }}</h3>
-          <p class="section-description">{{ $t('preferences.selectCategories') }}</p>
+          <h3>Category Preferences</h3>
+          <p class="section-description">Select your preferred categories</p>
           
           <div class="categories-grid">
             <label
@@ -39,10 +33,10 @@
 
       <div class="modal-footer">
         <button class="save-btn" @click="saveAndClose">
-          {{ $t('preferences.savePreferences') }}
+          Save Preferences
         </button>
         <button class="cancel-btn" @click="close">
-          {{ $t('common.cancel') }}
+          Cancel
         </button>
       </div>
     </div>
@@ -51,9 +45,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { usePreferences } from '../composables/usePreferences';
-import LanguageSwitcher from './LanguageSwitcher.vue';
 import { X } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -68,7 +60,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close']);
-const { t } = useI18n();
 const { toggleCategory, isCategoryPreferred, savePreferences } = usePreferences();
 
 const availableCategories = computed(() => props.categories);
@@ -79,7 +70,7 @@ function close() {
 
 function saveAndClose() {
   savePreferences({});
-  alert(t('preferences.preferencesSaved'));
+  alert('Preferences saved successfully');
   close();
 }
 </script>

@@ -3,7 +3,7 @@
     <div class="customizer-header">
       <h3>
         <Layout :size="20" />
-        <span>{{ $t('homeLayout.customize') }}</span>
+        <span>Customize Layout</span>
       </h3>
       <button class="close-btn" @click="$emit('close')" aria-label="Close customizer">
         <X :size="20" />
@@ -11,7 +11,7 @@
     </div>
 
     <div class="customizer-content">
-      <p class="customizer-hint">{{ $t('homeLayout.hint') }}</p>
+      <p class="customizer-hint">Toggle sections on/off and reorder them to personalize your homepage</p>
 
       <div class="sections-list">
         <div
@@ -61,7 +61,7 @@
       <div class="customizer-actions">
         <button class="reset-btn" @click="resetToDefaults">
           <RotateCcw :size="16" />
-          <span>{{ $t('homeLayout.reset') }}</span>
+          <span>Reset to Defaults</span>
         </button>
       </div>
     </div>
@@ -70,7 +70,6 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import {
   Layout,
   X,
@@ -85,8 +84,6 @@ import {
   Calendar
 } from 'lucide-vue-next';
 import { useHomeLayout } from '../composables/useHomeLayout';
-
-const { t } = useI18n();
 
 const props = defineProps({
   show: {

@@ -5,16 +5,16 @@
         <div class="warning-icon">
           <AlertTriangle :size="48" />
         </div>
-        <h1 class="verification-title">{{ $t('ageVerification.title') }}</h1>
+        <h1 class="verification-title">Age Verification Required</h1>
         <p class="verification-subtitle">
-          {{ $t('ageVerification.subtitle') }}
+          This website contains adult content. You must be 18 years or older to access.
         </p>
       </div>
 
       <div class="verification-content">
         <div class="verification-question">
           <p class="question-text">
-            {{ $t('ageVerification.question') }}
+            To verify your age, please solve this simple math problem:
           </p>
           <div class="math-problem">
             <span class="math-expression">
@@ -27,13 +27,13 @@
           <input
             v-model="userAnswer"
             type="number"
-            :placeholder="$t('ageVerification.enterAnswer')"
+            placeholder="Enter your answer"
             class="answer-input"
             @keyup.enter="verifyAge"
             autofocus
           />
           <p v-if="showError" class="error-message">
-            {{ $t('ageVerification.error') }}
+            Incorrect answer. Please try again.
           </p>
         </div>
 
@@ -43,13 +43,13 @@
             @click="verifyAge"
             :disabled="!userAnswer || verifying"
           >
-            {{ verifying ? $t('ageVerification.verifying') : $t('ageVerification.verify') }}
+            {{ verifying ? 'Verifying...' : 'Verify Age' }}
           </button>
         </div>
 
         <div class="verification-footer">
           <p class="footer-text">
-            {{ $t('ageVerification.footer') }}
+            By entering this site, you confirm that you are at least 18 years of age and agree to view adult content.
           </p>
         </div>
       </div>
@@ -59,10 +59,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { AlertTriangle } from 'lucide-vue-next';
-
-const { t } = useI18n();
 
 const isVerified = ref(false);
 const userAnswer = ref('');

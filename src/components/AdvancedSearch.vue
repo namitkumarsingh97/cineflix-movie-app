@@ -2,45 +2,45 @@
   <div class="advanced-search" v-if="showFilters">
     <div class="filters-container">
       <div class="filter-group">
-        <label>{{ $t('search.category') }}</label>
+        <label>Category</label>
         <select v-model="filters.category" class="filter-select">
-          <option value="">{{ $t('search.allCategories') }}</option>
+          <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label>{{ $t('search.star') }}</label>
+        <label>Star/Actor</label>
         <select v-model="filters.star" class="filter-select">
-          <option value="">{{ $t('search.allStars') }}</option>
+          <option value="">All Stars</option>
           <option v-for="star in stars" :key="star" :value="star">{{ star }}</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label>{{ $t('search.sortBy') }}</label>
+        <label>Sort By</label>
         <select v-model="filters.sortBy" class="filter-select">
-          <option value="date">{{ $t('search.recent') }}</option>
-          <option value="title">{{ $t('search.alphabetical') }}</option>
-          <option value="popular">{{ $t('search.popular') }}</option>
-          <option value="views">{{ $t('search.views') }}</option>
+          <option value="date">Recently Added</option>
+          <option value="title">Title (A-Z)</option>
+          <option value="popular">Most Popular</option>
+          <option value="views">Most Viewed</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label>{{ $t('search.dateRange') }}</label>
+        <label>Date Range</label>
         <select v-model="filters.dateRange" class="filter-select">
-          <option value="">{{ $t('search.allTime') }}</option>
-          <option value="today">{{ $t('search.today') }}</option>
-          <option value="week">{{ $t('search.thisWeek') }}</option>
-          <option value="month">{{ $t('search.thisMonth') }}</option>
-          <option value="year">{{ $t('search.thisYear') }}</option>
+          <option value="">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
         </select>
       </div>
 
       <div class="filter-actions">
-        <button class="filter-btn apply-btn" @click="applyFilters">{{ $t('common.apply') }}</button>
-        <button class="filter-btn clear-btn" @click="clearFilters">{{ $t('common.clear') }}</button>
+        <button class="filter-btn apply-btn" @click="applyFilters">Apply</button>
+        <button class="filter-btn clear-btn" @click="clearFilters">Clear</button>
       </div>
     </div>
   </div>
@@ -48,9 +48,6 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-
-const { t } = useI18n();
 
 const props = defineProps({
   showFilters: {

@@ -8,7 +8,7 @@
         aria-label="Customize homepage layout"
       >
         <Layout :size="18" />
-        <span>{{ $t('homeLayout.customize') }}</span>
+        <span>Customize Layout</span>
       </button>
     </div>
 
@@ -48,9 +48,9 @@
       <div class="section-header">
         <h2 class="section-title">
           <Clock :size="24" class="title-icon" />
-          <span>{{ $t('home.continueWatching') }}</span>
+          <span>Continue Watching</span>
         </h2>
-        <button class="clear-btn" @click="clearContinueWatching">{{ $t('common.clear') }}</button>
+        <button class="clear-btn" @click="clearContinueWatching">Clear</button>
       </div>
       <div class="youtube-videos-grid">
         <MovieCard
@@ -71,7 +71,7 @@
       <div class="section-header">
         <h2 class="section-title">
           <TrendingUp :size="24" class="title-icon" />
-          <span>{{ $t('home.trending') }}</span>
+          <span>Trending Now</span>
         </h2>
       </div>
       <div class="youtube-videos-grid">
@@ -93,7 +93,7 @@
       <div class="section-header">
         <h2 class="section-title">
           <Calendar :size="24" class="title-icon" />
-          <span>{{ $t('home.recentlyAdded') }}</span>
+          <span>Recently Added</span>
         </h2>
       </div>
       <div class="youtube-videos-grid">
@@ -123,7 +123,7 @@
       <div class="section-header">
         <h2 class="section-title">
           <Film :size="24" class="title-icon" />
-          <span>{{ $t('home.allMovies') }}</span>
+          <span>All Movies</span>
           <span class="movie-count">({{ filteredMovies.length }})</span>
         </h2>
         <div class="header-controls">
@@ -131,14 +131,14 @@
             class="filter-toggle-btn" 
             @click="showAdvancedFilters = !showAdvancedFilters"
             :class="{ active: showAdvancedFilters }"
-            :title="$t('common.filters')"
+            title="Filters"
           >
             <Filter :size="18" />
-            <span>{{ $t('common.filters') }}</span>
+            <span>Filters</span>
           </button>
-          <button class="random-btn" @click="pickRandom" :title="$t('common.random')">
+          <button class="random-btn" @click="pickRandom" title="Random">
             <Shuffle :size="18" />
-            <span>{{ $t('common.random') }}</span>
+            <span>Random</span>
           </button>
           <div class="dropdown">
             <select
@@ -146,9 +146,9 @@
               v-model="sortBy"
               @change="sortMovies"
             >
-              <option value="date">{{ $t('search.recent') }}</option>
-              <option value="title">{{ $t('search.alphabetical') }}</option>
-              <option value="popular">{{ $t('search.popular') }}</option>
+              <option value="date">Recently Added</option>
+              <option value="title">Title (A-Z)</option>
+              <option value="popular">Most Popular</option>
             </select>
           </div>
         </div>
@@ -177,7 +177,7 @@
       <!-- Pagination -->
       <div v-if="filteredMovies.length > 0 && totalPages > 1" class="pagination-wrapper">
         <div class="pagination-info">
-          <span>{{ $t('home.showing', { start: getStartIndex(), end: getEndIndex(), total: filteredMovies.length }) }}</span>
+          <span>Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ filteredMovies.length }} movies</span>
         </div>
         <div class="pagination">
           <button
@@ -222,7 +222,6 @@
 <script setup>
 import { ref, computed, onMounted, inject, watch } from "vue";
 import { useRouter } from "vue-router";
-import { useI18n } from "vue-i18n";
 import { useMovies } from "../composables/useMovies";
 import { usePagination } from "../composables/usePagination";
 import { useWatchHistory, useFavorites } from "../composables/useWatchHistory";
@@ -233,7 +232,6 @@ import AdvancedSearch from "../components/AdvancedSearch.vue";
 import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
 import { useHomeLayout } from "../composables/useHomeLayout";
 
-const { t } = useI18n();
 import {
   Film,
   Grid3x3,

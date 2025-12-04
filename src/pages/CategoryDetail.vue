@@ -3,7 +3,7 @@
     <div class="category-header">
       <button class="back-btn" @click="goBack">
         <ArrowLeft :size="20" />
-        <span>{{ $t('category.backToCategories') }}</span>
+        <span>Back to Categories</span>
       </button>
       <div class="category-title-section">
         <div class="category-icon-large">
@@ -11,7 +11,7 @@
         </div>
         <div>
           <h1 class="category-title">{{ categoryName || 'Uncategorized' }}</h1>
-          <p class="category-meta">{{ movies.length }} {{ $tc('category.moviesInCategory', movies.length) }} in this category</p>
+          <p class="category-meta">{{ movies.length }} {{ movies.length === 1 ? 'movie' : 'movies' }} in this category</p>
         </div>
       </div>
     </div>
@@ -29,9 +29,9 @@
 
     <div v-else class="empty-state">
       <Film :size="64" />
-      <h3>{{ $t('category.noMovies') }}</h3>
-      <p>{{ $t('category.noMoviesDesc') }}</p>
-      <button class="btn-primary" @click="goBack">{{ $t('category.backToCategories') }}</button>
+      <h3>No movies found</h3>
+      <p>There are no movies in this category yet.</p>
+      <button class="btn-primary" @click="goBack">Back to Categories</button>
     </div>
   </div>
 </template>
@@ -39,13 +39,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import { ArrowLeft, FolderOpen, Film } from 'lucide-vue-next';
 import apiClient from '../plugins/axios';
 import MovieCard from '../components/MovieCard.vue';
 import Loader from '../components/Loader.vue';
-
-const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();

@@ -29,7 +29,7 @@
             <!-- Playback Speed Control -->
             <div v-if="video && video.url && videoPlayer" class="playback-controls">
               <div class="speed-control">
-                <label>{{ $t('watch.playbackSpeed') }}:</label>
+                <label>Speed:</label>
                 <select v-model="playbackSpeed" @change="changePlaybackSpeed" class="speed-select">
                   <option value="0.5">0.5x</option>
                   <option value="0.75">0.75x</option>
@@ -50,7 +50,7 @@
             
             <div class="video-actions-bar">
               <div class="video-stats">
-                <span class="view-count-main">{{ formatViews(video.views || 0) }} {{ $tc('watch.views', video.views || 0) }}</span>
+                <span class="view-count-main">{{ formatViews(video.views || 0) }} {{ (video.views || 0) === 1 ? 'view' : 'views' }}</span>
                 <span class="upload-date-main">{{ formatTimeAgo(video.uploadedAt || video.createdAt) }}</span>
               </div>
               <div class="action-buttons">
@@ -68,16 +68,16 @@
                 </button>
                 <button class="action-btn" @click="handleDownload">
                   <Download :size="20" />
-                  <span>{{ $t('watch.download') }}</span>
+                  <span>Download</span>
                 </button>
                 <button 
                   v-if="video.url" 
                   class="action-btn download-offline-btn" 
                   @click="downloadForOffline"
-                  :title="$t('download.downloadForOffline')"
+                  title="Download for Offline Viewing"
                 >
                   <Download :size="20" />
-                  <span>{{ $t('download.downloadForOffline') }}</span>
+                  <span>Download for Offline Viewing</span>
                 </button>
                 <button 
                   class="action-btn" 
@@ -124,7 +124,7 @@
 
             <!-- Comments Section -->
             <div class="comments-section">
-              <h2 class="comments-title">{{ comments.length }} {{ $tc('watch.comments', comments.length) }}</h2>
+              <h2 class="comments-title">{{ comments.length }} {{ comments.length === 1 ? 'Comment' : 'Comments' }}</h2>
               
               <!-- Comment Form -->
               <div class="comment-form">
@@ -132,13 +132,13 @@
                   <input
                     v-model="commentAuthor"
                     type="text"
-                    :placeholder="$t('watch.yourName')"
+                    placeholder="Your name (optional)"
                     class="comment-author-input"
                     maxlength="50"
                   />
                   <textarea
                     v-model="commentText"
-                    :placeholder="$t('watch.addComment')"
+                    placeholder="Add a comment..."
                     class="comment-text-input"
                     rows="3"
                     maxlength="1000"
@@ -151,16 +151,16 @@
                     @click="submitComment"
                     :disabled="!commentText.trim() || submittingComment"
                   >
-                    {{ submittingComment ? $t('watch.posting') : $t('watch.postComment') }}
+                    {{ submittingComment ? 'Posting...' : 'Comment' }}
                   </button>
                 </div>
               </div>
 
               <!-- Comments List -->
               <div class="comments-list">
-                <div v-if="loadingComments" class="comments-loading">{{ $t('common.loading') }}</div>
+                <div v-if="loadingComments" class="comments-loading">Loading...</div>
                 <div v-else-if="comments.length === 0" class="no-comments">
-                  <p>{{ $t('watch.noComments') }}</p>
+                  <p>No comments yet. Be the first to comment!</p>
                 </div>
                 <div v-else class="comment-item" v-for="comment in comments" :key="comment._id || comment.createdAt">
                   <div class="comment-avatar">
@@ -217,7 +217,6 @@ import { useVideos } from '../composables/useVideos';
 import { useMovies } from '../composables/useMovies';
 import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
 import { useDownloads } from '../composables/useDownloads';
-import { useI18n } from 'vue-i18n';
 import VideoCard from '../components/VideoCard.vue';
 import MovieCard from '../components/MovieCard.vue';
 import Loader from '../components/Loader.vue';
@@ -251,7 +250,7 @@ const playbackSpeed = ref(1);
 const { addToHistory, updateProgress } = useWatchHistory();
 const { isFavorited, toggleFavorite } = useFavorites();
 const { downloadForOffline: downloadOffline } = useDownloads();
-const { t } = useI18n();
+
 const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
 
 const recommendations = computed(() => {

@@ -5,15 +5,15 @@
         <Download :size="24" />
       </div>
       <div class="prompt-text">
-        <h4>{{ $t('pwa.installTitle') }}</h4>
-        <p>{{ $t('pwa.installDescription') }}</p>
+        <h4>Install App</h4>
+        <p>Install Cineflix for a better experience</p>
       </div>
       <div class="prompt-actions">
         <button class="install-btn" @click="handleInstall" aria-label="Install app">
-          {{ $t('pwa.install') }}
+          Install
         </button>
         <button class="dismiss-btn" @click="dismiss" aria-label="Dismiss">
-          {{ $t('common.close') }}
+          Close
         </button>
       </div>
     </div>
@@ -22,11 +22,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { Download } from 'lucide-vue-next';
 import { usePWA } from '../composables/usePWA';
-
-const { t } = useI18n();
 
 const props = defineProps({
   show: {

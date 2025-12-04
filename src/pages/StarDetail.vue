@@ -3,7 +3,7 @@
     <div class="star-header">
       <button class="back-btn" @click="goBack">
         <ArrowLeft :size="20" />
-        <span>{{ $t('star.backToStars') }}</span>
+        <span>Back to Stars</span>
       </button>
       <div class="star-title-section">
         <div class="star-icon-large">
@@ -11,7 +11,7 @@
         </div>
         <div>
           <h1 class="star-title">{{ starName }}</h1>
-          <p class="star-meta">{{ movies.length }} {{ $tc('star.moviesWithStar', movies.length) }} with this star</p>
+          <p class="star-meta">{{ movies.length }} {{ movies.length === 1 ? 'movie' : 'movies' }} with this star</p>
         </div>
       </div>
     </div>
@@ -29,9 +29,9 @@
 
     <div v-else class="empty-state">
       <Film :size="64" />
-      <h3>{{ $t('star.noMovies') }}</h3>
-      <p>{{ $t('star.noMoviesDesc') }}</p>
-      <button class="btn-primary" @click="goBack">{{ $t('star.backToStars') }}</button>
+      <h3>No movies found</h3>
+      <p>There are no movies with this star yet.</p>
+      <button class="btn-primary" @click="goBack">Back to Stars</button>
     </div>
   </div>
 </template>
@@ -39,13 +39,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import { ArrowLeft, Star, Film } from 'lucide-vue-next';
 import apiClient from '../plugins/axios';
 import MovieCard from '../components/MovieCard.vue';
 import Loader from '../components/Loader.vue';
-
-const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();

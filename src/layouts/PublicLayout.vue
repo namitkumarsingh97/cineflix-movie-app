@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-to-main" @click.prevent="skipToMain">
-      {{ $t('accessibility.skipToContent') }}
+      Skip to main content
     </a>
     <main id="main-content" class="main-content" role="main">
       <!-- Top Navbar -->
@@ -85,7 +85,7 @@
               <Search :size="18" class="search-icon" />
               <input
                 type="text"
-                :placeholder="$t('common.search')"
+                placeholder="Search movies..."
                 class="search-input"
                 :value="modelValue"
                 @input="handleSearchInput"
@@ -114,7 +114,6 @@
           </div>
 
           <div class="navbar-right">
-            <LanguageSwitcher />
             <button
               class="navbar-btn preferences-btn"
               @click="showPreferences = true"
@@ -134,7 +133,7 @@
             <button
               class="navbar-btn refresh-btn"
               @click="$emit('refresh')"
-              :title="$t('common.refresh')"
+              title="Refresh"
             >
               <RefreshCw :size="20" />
             </button>
@@ -401,7 +400,6 @@ import {
   Settings,
   Accessibility,
 } from "lucide-vue-next";
-import LanguageSwitcher from "../components/LanguageSwitcher.vue";
 import PreferencesModal from "../components/PreferencesModal.vue";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";
 import PWAInstallPrompt from "../components/PWAInstallPrompt.vue";

@@ -3,9 +3,9 @@
     <div class="stars-header">
       <h1>
         <Star :size="28" />
-        <span>{{ $t('stars.title') }}</span>
+        <span>Stars & Actors</span>
       </h1>
-      <p class="stars-subtitle">{{ $t('stars.subtitle') }}</p>
+      <p class="stars-subtitle">Browse movies by your favorite stars</p>
     </div>
 
     <Loader v-if="loading" message="Loading stars..." />
@@ -40,7 +40,7 @@
             {{ star.star }}
           </h3>
           <div class="category-meta-info">
-            <span class="category-count-text">{{ star.count }} {{ $tc('stars.movies', star.count) }}</span>
+            <span class="category-count-text">{{ star.count }} {{ star.count === 1 ? 'movie' : 'movies' }}</span>
           </div>
         </div>
       </div>
@@ -48,8 +48,8 @@
 
     <div v-else class="empty-state">
       <Star :size="64" />
-      <h3>{{ $t('stars.noStars') }}</h3>
-      <p>{{ $t('stars.noStarsDesc') }}</p>
+      <h3>No stars found</h3>
+      <p>Stars will appear here once movies with star information are added.</p>
     </div>
   </div>
 </template>
@@ -57,12 +57,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import { Star } from 'lucide-vue-next';
 import { moviesApi } from '../api/movies';
 import Loader from '../components/Loader.vue';
-
-const { t } = useI18n();
 
 const router = useRouter();
 

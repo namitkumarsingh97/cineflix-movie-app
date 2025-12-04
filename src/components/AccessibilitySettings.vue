@@ -3,7 +3,7 @@
     <div class="settings-header">
       <h3>
         <Accessibility :size="20" />
-        <span>{{ $t('accessibility.title') }}</span>
+        <span>Accessibility Settings</span>
       </h3>
       <button class="close-btn" @click="$emit('close')" aria-label="Close accessibility settings">
         <X :size="20" />
@@ -13,8 +13,8 @@
     <div class="settings-content">
       <div class="setting-item">
         <div class="setting-info">
-          <label>{{ $t('accessibility.reducedMotion') }}</label>
-          <p class="setting-description">{{ $t('accessibility.reducedMotionDesc') }}</p>
+          <label>Reduce Motion</label>
+          <p class="setting-description">Minimize animations and transitions</p>
         </div>
         <button
           class="toggle-switch"
@@ -29,8 +29,8 @@
 
       <div class="setting-item">
         <div class="setting-info">
-          <label>{{ $t('accessibility.highContrast') }}</label>
-          <p class="setting-description">{{ $t('accessibility.highContrastDesc') }}</p>
+          <label>High Contrast</label>
+          <p class="setting-description">Increase contrast for better visibility</p>
         </div>
         <button
           class="toggle-switch"
@@ -45,8 +45,8 @@
 
       <div class="setting-item">
         <div class="setting-info">
-          <label>{{ $t('accessibility.largeText') }}</label>
-          <p class="setting-description">{{ $t('accessibility.largeTextDesc') }}</p>
+          <label>Large Text</label>
+          <p class="setting-description">Increase text size for better readability</p>
         </div>
         <button
           class="toggle-switch"
@@ -61,8 +61,8 @@
 
       <div class="setting-item">
         <div class="setting-info">
-          <label>{{ $t('accessibility.focusVisible') }}</label>
-          <p class="setting-description">{{ $t('accessibility.focusVisibleDesc') }}</p>
+          <label>Focus Indicators</label>
+          <p class="setting-description">Show visible focus indicators for keyboard navigation</p>
         </div>
         <button
           class="toggle-switch"
@@ -76,15 +76,15 @@
       </div>
 
       <div class="keyboard-shortcuts">
-        <h4>{{ $t('accessibility.keyboardShortcuts') }}</h4>
+        <h4>Keyboard Shortcuts</h4>
         <div class="shortcut-list">
           <div class="shortcut-item">
             <kbd>Alt</kbd> + <kbd>S</kbd>
-            <span>{{ $t('accessibility.skipToContent') }}</span>
+            <span>Skip to main content</span>
           </div>
           <div class="shortcut-item">
             <kbd>Esc</kbd>
-            <span>{{ $t('accessibility.closeModal') }}</span>
+            <span>Close modal or dialog</span>
           </div>
         </div>
       </div>
@@ -93,11 +93,8 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n';
 import { Accessibility, X } from 'lucide-vue-next';
 import { useAccessibility } from '../composables/useAccessibility';
-
-const { t } = useI18n();
 
 const props = defineProps({
   show: {
