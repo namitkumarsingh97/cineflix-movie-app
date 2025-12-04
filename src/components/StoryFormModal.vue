@@ -56,21 +56,107 @@
           </div>
 
           <div class="form-group">
-            <label for="storyContent">
-              <FileText :size="16" />
-              <span>Story Content *</span>
-            </label>
+            <div class="content-header">
+              <label for="storyContent">
+                <FileText :size="16" />
+                <span>Story Content *</span>
+              </label>
+              <div class="content-toolbar">
+                <button
+                  type="button"
+                  class="toolbar-btn"
+                  @click="showImageModal = true"
+                  title="Insert Image"
+                >
+                  <Image :size="16" />
+                  <span>Insert Image</span>
+                </button>
+              </div>
+            </div>
             <textarea
               id="storyContent"
               v-model="formData.content"
-              placeholder="Write your story here..."
+              placeholder="Write your story here...&#10;&#10;Tip: Use [IMAGE:url] or [IMG:url] to insert images in the middle of your story.&#10;Example: [IMAGE:https://example.com/image.jpg]"
               class="form-textarea"
               rows="15"
               required
+              ref="contentTextarea"
             ></textarea>
-            <span class="char-count"
-              >{{ formData.content.length }} characters</span
-            >
+            <div class="content-help">
+              <span class="char-count">{{ formData.content.length }} characters</span>
+              <span class="help-text">Use [IMAGE:url] or [IMG:url] to insert images</span>
+            </div>
+          </div>
+
+          <!-- Image Insertion Modal -->
+          <div v-if="showImageModal" class="image-modal-overlay" @click.self="showImageModal = false">
+            <div class="image-modal">
+              <div class="image-modal-header">
+                <h4>Insert Image</h4>
+                <button class="close-btn" @click="showImageModal = false">
+                  <X :size="20" />
+                </button>
+              </div>
+              <div class="image-modal-body">
+                <div class="image-options">
+                  <button
+                    type="button"
+                    :class="['option-btn', { active: imageType === 'url' }]"
+                    @click="imageType = 'url'"
+                  >
+                    <Link :size="16" />
+                    <span>Image URL</span>
+                  </button>
+                  <button
+                    type="button"
+                    :class="['option-btn', { active: imageType === 'upload' }]"
+                    @click="imageType = 'upload'"
+                  >
+                    <Upload :size="16" />
+                    <span>Upload Image</span>
+                  </button>
+                </div>
+
+                <div v-if="imageType === 'url'" class="image-url-input">
+                  <input
+                    type="url"
+                    v-model="imageUrl"
+                    placeholder="https://example.com/image.jpg"
+                    class="form-input"
+                    @keyup.enter="insertImage"
+                  />
+                  <div v-if="imageUrl && imagePreview" class="image-preview-small">
+                    <img :src="imageUrl" alt="Preview" @error="imagePreview = false" />
+                  </div>
+                </div>
+
+                <div v-else class="image-upload-input">
+                  <input
+                    type="file"
+                    id="storyImage"
+                    accept="image/*"
+                    @change="handleImageUpload"
+                    class="file-input"
+                  />
+                  <label for="storyImage" class="file-label">
+                    <Upload :size="20" />
+                    <span>{{ imageFile ? imageFile.name : 'Choose image file' }}</span>
+                  </label>
+                  <div v-if="imageFile && imageFilePreview" class="image-preview-small">
+                    <img :src="imageFilePreview" alt="Preview" />
+                  </div>
+                </div>
+
+                <div class="image-modal-actions">
+                  <button type="button" class="btn-secondary" @click="showImageModal = false">
+                    Cancel
+                  </button>
+                  <button type="button" class="btn-primary" @click="insertImage" :disabled="!imageUrl && !imageFile">
+                    Insert Image
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -150,6 +236,9 @@ import {
   Globe,
   AlertCircle,
   Loader2,
+  Image,
+  Link,
+  Upload,
 } from "lucide-vue-next";
 import apiClient from "../plugins/axios";
 
@@ -191,6 +280,20 @@ const storyCategories = ref([
 ]);
 const saving = ref(false);
 const error = ref("");
+const contentTextarea = ref(null);
+const showImageModal = ref(false);
+const imageType = ref("url");
+const imageUrl = ref("");
+const imageFile = ref(null);
+const imageFilePreview = ref(null);
+const imagePreview = ref(true);
+const contentTextarea = ref(null);
+const showImageModal = ref(false);
+const imageType = ref("url");
+const imageUrl = ref("");
+const imageFile = ref(null);
+const imageFilePreview = ref(null);
+const imagePreview = ref(true);
 
 watch(
   () => props.story,
@@ -241,6 +344,74 @@ async function loadCategories() {
 function close() {
   emit("close");
   error.value = "";
+  showImageModal.value = false;
+  imageUrl.value = "";
+  imageFile.value = null;
+  imageFilePreview.value = null;
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    if (file.size > 10 * 1024 * 1024) {
+      error.value = "Image size should be less than 10MB";
+      return;
+    }
+    imageFile.value = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageFilePreview.value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    error.value = "";
+  }
+}
+
+function insertImage() {
+  let imageToInsert = "";
+  
+  if (imageType.value === "url" && imageUrl.value.trim()) {
+    imageToInsert = `[IMAGE:${imageUrl.value.trim()}]`;
+  } else if (imageType.value === "upload" && imageFile.value) {
+    // For uploaded images, we'll need to upload first and get URL
+    // For now, show error that upload needs to be handled separately
+    error.value = "Please upload the image first, then insert the URL";
+    return;
+  } else {
+    error.value = "Please provide an image URL or upload an image";
+    return;
+  }
+
+  // Insert at cursor position or at the end
+  const textarea = contentTextarea.value;
+  if (textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = formData.value.content;
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    
+    // Insert with spacing
+    const insertText = before + (before && !before.endsWith('\n\n') ? '\n\n' : '') + imageToInsert + (after && !after.startsWith('\n\n') ? '\n\n' : '') + after;
+    formData.value.content = insertText;
+    
+    // Set cursor position after inserted image
+    setTimeout(() => {
+      const newPos = start + imageToInsert.length + (before && !before.endsWith('\n\n') ? 2 : 0) + (after && !after.startsWith('\n\n') ? 2 : 0);
+      textarea.setSelectionRange(newPos, newPos);
+      textarea.focus();
+    }, 0);
+  } else {
+    // Fallback: append to end
+    formData.value.content += (formData.value.content ? '\n\n' : '') + imageToInsert + '\n\n';
+  }
+
+  // Reset image modal
+  showImageModal.value = false;
+  imageUrl.value = "";
+  imageFile.value = null;
+  imageFilePreview.value = null;
+  error.value = "";
 }
 
 async function handleSave() {
@@ -267,12 +438,24 @@ async function handleSave() {
   saving.value = true;
 
   try {
+    // Extract images from content using [IMAGE:url] markers
+    const imageMatches = formData.value.content.match(/\[(IMAGE|IMG):(.+?)\]/gi);
+    const images = imageMatches ? imageMatches.map(match => {
+      const url = match.replace(/\[(IMAGE|IMG):/i, '').replace(/\]/, '');
+      return {
+        url: url.trim(),
+        position: formData.value.content.indexOf(match),
+        caption: ''
+      };
+    }) : [];
+
     const payload = {
       title: formData.value.title.trim(),
       content: formData.value.content.trim(),
       category: formData.value.category,
       status: formData.value.status,
       author: formData.value.author.trim() || "Admin",
+      images: images
     };
 
     if (props.story) {
@@ -564,5 +747,190 @@ async function handleSave() {
   to {
     transform: rotate(360deg);
   }
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.content-toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 0, 110, 0.2);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: rgba(255, 0, 110, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.content-help {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.help-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.image-modal {
+  background: var(--dark-lighter);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid rgba(255, 0, 110, 0.2);
+}
+
+.image-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+}
+
+.image-modal-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.image-modal-header .close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.image-modal-header .close-btn:hover {
+  background: var(--dark);
+  color: var(--text-primary);
+}
+
+.image-modal-body {
+  padding: 20px;
+}
+
+.image-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.option-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--dark);
+  border: 2px solid rgba(255, 0, 110, 0.2);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-btn.active {
+  background: var(--gradient-primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.image-url-input,
+.image-upload-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.image-preview-small {
+  max-width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 0, 110, 0.2);
+}
+
+.image-preview-small img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--dark);
+  border: 2px dashed rgba(255, 0, 110, 0.3);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.file-label:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(255, 0, 110, 0.05);
+}
+
+.image-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 0, 110, 0.1);
 }
 </style>

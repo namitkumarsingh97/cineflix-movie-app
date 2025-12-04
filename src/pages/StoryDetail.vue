@@ -83,7 +83,7 @@ const router = useRouter();
 const story = ref(null);
 const loading = ref(true);
 const currentPage = ref(1);
-const wordsPerPage = 500; // Adjust based on your needs
+const wordsPerPage = 2000; // Increased for more content per page
 
 const totalPages = computed(() => {
   if (!story.value || !story.value.content) return 1;
@@ -168,6 +168,12 @@ function scrollToTop() {
 function formatContent(text) {
   if (!text) return '';
   
+  // Check if content already contains HTML (like img tags)
+  if (text.includes('<img') || text.includes('<p>') || text.includes('<div>')) {
+    // Content is already HTML, return as-is but sanitize
+    return sanitizeHTML(text);
+  }
+  
   // Split by double line breaks (paragraph breaks)
   const paragraphs = text.split(/\n\s*\n/);
   
@@ -179,14 +185,33 @@ function formatContent(text) {
     // If paragraph is empty, return empty string
     if (!para) return '';
     
+    // Check if paragraph contains image markers like [IMAGE:url] or [IMG:url]
+    if (para.match(/\[(IMAGE|IMG):(.+?)\]/i)) {
+      const match = para.match(/\[(IMAGE|IMG):(.+?)\]/i);
+      const imageUrl = match[2];
+      // Replace marker with img tag
+      para = para.replace(/\[(IMAGE|IMG):.+?\]/i, `<div class="story-image-container"><img src="${imageUrl}" alt="Story image" class="story-image" /></div>`);
+    }
+    
     // Replace single line breaks within paragraph with <br> tags
     para = para.replace(/\n/g, '<br>');
     
-    // Wrap in paragraph tag
+    // Wrap in paragraph tag (unless it already contains div/img)
+    if (para.includes('<div') || para.includes('<img')) {
+      return para;
+    }
     return `<p>${para}</p>`;
   }).filter(p => p); // Remove empty paragraphs
   
   return formattedParagraphs.join('');
+}
+
+function sanitizeHTML(html) {
+  // Basic sanitization - allow img, p, br, div tags
+  // In production, use a proper HTML sanitizer library
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
+    .replace(/on\w+="[^"]*"/gi, ''); // Remove event handlers
 }
 
 function formatNumber(num) {
@@ -355,6 +380,31 @@ function goBack() {
 /* Style for paragraphs with multiple line breaks (spacing) */
 .story-text :deep(p + p) {
   margin-top: 24px;
+}
+
+.story-text :deep(.story-image-container) {
+  margin: 32px 0;
+  text-align: center;
+}
+
+.story-text :deep(.story-image) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 0, 110, 0.2);
+}
+
+.story-text :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 32px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 0, 110, 0.2);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .story-pagination {
