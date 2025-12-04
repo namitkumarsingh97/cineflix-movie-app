@@ -66,34 +66,39 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="pagination">
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === 1"
-          @click="prevPage"
-        >
-          <ChevronLeft :size="18" />
-          <span>Previous</span>
-        </button>
-        <div class="page-numbers">
+      <div v-if="filteredMovies.length > 0 && totalPages > 1" class="pagination-wrapper">
+        <div class="pagination-info">
+          <span>Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ filteredMovies.length }} movies</span>
+        </div>
+        <div class="pagination">
           <button
-            v-for="page in visiblePages"
-            :key="page"
-            :class="['page-number', { active: page === currentPage }]"
-            @click="goToPage(page)"
-            :disabled="page === '...'"
+            class="pagination-btn"
+            :disabled="currentPage === 1"
+            @click="prevPage"
           >
-            {{ page }}
+            <ChevronLeft :size="18" />
+            <span>Previous</span>
+          </button>
+          <div class="page-numbers">
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              :class="['page-number', { active: page === currentPage }]"
+              @click="goToPage(page)"
+              :disabled="page === '...'"
+            >
+              {{ page }}
+            </button>
+          </div>
+          <button
+            class="pagination-btn"
+            :disabled="currentPage >= totalPages"
+            @click="nextPage"
+          >
+            <span>Next</span>
+            <ChevronRight :size="18" />
           </button>
         </div>
-        <button
-          class="pagination-btn"
-          :disabled="currentPage >= totalPages"
-          @click="nextPage"
-        >
-          <span>Next</span>
-          <ChevronRight :size="18" />
-        </button>
       </div>
     </section>
   </div>
@@ -129,7 +134,7 @@ watch(refreshTrigger, () => {
   loadMovies();
 });
 
-// Pagination
+// Pagination - reduced items per page for better UX
 const {
   currentPage,
   totalPages,
@@ -138,7 +143,14 @@ const {
   goToPage,
   nextPage,
   prevPage,
-} = usePagination(filteredMovies, 40);
+} = usePagination(filteredMovies, 12);
+
+// Reset to page 1 when filteredMovies changes (search/filter)
+watch(filteredMovies, () => {
+  if (currentPage.value > 1) {
+    currentPage.value = 1;
+  }
+});
 
 // Local state
 const viewMode = ref("grid");
@@ -151,6 +163,14 @@ function sortMovies() {
 function navigateToMovie(movie) {
   // Navigate to watch page with movie ID
   router.push(`/watch/${movie._id}`);
+}
+
+function getStartIndex() {
+  return (currentPage.value - 1) * 12 + 1;
+}
+
+function getEndIndex() {
+  return Math.min(currentPage.value * 12, filteredMovies.value.length);
 }
 
 onMounted(() => {
