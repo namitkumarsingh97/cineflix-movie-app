@@ -26,8 +26,11 @@
               Your browser does not support the video tag.
             </video>
             
+            <!-- Loading State -->
+            <Loader v-if="loading" message="Loading video..." />
+            
             <!-- Playback Speed Control -->
-            <div v-if="video && video.url && videoPlayer" class="playback-controls">
+            <div v-else-if="video && video.url && videoPlayer" class="playback-controls">
               <div class="speed-control">
                 <label>Speed:</label>
                 <select v-model="playbackSpeed" @change="changePlaybackSpeed" class="speed-select">
@@ -41,7 +44,6 @@
                 </select>
               </div>
             </div>
-            <Loader v-else message="Loading video..." />
           </div>
 
           <!-- Video Info -->
