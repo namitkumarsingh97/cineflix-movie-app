@@ -4,7 +4,7 @@
       <div class="modal-header">
         <h3>
           <FileText :size="20" />
-          <span>{{ story ? 'Edit Story' : 'Create New Story' }}</span>
+          <span>{{ story ? "Edit Story" : "Create New Story" }}</span>
         </h3>
         <button class="modal-close" @click="close">
           <X :size="24" />
@@ -51,7 +51,7 @@
               v-model="customCategory"
               placeholder="Enter custom category"
               class="form-input"
-              style="margin-top: 8px;"
+              style="margin-top: 8px"
             />
           </div>
 
@@ -68,7 +68,9 @@
               rows="15"
               required
             ></textarea>
-            <span class="char-count">{{ formData.content.length }} characters</span>
+            <span class="char-count"
+              >{{ formData.content.length }} characters</span
+            >
           </div>
 
           <div class="form-group">
@@ -101,7 +103,10 @@
               </button>
               <button
                 type="button"
-                :class="['status-btn', { active: formData.status === 'published' }]"
+                :class="[
+                  'status-btn',
+                  { active: formData.status === 'published' },
+                ]"
                 @click="formData.status = 'published'"
               >
                 <Globe :size="16" />
@@ -122,7 +127,9 @@
             <button type="submit" class="btn-primary" :disabled="saving">
               <Loader2 v-if="saving" :size="16" class="spinning" />
               <Save v-else :size="16" />
-              <span>{{ saving ? 'Saving...' : story ? 'Update Story' : 'Create Story' }}</span>
+              <span>{{
+                saving ? "Saving..." : story ? "Update Story" : "Create Story"
+              }}</span>
             </button>
           </div>
         </form>
@@ -132,7 +139,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from "vue";
 import {
   FileText,
   X,
@@ -143,8 +150,8 @@ import {
   Globe,
   AlertCircle,
   Loader2,
-} from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
+} from "lucide-vue-next";
+import apiClient from "../plugins/axios";
 
 const props = defineProps({
   show: {
@@ -157,53 +164,58 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['close', 'saved']);
+const emit = defineEmits(["close", "saved"]);
 
 const formData = ref({
-  title: '',
-  content: '',
-  category: '',
-  status: 'draft',
-  author: '',
+  title: "",
+  content: "",
+  category: "",
+  status: "draft",
+  author: "",
 });
 
-const customCategory = ref('');
+const customCategory = ref("");
 const storyCategories = ref([
-  'General',
-  'Romance',
-  'Drama',
-  'Thriller',
-  'Comedy',
-  'Horror',
-  'Sci-Fi',
-  'Fantasy',
-  'Mystery',
-  'Adventure',
-  'custom',
+  "Custom",
+  "Dangerous Attraction",
+  "Dark Romance",
+  "Dark Temptation",
+  "Fantasy Escape",
+  "Forbidden Desire",
+  "Obsession",
+  "Power Dynamics",
+  "Secret Affairs",
+  "Seduction",
+  "Taboo Fiction",
+  "Thriller",
 ]);
 const saving = ref(false);
-const error = ref('');
+const error = ref("");
 
-watch(() => props.story, (newStory) => {
-  if (newStory) {
-    formData.value = {
-      title: newStory.title || '',
-      content: newStory.content || '',
-      category: newStory.category || 'General',
-      status: newStory.status || 'draft',
-      author: newStory.author || '',
-    };
-  } else {
-    formData.value = {
-      title: '',
-      content: '',
-      category: 'General',
-      status: 'draft',
-      author: '',
-    };
-  }
-  error.value = '';
-}, { immediate: true });
+watch(
+  () => props.story,
+  (newStory) => {
+    if (newStory) {
+      formData.value = {
+        title: newStory.title || "",
+        content: newStory.content || "",
+        category: newStory.category || "General",
+        status: newStory.status || "draft",
+        author: newStory.author || "",
+      };
+    } else {
+      formData.value = {
+        title: "",
+        content: "",
+        category: "General",
+        status: "draft",
+        author: "",
+      };
+    }
+    error.value = "";
+  },
+  { immediate: true }
+);
 
 onMounted(async () => {
   await loadCategories();
@@ -211,40 +223,42 @@ onMounted(async () => {
 
 async function loadCategories() {
   try {
-    const response = await apiClient.get('/stories/categories');
+    const response = await apiClient.get("/stories/categories");
     if (response.data.success) {
       const existingCategories = response.data.data || [];
       storyCategories.value = [
         ...new Set([...storyCategories.value, ...existingCategories]),
-      ].filter(cat => cat !== 'custom').sort();
-      storyCategories.value.push('custom');
+      ]
+        .filter((cat) => cat !== "custom")
+        .sort();
+      storyCategories.value.push("custom");
     }
   } catch (error) {
-    console.error('Failed to load categories:', error);
+    console.error("Failed to load categories:", error);
   }
 }
 
 function close() {
-  emit('close');
-  error.value = '';
+  emit("close");
+  error.value = "";
 }
 
 async function handleSave() {
-  error.value = '';
+  error.value = "";
 
   if (!formData.value.title.trim()) {
-    error.value = 'Please enter a story title';
+    error.value = "Please enter a story title";
     return;
   }
 
   if (!formData.value.content.trim()) {
-    error.value = 'Please enter story content';
+    error.value = "Please enter story content";
     return;
   }
 
-  if (!formData.value.category || formData.value.category === 'custom') {
+  if (!formData.value.category || formData.value.category === "custom") {
     if (!customCategory.value.trim()) {
-      error.value = 'Please select or enter a category';
+      error.value = "Please select or enter a category";
       return;
     }
     formData.value.category = customCategory.value.trim();
@@ -258,19 +272,22 @@ async function handleSave() {
       content: formData.value.content.trim(),
       category: formData.value.category,
       status: formData.value.status,
-      author: formData.value.author.trim() || 'Admin',
+      author: formData.value.author.trim() || "Admin",
     };
 
     if (props.story) {
       await apiClient.put(`/stories/${props.story._id}`, payload);
     } else {
-      await apiClient.post('/stories', payload);
+      await apiClient.post("/stories", payload);
     }
 
-    emit('saved');
+    emit("saved");
     close();
   } catch (err) {
-    error.value = err.response?.data?.error || err.response?.data?.message || 'Failed to save story. Please try again.';
+    error.value =
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      "Failed to save story. Please try again.";
   } finally {
     saving.value = false;
   }
@@ -549,4 +566,3 @@ async function handleSave() {
   }
 }
 </style>
-

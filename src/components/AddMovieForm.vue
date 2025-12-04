@@ -85,7 +85,11 @@
             />
             <label for="thumbnail" class="file-label">
               <Upload :size="20" />
-              <span>{{ movieData.thumbnailFile ? movieData.thumbnailFile.name : 'Choose thumbnail image' }}</span>
+              <span>{{
+                movieData.thumbnailFile
+                  ? movieData.thumbnailFile.name
+                  : "Choose thumbnail image"
+              }}</span>
             </label>
             <div v-if="thumbnailPreview" class="thumbnail-preview">
               <img :src="thumbnailPreview" alt="Thumbnail preview" />
@@ -109,8 +113,15 @@
               class="form-input"
               @input="handleUrlChange"
             />
-            <div v-if="movieData.thumbnailUrl && urlPreview" class="thumbnail-preview">
-              <img :src="movieData.thumbnailUrl" alt="Thumbnail preview" @error="urlPreview = false" />
+            <div
+              v-if="movieData.thumbnailUrl && urlPreview"
+              class="thumbnail-preview"
+            >
+              <img
+                :src="movieData.thumbnailUrl"
+                alt="Thumbnail preview"
+                @error="urlPreview = false"
+              />
             </div>
           </div>
         </div>
@@ -128,7 +139,7 @@
         <button type="submit" class="btn-primary" :disabled="saving">
           <Loader2 v-if="saving" :size="16" class="spinning" />
           <Sparkles v-else :size="16" />
-          <span>{{ saving ? 'Saving...' : 'Add Movie' }}</span>
+          <span>{{ saving ? "Saving..." : "Add Movie" }}</span>
         </button>
       </div>
     </form>
@@ -136,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 import {
   Film,
   Video,
@@ -148,66 +159,79 @@ import {
   FolderOpen,
   AlertCircle,
   Link,
-} from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
+} from "lucide-vue-next";
+import apiClient from "../plugins/axios";
 
-const emit = defineEmits(['saved']);
+const emit = defineEmits(["saved"]);
 
 const categories = [
-  'Action',
-  'Comedy',
-  'Drama',
-  'Horror',
-  'Romance',
-  'Sci-Fi',
-  'Thriller',
-  'Adventure',
-  'Animation',
-  'Documentary',
-  'Fantasy',
-  'Crime',
-  'Mystery',
-  'Other',
+  "Adventure",
+  "Amateur",
+  "Anal",
+  "Asian",
+  "BDSM",
+  "Big Ass",
+  "Desi",
+  "Blowjob",
+  "Compilation",
+  "Cartoon",
+  "Cosplay",
+  "Cuckold",
+  "Ebony",
+  "Fantasy",
+  "Family",
+  "Fetish",
+  "Foot Fetish",
+  "Gangbang",
+  "Housewife",
+  "Japanese",
+  "MILF",
+  "Massage",
+  "Mature",
+  "Romance",
+  "Teen",
+  "Threesome",
+  "Other",
 ];
 
 const movieData = ref({
-  title: '',
-  category: '',
-  iframeCode: '',
+  title: "",
+  category: "",
+  iframeCode: "",
   thumbnailFile: null,
-  thumbnailUrl: '',
+  thumbnailUrl: "",
 });
 
-const thumbnailType = ref('upload'); // 'upload' or 'url'
+const thumbnailType = ref("upload"); // 'upload' or 'url'
 const thumbnailPreview = ref(null);
 const urlPreview = ref(true);
 const saving = ref(false);
-const error = ref('');
+const error = ref("");
 
 function handleThumbnailChange(event) {
   const file = event.target.files[0];
   if (file) {
     if (file.size > 5 * 1024 * 1024) {
-      error.value = 'Thumbnail size should be less than 5MB';
+      error.value = "Thumbnail size should be less than 5MB";
       return;
     }
     movieData.value.thumbnailFile = file;
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
       thumbnailPreview.value = e.target.result;
     };
     reader.readAsDataURL(file);
-    error.value = '';
+    error.value = "";
   }
 }
 
 function removeThumbnail() {
   movieData.value.thumbnailFile = null;
   thumbnailPreview.value = null;
-  const fileInput = document.getElementById('thumbnail');
-  if (fileInput) fileInput.value = '';
+  const fileInput = document.getElementById("thumbnail");
+  if (fileInput) fileInput.value = "";
 }
 
 function handleUrlChange() {
@@ -224,54 +248,54 @@ function handleUrlChange() {
 
 function resetForm() {
   movieData.value = {
-    title: '',
-    category: '',
-    iframeCode: '',
+    title: "",
+    category: "",
+    iframeCode: "",
     thumbnailFile: null,
-    thumbnailUrl: '',
+    thumbnailUrl: "",
   };
-  thumbnailType.value = 'upload';
+  thumbnailType.value = "upload";
   thumbnailPreview.value = null;
   urlPreview.value = true;
-  error.value = '';
-  const fileInput = document.getElementById('thumbnail');
-  if (fileInput) fileInput.value = '';
+  error.value = "";
+  const fileInput = document.getElementById("thumbnail");
+  if (fileInput) fileInput.value = "";
 }
 
 async function handleSave() {
-  error.value = '';
+  error.value = "";
 
   if (!movieData.value.title.trim()) {
-    error.value = 'Please enter a movie title';
+    error.value = "Please enter a movie title";
     return;
   }
 
   if (!movieData.value.category) {
-    error.value = 'Please select a category';
+    error.value = "Please select a category";
     return;
   }
 
   if (!movieData.value.iframeCode.trim()) {
-    error.value = 'Please enter iframe code';
+    error.value = "Please enter iframe code";
     return;
   }
 
-  if (thumbnailType.value === 'upload' && !movieData.value.thumbnailFile) {
-    error.value = 'Please upload a thumbnail image';
+  if (thumbnailType.value === "upload" && !movieData.value.thumbnailFile) {
+    error.value = "Please upload a thumbnail image";
     return;
   }
 
-  if (thumbnailType.value === 'url' && !movieData.value.thumbnailUrl.trim()) {
-    error.value = 'Please enter a thumbnail URL';
+  if (thumbnailType.value === "url" && !movieData.value.thumbnailUrl.trim()) {
+    error.value = "Please enter a thumbnail URL";
     return;
   }
 
-  if (thumbnailType.value === 'url') {
+  if (thumbnailType.value === "url") {
     // Validate URL
     try {
       new URL(movieData.value.thumbnailUrl.trim());
     } catch (e) {
-      error.value = 'Please enter a valid URL';
+      error.value = "Please enter a valid URL";
       return;
     }
   }
@@ -281,16 +305,20 @@ async function handleSave() {
   try {
     // Parse iframe code
     let iframeSrc = movieData.value.iframeCode.trim();
-    let iframeWidth = '100%';
-    let iframeHeight = '100%';
+    let iframeWidth = "100%";
+    let iframeHeight = "100%";
 
     const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
     if (iframeMatch) {
       iframeSrc = iframeMatch[1];
     }
 
-    const widthMatch = movieData.value.iframeCode.match(/width=["']([^"']+)["']/);
-    const heightMatch = movieData.value.iframeCode.match(/height=["']([^"']+)["']/);
+    const widthMatch = movieData.value.iframeCode.match(
+      /width=["']([^"']+)["']/
+    );
+    const heightMatch = movieData.value.iframeCode.match(
+      /height=["']([^"']+)["']/
+    );
     if (widthMatch) iframeWidth = widthMatch[1];
     if (heightMatch) iframeHeight = heightMatch[1];
 
@@ -306,27 +334,27 @@ async function handleSave() {
     ></iframe>`;
 
     // Create FormData for file upload or JSON for URL
-    if (thumbnailType.value === 'upload' && movieData.value.thumbnailFile) {
+    if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
       const formData = new FormData();
-      formData.append('title', movieData.value.title.trim());
-      formData.append('category', movieData.value.category);
-      formData.append('iframe', iframeHtml);
-      formData.append('iframeSrc', iframeSrc);
-      formData.append('thumbnail', movieData.value.thumbnailFile);
+      formData.append("title", movieData.value.title.trim());
+      formData.append("category", movieData.value.category);
+      formData.append("iframe", iframeHtml);
+      formData.append("iframeSrc", iframeSrc);
+      formData.append("thumbnail", movieData.value.thumbnailFile);
 
-      const response = await apiClient.post('/movies', formData, {
+      const response = await apiClient.post("/movies", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.data.success) {
-        emit('saved');
+        emit("saved");
         resetForm();
       }
     } else {
       // Use JSON for URL thumbnail
-      const response = await apiClient.post('/movies', {
+      const response = await apiClient.post("/movies", {
         title: movieData.value.title.trim(),
         category: movieData.value.category,
         iframe: iframeHtml,
@@ -335,13 +363,15 @@ async function handleSave() {
       });
 
       if (response.data.success) {
-        emit('saved');
+        emit("saved");
         resetForm();
       }
     }
-
   } catch (err) {
-    error.value = err.response?.data?.error || err.response?.data?.message || 'Failed to save movie. Please try again.';
+    error.value =
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      "Failed to save movie. Please try again.";
   } finally {
     saving.value = false;
   }
@@ -615,4 +645,3 @@ async function handleSave() {
   }
 }
 </style>
-

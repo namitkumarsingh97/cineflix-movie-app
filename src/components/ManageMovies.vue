@@ -24,7 +24,10 @@
     <!-- Bulk Actions Bar -->
     <div v-if="selectedMovies.length > 0" class="bulk-actions-bar">
       <div class="bulk-info">
-        <span>{{ selectedMovies.length }} {{ selectedMovies.length === 1 ? 'movie' : 'movies' }} selected</span>
+        <span
+          >{{ selectedMovies.length }}
+          {{ selectedMovies.length === 1 ? "movie" : "movies" }} selected</span
+        >
       </div>
       <div class="bulk-buttons">
         <select v-model="bulkCategory" class="bulk-select">
@@ -49,10 +52,7 @@
           <Trash2 :size="16" />
           <span>Delete Selected</span>
         </button>
-        <button
-          class="bulk-btn clear-btn"
-          @click="clearSelection"
-        >
+        <button class="bulk-btn clear-btn" @click="clearSelection">
           <X :size="16" />
           <span>Clear</span>
         </button>
@@ -60,7 +60,7 @@
     </div>
 
     <Loader v-if="loading" message="Loading movies..." />
-    
+
     <div v-else-if="filteredMovies.length > 0" class="movies-list">
       <div class="select-all-bar">
         <label class="checkbox-label">
@@ -98,7 +98,9 @@
         <div class="movie-info">
           <h3>{{ movie.title }}</h3>
           <div class="movie-meta">
-            <span class="category-badge">{{ movie.category || 'Uncategorized' }}</span>
+            <span class="category-badge">{{
+              movie.category || "Uncategorized"
+            }}</span>
             <span class="date">{{ formatDate(movie.createdAt) }}</span>
           </div>
         </div>
@@ -124,7 +126,9 @@
     <div v-else class="empty-state">
       <Film :size="48" />
       <h3>No movies found</h3>
-      <p v-if="searchQuery || categoryFilter">Try adjusting your search or filters</p>
+      <p v-if="searchQuery || categoryFilter">
+        Try adjusting your search or filters
+      </p>
       <p v-else>Add your first movie to get started!</p>
     </div>
 
@@ -139,37 +143,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { Film, Edit, Trash2, Search, Tag, X } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
-import Loader from './Loader.vue';
-import EditMovieModal from './EditMovieModal.vue';
+import { ref, onMounted, computed } from "vue";
+import { Film, Edit, Trash2, Search, Tag, X } from "lucide-vue-next";
+import apiClient from "../plugins/axios";
+import Loader from "./Loader.vue";
+import EditMovieModal from "./EditMovieModal.vue";
 
 const movies = ref([]);
 const loading = ref(true);
-const searchQuery = ref('');
-const categoryFilter = ref('');
+const searchQuery = ref("");
+const categoryFilter = ref("");
 const showEditModal = ref(false);
 const selectedMovie = ref(null);
 const selectedMovies = ref([]);
-const bulkCategory = ref('');
+const bulkCategory = ref("");
 const bulkProcessing = ref(false);
 
 const categories = [
-  'Action',
-  'Comedy',
-  'Drama',
-  'Horror',
-  'Romance',
-  'Sci-Fi',
-  'Thriller',
-  'Adventure',
-  'Animation',
-  'Documentary',
-  'Fantasy',
-  'Crime',
-  'Mystery',
-  'Other',
+  "Adventure",
+  "Amateur",
+  "Anal",
+  "Asian",
+  "BDSM",
+  "Big Ass",
+  "Desi",
+  "Blowjob",
+  "Compilation",
+  "Cartoon",
+  "Cosplay",
+  "Cuckold",
+  "Ebony",
+  "Fantasy",
+  "Family",
+  "Fetish",
+  "Foot Fetish",
+  "Gangbang",
+  "Housewife",
+  "Japanese",
+  "MILF",
+  "Massage",
+  "Mature",
+  "Romance",
+  "Teen",
+  "Threesome",
+  "Other",
 ];
 
 const filteredMovies = computed(() => {
@@ -178,15 +195,15 @@ const filteredMovies = computed(() => {
   // Filter by search query
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(movie =>
+    filtered = filtered.filter((movie) =>
       movie.title.toLowerCase().includes(query)
     );
   }
 
   // Filter by category
   if (categoryFilter.value) {
-    filtered = filtered.filter(movie =>
-      movie.category === categoryFilter.value
+    filtered = filtered.filter(
+      (movie) => movie.category === categoryFilter.value
     );
   }
 
@@ -194,19 +211,23 @@ const filteredMovies = computed(() => {
 });
 
 const allSelected = computed(() => {
-  return filteredMovies.value.length > 0 &&
-    filteredMovies.value.every(movie => selectedMovies.value.includes(movie._id));
+  return (
+    filteredMovies.value.length > 0 &&
+    filteredMovies.value.every((movie) =>
+      selectedMovies.value.includes(movie._id)
+    )
+  );
 });
 
 function toggleSelectAll() {
   if (allSelected.value) {
     // Deselect all filtered movies
     selectedMovies.value = selectedMovies.value.filter(
-      id => !filteredMovies.value.some(movie => movie._id === id)
+      (id) => !filteredMovies.value.some((movie) => movie._id === id)
     );
   } else {
     // Select all filtered movies
-    filteredMovies.value.forEach(movie => {
+    filteredMovies.value.forEach((movie) => {
       if (!selectedMovies.value.includes(movie._id)) {
         selectedMovies.value.push(movie._id);
       }
@@ -216,11 +237,15 @@ function toggleSelectAll() {
 
 function clearSelection() {
   selectedMovies.value = [];
-  bulkCategory.value = '';
+  bulkCategory.value = "";
 }
 
 async function bulkDelete() {
-  if (!confirm(`Are you sure you want to delete ${selectedMovies.value.length} movie(s)?`)) {
+  if (
+    !confirm(
+      `Are you sure you want to delete ${selectedMovies.value.length} movie(s)?`
+    )
+  ) {
     return;
   }
 
@@ -232,7 +257,7 @@ async function bulkDelete() {
     await loadMovies();
     clearSelection();
   } catch (error) {
-    alert('Failed to delete some movies. Please try again.');
+    alert("Failed to delete some movies. Please try again.");
   } finally {
     bulkProcessing.value = false;
   }
@@ -240,14 +265,14 @@ async function bulkDelete() {
 
 async function bulkUpdateCategory() {
   if (!bulkCategory.value) {
-    alert('Please select a category');
+    alert("Please select a category");
     return;
   }
 
   bulkProcessing.value = true;
   try {
     for (const id of selectedMovies.value) {
-      const movie = movies.value.find(m => m._id === id);
+      const movie = movies.value.find((m) => m._id === id);
       if (movie) {
         await apiClient.put(`/movies/${id}`, {
           title: movie.title,
@@ -261,7 +286,7 @@ async function bulkUpdateCategory() {
     await loadMovies();
     clearSelection();
   } catch (error) {
-    alert('Failed to update some movies. Please try again.');
+    alert("Failed to update some movies. Please try again.");
   } finally {
     bulkProcessing.value = false;
   }
@@ -274,12 +299,12 @@ onMounted(async () => {
 async function loadMovies() {
   loading.value = true;
   try {
-    const response = await apiClient.get('/movies');
+    const response = await apiClient.get("/movies");
     if (response.data.success) {
       movies.value = response.data.data || [];
     }
   } catch (error) {
-    console.error('Failed to load movies:', error);
+    console.error("Failed to load movies:", error);
   } finally {
     loading.value = false;
   }
@@ -287,10 +312,10 @@ async function loadMovies() {
 
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 
@@ -311,7 +336,7 @@ function handleMovieUpdated() {
 }
 
 async function deleteMovie(id) {
-  if (!confirm('Are you sure you want to delete this movie?')) {
+  if (!confirm("Are you sure you want to delete this movie?")) {
     return;
   }
 
@@ -319,9 +344,11 @@ async function deleteMovie(id) {
     await apiClient.delete(`/movies/${id}`);
     await loadMovies();
     // Remove from selection if selected
-    selectedMovies.value = selectedMovies.value.filter(selectedId => selectedId !== id);
+    selectedMovies.value = selectedMovies.value.filter(
+      (selectedId) => selectedId !== id
+    );
   } catch (error) {
-    alert('Failed to delete movie. Please try again.');
+    alert("Failed to delete movie. Please try again.");
   }
 }
 </script>
@@ -695,4 +722,3 @@ async function deleteMovie(id) {
   }
 }
 </style>
-

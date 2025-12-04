@@ -21,7 +21,10 @@
           <FolderOpen :size="20" />
           <div>
             <h3>{{ category.name }}</h3>
-            <p>{{ category.count }} {{ category.count === 1 ? 'movie' : 'movies' }}</p>
+            <p>
+              {{ category.count }}
+              {{ category.count === 1 ? "movie" : "movies" }}
+            </p>
           </div>
         </div>
         <div class="category-actions">
@@ -51,12 +54,18 @@
     </div>
 
     <!-- Add/Edit Category Modal -->
-    <div v-if="showAddModal || editingCategory" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showAddModal || editingCategory"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h3>
             <FolderOpen :size="20" />
-            <span>{{ editingCategory ? 'Edit Category' : 'Add Category' }}</span>
+            <span>{{
+              editingCategory ? "Edit Category" : "Add Category"
+            }}</span>
           </h3>
           <button class="modal-close" @click="closeModal">
             <X :size="24" />
@@ -86,10 +95,17 @@
             <button type="button" class="btn-secondary" @click="closeModal">
               Cancel
             </button>
-            <button type="button" class="btn-primary" @click="saveCategory" :disabled="saving">
+            <button
+              type="button"
+              class="btn-primary"
+              @click="saveCategory"
+              :disabled="saving"
+            >
               <Loader2 v-if="saving" :size="16" class="spinning" />
               <Save v-else :size="16" />
-              <span>{{ saving ? 'Saving...' : editingCategory ? 'Update' : 'Add' }}</span>
+              <span>{{
+                saving ? "Saving..." : editingCategory ? "Update" : "Add"
+              }}</span>
             </button>
           </div>
         </div>
@@ -99,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 import {
   FolderOpen,
   Plus,
@@ -110,36 +126,49 @@ import {
   Save,
   Loader2,
   AlertCircle,
-} from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
-import Loader from './Loader.vue';
+} from "lucide-vue-next";
+import apiClient from "../plugins/axios";
+import Loader from "./Loader.vue";
 
 const categories = ref([]);
 const loading = ref(true);
 const showAddModal = ref(false);
 const editingCategory = ref(null);
 const saving = ref(false);
-const error = ref('');
+const error = ref("");
 
 const categoryForm = ref({
-  name: '',
+  name: "",
 });
 
 const predefinedCategories = [
-  'Action',
-  'Comedy',
-  'Drama',
-  'Horror',
-  'Romance',
-  'Sci-Fi',
-  'Thriller',
-  'Adventure',
-  'Animation',
-  'Documentary',
-  'Fantasy',
-  'Crime',
-  'Mystery',
-  'Other',
+  "Adventure",
+  "Amateur",
+  "Anal",
+  "Asian",
+  "BDSM",
+  "Big Ass",
+  "Desi",
+  "Blowjob",
+  "Compilation",
+  "Cartoon",
+  "Cosplay",
+  "Cuckold",
+  "Ebony",
+  "Fantasy",
+  "Family",
+  "Fetish",
+  "Foot Fetish",
+  "Gangbang",
+  "Housewife",
+  "Japanese",
+  "MILF",
+  "Massage",
+  "Mature",
+  "Romance",
+  "Teen",
+  "Threesome",
+  "Other",
 ];
 
 onMounted(async () => {
@@ -149,34 +178,34 @@ onMounted(async () => {
 async function loadCategories() {
   loading.value = true;
   try {
-    const response = await apiClient.get('/movies');
+    const response = await apiClient.get("/movies");
     if (response.data.success) {
       const movies = response.data.data || [];
-      
+
       // Count movies per category
       const categoryMap = {};
-      movies.forEach(movie => {
-        const category = movie.category || 'Uncategorized';
+      movies.forEach((movie) => {
+        const category = movie.category || "Uncategorized";
         categoryMap[category] = (categoryMap[category] || 0) + 1;
       });
 
       // Combine predefined and custom categories
       const allCategories = new Set([...predefinedCategories]);
-      Object.keys(categoryMap).forEach(cat => {
-        if (cat && cat !== 'Uncategorized') {
+      Object.keys(categoryMap).forEach((cat) => {
+        if (cat && cat !== "Uncategorized") {
           allCategories.add(cat);
         }
       });
 
       categories.value = Array.from(allCategories)
-        .map(name => ({
+        .map((name) => ({
           name,
           count: categoryMap[name] || 0,
         }))
         .sort((a, b) => a.name.localeCompare(b.name));
     }
   } catch (error) {
-    console.error('Failed to load categories:', error);
+    console.error("Failed to load categories:", error);
   } finally {
     loading.value = false;
   }
@@ -191,15 +220,15 @@ function editCategory(category) {
 function closeModal() {
   showAddModal.value = false;
   editingCategory.value = null;
-  categoryForm.value.name = '';
-  error.value = '';
+  categoryForm.value.name = "";
+  error.value = "";
 }
 
 async function saveCategory() {
-  error.value = '';
+  error.value = "";
 
   if (!categoryForm.value.name.trim()) {
-    error.value = 'Please enter a category name';
+    error.value = "Please enter a category name";
     return;
   }
 
@@ -207,12 +236,12 @@ async function saveCategory() {
 
   // Validate category name
   if (categoryName.length < 2) {
-    error.value = 'Category name must be at least 2 characters';
+    error.value = "Category name must be at least 2 characters";
     return;
   }
 
   if (categoryName.length > 50) {
-    error.value = 'Category name must be less than 50 characters';
+    error.value = "Category name must be less than 50 characters";
     return;
   }
 
@@ -221,11 +250,11 @@ async function saveCategory() {
   try {
     if (editingCategory.value) {
       // Update movies with old category to new category
-      const response = await apiClient.get('/movies');
+      const response = await apiClient.get("/movies");
       if (response.data.success) {
         const movies = response.data.data || [];
         const moviesToUpdate = movies.filter(
-          m => m.category === editingCategory.value.name
+          (m) => m.category === editingCategory.value.name
         );
 
         // Update each movie
@@ -244,23 +273,30 @@ async function saveCategory() {
     await loadCategories();
     closeModal();
   } catch (err) {
-    error.value = err.response?.data?.error || err.response?.data?.message || 'Failed to save category. Please try again.';
+    error.value =
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      "Failed to save category. Please try again.";
   } finally {
     saving.value = false;
   }
 }
 
 async function deleteCategory(categoryName) {
-  if (!confirm(`Are you sure you want to delete "${categoryName}"? This will remove the category from all movies.`)) {
+  if (
+    !confirm(
+      `Are you sure you want to delete "${categoryName}"? This will remove the category from all movies.`
+    )
+  ) {
     return;
   }
 
   try {
     // Get all movies with this category
-    const response = await apiClient.get('/movies');
+    const response = await apiClient.get("/movies");
     if (response.data.success) {
       const movies = response.data.data || [];
-      const moviesToUpdate = movies.filter(m => m.category === categoryName);
+      const moviesToUpdate = movies.filter((m) => m.category === categoryName);
 
       // Remove category from movies (set to null)
       for (const movie of moviesToUpdate) {
@@ -276,7 +312,7 @@ async function deleteCategory(categoryName) {
 
     await loadCategories();
   } catch (error) {
-    alert('Failed to delete category. Please try again.');
+    alert("Failed to delete category. Please try again.");
   }
 }
 </script>
@@ -579,4 +615,3 @@ async function deleteCategory(categoryName) {
   }
 }
 </style>
-
