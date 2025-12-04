@@ -383,28 +383,32 @@ function goBack() {
 }
 
 .story-text :deep(.story-image-container) {
-  margin: 32px 0;
+  margin: 24px 0;
   text-align: center;
 }
 
 .story-text :deep(.story-image) {
-  max-width: 100%;
+  max-width: 600px;
+  max-height: 400px;
+  width: auto;
   height: auto;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   border: 2px solid rgba(255, 0, 110, 0.2);
+  object-fit: contain;
 }
 
 .story-text :deep(img) {
-  max-width: 100%;
+  max-width: 600px;
+  max-height: 400px;
+  width: auto;
   height: auto;
   border-radius: 12px;
-  margin: 32px 0;
+  margin: 24px auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   border: 2px solid rgba(255, 0, 110, 0.2);
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  object-fit: contain;
 }
 
 .story-pagination {
@@ -581,6 +585,12 @@ function goBack() {
 
   .story-text :deep(p + p) {
     margin-top: 20px;
+  }
+
+  .story-text :deep(img),
+  .story-text :deep(.story-image) {
+    max-width: 100%;
+    max-height: 250px;
   }
 
   .story-pagination {

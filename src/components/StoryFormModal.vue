@@ -882,14 +882,18 @@ async function handleSave() {
 
 .image-preview-small {
   max-width: 100%;
+  max-height: 300px;
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid rgba(255, 0, 110, 0.2);
+  margin-top: 12px;
 }
 
 .image-preview-small img {
   width: 100%;
+  max-height: 300px;
   height: auto;
+  object-fit: contain;
   display: block;
 }
 
