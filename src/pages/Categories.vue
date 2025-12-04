@@ -40,7 +40,7 @@
             {{ category.name || 'Uncategorized' }}
           </h3>
           <div class="category-meta-info">
-            <span class="category-count-text">{{ $t('categories.movies', { count: category.count }) }}</span>
+            <span class="category-count-text">{{ category.count }} {{ $tc('categories.movies', category.count) }}</span>
           </div>
         </div>
       </div>

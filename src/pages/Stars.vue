@@ -40,7 +40,7 @@
             {{ star.star }}
           </h3>
           <div class="category-meta-info">
-            <span class="category-count-text">{{ $t('stars.movies', { count: star.count }) }}</span>
+            <span class="category-count-text">{{ star.count }} {{ $tc('stars.movies', star.count) }}</span>
           </div>
         </div>
       </div>

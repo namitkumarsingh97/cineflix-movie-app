@@ -11,7 +11,7 @@
         </div>
         <div>
           <h1 class="star-title">{{ starName }}</h1>
-          <p class="star-meta">{{ $t('star.moviesWithStar', { count: movies.length }) }}</p>
+          <p class="star-meta">{{ movies.length }} {{ $tc('star.moviesWithStar', movies.length) }} with this star</p>
         </div>
       </div>
     </div>

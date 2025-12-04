@@ -50,7 +50,7 @@
             
             <div class="video-actions-bar">
               <div class="video-stats">
-                <span class="view-count-main">{{ formatViews(video.views || 0) }} {{ (video.views || 0) === 1 ? 'view' : 'views' }}</span>
+                <span class="view-count-main">{{ formatViews(video.views || 0) }} {{ $tc('watch.views', video.views || 0) }}</span>
                 <span class="upload-date-main">{{ formatTimeAgo(video.uploadedAt || video.createdAt) }}</span>
               </div>
               <div class="action-buttons">
@@ -124,7 +124,7 @@
 
             <!-- Comments Section -->
             <div class="comments-section">
-              <h2 class="comments-title">{{ $t('watch.comments', { count: comments.length }) }}</h2>
+              <h2 class="comments-title">{{ comments.length }} {{ $tc('watch.comments', comments.length) }}</h2>
               
               <!-- Comment Form -->
               <div class="comment-form">

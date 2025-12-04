@@ -36,12 +36,12 @@
     "showing": "Showing {start}-{end} of {total} movies"
   },
   "watch": {
-    "views": "{count} {count, plural, =1 {view} other {views}}",
+    "views": "view | views",
     "likes": "Likes",
     "dislikes": "Dislikes",
     "share": "Share",
     "download": "Download",
-    "comments": "{count} {count, plural, =1 {Comment} other {Comments}}",
+    "comments": "Comment | Comments",
     "addComment": "Add a comment...",
     "yourName": "Your name (optional)",
     "postComment": "Comment",
@@ -57,11 +57,11 @@
     "subtitle": "Browse movies by category",
     "noCategories": "No categories found",
     "noCategoriesDesc": "Categories will appear here once movies are added.",
-    "movies": "{count} {count, plural, =1 {movie} other {movies}}"
+    "movies": "movie | movies"
   },
   "category": {
     "title": "Category",
-    "moviesInCategory": "{count} {count, plural, =1 {movie} other {movies}} in this category",
+    "moviesInCategory": "movie in this category | movies in this category",
     "backToCategories": "Back to Categories",
     "noMovies": "No movies found",
     "noMoviesDesc": "There are no movies in this category yet."
@@ -89,11 +89,11 @@
     "subtitle": "Browse movies by your favorite stars",
     "noStars": "No stars found",
     "noStarsDesc": "Stars will appear here once movies with star information are added.",
-    "movies": "{count} {count, plural, =1 {movie} other {movies}}"
+    "movies": "movie | movies"
   },
   "star": {
     "title": "Star",
-    "moviesWithStar": "{count} {count, plural, =1 {movie} other {movies}} with this star",
+    "moviesWithStar": "movie with this star | movies with this star",
     "backToStars": "Back to Stars",
     "noMovies": "No movies found",
     "noMoviesDesc": "There are no movies with this star yet."

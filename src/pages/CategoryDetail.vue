@@ -11,7 +11,7 @@
         </div>
         <div>
           <h1 class="category-title">{{ categoryName || 'Uncategorized' }}</h1>
-          <p class="category-meta">{{ $t('category.moviesInCategory', { count: movies.length }) }}</p>
+          <p class="category-meta">{{ movies.length }} {{ $tc('category.moviesInCategory', movies.length) }} in this category</p>
         </div>
       </div>
     </div>
