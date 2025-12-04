@@ -94,15 +94,6 @@ export function useAccessibility() {
 
   // Skip to main content (for screen readers)
   function skipToMain() {
-    const main = document.querySelector('main, [role="main"]');
-    if (main) {
-      main.focus();
-      main.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  // Skip to main content (for screen readers)
-  function skipToMain() {
     const main = document.querySelector('main, [role="main"], #main-content');
     if (main) {
       main.setAttribute('tabindex', '-1');
@@ -114,34 +105,34 @@ export function useAccessibility() {
     }
   }
 
+  // Add keyboard shortcuts handler
+  const handleKeyDown = (e) => {
+    // Alt + S: Skip to main content
+    if (e.altKey && e.key === 's') {
+      e.preventDefault();
+      skipToMain();
+    }
+    
+    // Escape: Close modals/dropdowns
+    if (e.key === 'Escape') {
+      // This can be extended to close any open modals
+      const modals = document.querySelectorAll('.modal-overlay, [role="dialog"]');
+      modals.forEach(modal => {
+        const closeBtn = modal.querySelector('[aria-label*="close" i], [aria-label*="Close" i]');
+        if (closeBtn) closeBtn.click();
+      });
+    }
+  };
+
   // Initialize on mount
   onMounted(() => {
     applyPreferences();
-    
-    // Add keyboard shortcuts
-    const handleKeyDown = (e) => {
-      // Alt + S: Skip to main content
-      if (e.altKey && e.key === 's') {
-        e.preventDefault();
-        skipToMain();
-      }
-      
-      // Escape: Close modals/dropdowns
-      if (e.key === 'Escape') {
-        // This can be extended to close any open modals
-        const modals = document.querySelectorAll('.modal-overlay, [role="dialog"]');
-        modals.forEach(modal => {
-          const closeBtn = modal.querySelector('[aria-label*="close" i], [aria-label*="Close" i]');
-          if (closeBtn) closeBtn.click();
-        });
-      }
-    };
-
     document.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
+  });
+
+  // Cleanup on unmount
+  onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeyDown);
   });
 
   return {
