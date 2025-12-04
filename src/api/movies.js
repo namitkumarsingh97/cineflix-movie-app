@@ -15,5 +15,20 @@ export const moviesApi = {
   
   // Delete movie
   delete: (id) => apiClient.delete(`/movies/${id}`),
+  
+  // Like movie
+  like: (id) => apiClient.post(`/movies/${id}/like`),
+  
+  // Dislike movie
+  dislike: (id) => apiClient.post(`/movies/${id}/dislike`),
+  
+  // Increment view
+  incrementView: (id) => apiClient.post(`/movies/${id}/view`),
+  
+  // Add comment
+  addComment: (id, data) => apiClient.post(`/movies/${id}/comments`, data),
+  
+  // Get comments
+  getComments: (id) => apiClient.get(`/movies/${id}/comments`),
 };
 

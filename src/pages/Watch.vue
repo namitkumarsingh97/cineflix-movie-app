@@ -30,22 +30,23 @@
             
             <div class="video-actions-bar">
               <div class="video-stats">
-                <span class="view-count-main" v-if="!isMovie">{{ formatViews(video.views || 0) }} views</span>
+                <span class="view-count-main">{{ formatViews(video.views || 0) }} {{ (video.views || 0) === 1 ? 'view' : 'views' }}</span>
                 <span class="upload-date-main">{{ formatTimeAgo(video.uploadedAt || video.createdAt) }}</span>
               </div>
               <div class="action-buttons">
-                <button class="action-btn like-btn">
+                <button class="action-btn like-btn" :class="{ active: isLiked }" @click="handleLike">
                   <ThumbsUp :size="20" />
                   <span>{{ formatViews(video.likes || 0) }}</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" :class="{ active: isDisliked }" @click="handleDislike">
                   <ThumbsDown :size="20" />
+                  <span>{{ formatViews(video.dislikes || 0) }}</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" @click="handleShare">
                   <Share2 :size="20" />
                   <span>Share</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" @click="handleDownload">
                   <Download :size="20" />
                   <span>Download</span>
                 </button>
@@ -68,6 +69,61 @@
               </div>
               <div class="video-description" v-if="video.description">
                 <p>{{ video.description }}</p>
+              </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+              <h2 class="comments-title">{{ comments.length }} {{ comments.length === 1 ? 'Comment' : 'Comments' }}</h2>
+              
+              <!-- Comment Form -->
+              <div class="comment-form">
+                <div class="comment-input-wrapper">
+                  <input
+                    v-model="commentAuthor"
+                    type="text"
+                    placeholder="Your name (optional)"
+                    class="comment-author-input"
+                    maxlength="50"
+                  />
+                  <textarea
+                    v-model="commentText"
+                    placeholder="Add a comment..."
+                    class="comment-text-input"
+                    rows="3"
+                    maxlength="1000"
+                  ></textarea>
+                </div>
+                <div class="comment-form-actions">
+                  <span class="char-count">{{ commentText.length }}/1000</span>
+                  <button 
+                    class="comment-submit-btn" 
+                    @click="submitComment"
+                    :disabled="!commentText.trim() || submittingComment"
+                  >
+                    {{ submittingComment ? 'Posting...' : 'Comment' }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Comments List -->
+              <div class="comments-list">
+                <div v-if="loadingComments" class="comments-loading">Loading comments...</div>
+                <div v-else-if="comments.length === 0" class="no-comments">
+                  <p>No comments yet. Be the first to comment!</p>
+                </div>
+                <div v-else class="comment-item" v-for="comment in comments" :key="comment._id || comment.createdAt">
+                  <div class="comment-avatar">
+                    {{ getInitials(comment.author || 'Anonymous') }}
+                  </div>
+                  <div class="comment-content">
+                    <div class="comment-header">
+                      <span class="comment-author">{{ comment.author || 'Anonymous' }}</span>
+                      <span class="comment-date">{{ formatTimeAgo(comment.createdAt) }}</span>
+                    </div>
+                    <p class="comment-text">{{ comment.text }}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -129,6 +185,13 @@ const { movies, loadMovies } = useMovies();
 
 const videoId = computed(() => route.params.id);
 const isMovie = ref(false);
+const isLiked = ref(false);
+const isDisliked = ref(false);
+const comments = ref([]);
+const loadingComments = ref(false);
+const commentText = ref('');
+const commentAuthor = ref('');
+const submittingComment = ref(false);
 
 const recommendations = computed(() => {
   if (isMovie.value) {
@@ -143,6 +206,12 @@ const recommendations = computed(() => {
 // Watch for route changes
 watch(() => route.params.id, () => {
   loadVideo();
+  // Reset states
+  isLiked.value = false;
+  isDisliked.value = false;
+  comments.value = [];
+  commentText.value = '';
+  commentAuthor.value = '';
 });
 
 async function loadVideo() {
@@ -157,6 +226,12 @@ async function loadVideo() {
         video.value = videoResponse.data.data;
         isMovie.value = false;
         loading.value = false;
+        // Increment view for videos
+        try {
+          await videosApi.incrementView?.(videoId.value);
+        } catch (e) {
+          console.log('View increment not available for videos');
+        }
         return;
       }
     } catch (videoError) {
@@ -169,6 +244,15 @@ async function loadVideo() {
       if (movieResponse.data.success || movieResponse.data) {
         video.value = movieResponse.data.data || movieResponse.data;
         isMovie.value = true;
+        // Increment view for movies
+        try {
+          await moviesApi.incrementView(videoId.value);
+          video.value.views = (video.value.views || 0) + 1;
+        } catch (e) {
+          console.error('Error incrementing view:', e);
+        }
+        // Load comments
+        await loadComments();
       }
     } catch (movieError) {
       console.error('Error loading video/movie:', movieError);
@@ -177,6 +261,129 @@ async function loadVideo() {
     console.error('Error loading video:', error);
   } finally {
     loading.value = false;
+  }
+}
+
+async function loadComments() {
+  if (!isMovie.value || !videoId.value) return;
+  
+  loadingComments.value = true;
+  try {
+    const response = await moviesApi.getComments(videoId.value);
+    if (response.data.success) {
+      comments.value = response.data.data || [];
+      // Sort by newest first
+      comments.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+  } catch (error) {
+    console.error('Error loading comments:', error);
+  } finally {
+    loadingComments.value = false;
+  }
+}
+
+async function handleLike() {
+  if (!isMovie.value || !videoId.value) return;
+  
+  try {
+    const response = await moviesApi.like(videoId.value);
+    if (response.data.success) {
+      video.value.likes = response.data.data.likes;
+      isLiked.value = true;
+      isDisliked.value = false;
+    }
+  } catch (error) {
+    console.error('Error liking movie:', error);
+  }
+}
+
+async function handleDislike() {
+  if (!isMovie.value || !videoId.value) return;
+  
+  try {
+    const response = await moviesApi.dislike(videoId.value);
+    if (response.data.success) {
+      video.value.dislikes = response.data.data.dislikes;
+      isDisliked.value = true;
+      isLiked.value = false;
+    }
+  } catch (error) {
+    console.error('Error disliking movie:', error);
+  }
+}
+
+function handleShare() {
+  const url = window.location.href;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: video.value?.title || 'Check out this video',
+      text: video.value?.title || 'Check out this video',
+      url: url
+    }).catch(err => {
+      console.log('Error sharing:', err);
+      copyToClipboard(url);
+    });
+  } else {
+    copyToClipboard(url);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Link copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    // Fallback for older browsers
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('Link copied to clipboard!');
+  });
+}
+
+function handleDownload() {
+  if (!video.value) return;
+  
+  if (video.value.url) {
+    // For S3 videos, create download link
+    const link = document.createElement('a');
+    link.href = video.value.url;
+    link.download = video.value.title || 'video';
+    link.click();
+  } else if (video.value.iframeSrc) {
+    // For iframe videos, open in new tab
+    window.open(video.value.iframeSrc, '_blank');
+  } else {
+    alert('Download not available for this video');
+  }
+}
+
+async function submitComment() {
+  if (!commentText.value.trim() || !isMovie.value || !videoId.value || submittingComment.value) return;
+  
+  submittingComment.value = true;
+  try {
+    const response = await moviesApi.addComment(videoId.value, {
+      text: commentText.value.trim(),
+      author: commentAuthor.value.trim() || undefined
+    });
+    
+    if (response.data.success) {
+      // Add comment to list
+      comments.value.unshift(response.data.data);
+      // Clear form
+      commentText.value = '';
+      commentAuthor.value = '';
+    }
+  } catch (error) {
+    console.error('Error submitting comment:', error);
+    alert('Failed to post comment. Please try again.');
+  } finally {
+    submittingComment.value = false;
   }
 }
 
@@ -502,6 +709,181 @@ onMounted(async () => {
   }
 }
 
+/* Comments Section */
+.comments-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comments-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+}
+
+.comment-form {
+  margin-bottom: 32px;
+  padding: 16px;
+  background: var(--dark-lighter);
+  border-radius: 12px;
+}
+
+.comment-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.comment-author-input {
+  padding: 10px 14px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.comment-author-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.comment-text-input {
+  padding: 12px 14px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  width: 100%;
+}
+
+.comment-text-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.comment-text-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.comment-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.comment-submit-btn {
+  padding: 10px 24px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.comment-submit-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.comment-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comments-loading,
+.no-comments {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.comment-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--dark-lighter);
+  border-radius: 12px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.comment-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.comment-author {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comment-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.comment-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.action-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.action-btn.active:hover {
+  background: var(--primary-dark);
+}
+
 @media (max-width: 768px) {
   .watch-page {
     padding: 16px;
@@ -526,6 +908,14 @@ onMounted(async () => {
   .action-btn {
     flex: 1;
     justify-content: center;
+  }
+
+  .comment-form {
+    padding: 12px;
+  }
+
+  .comment-item {
+    padding: 12px;
   }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <AgeVerification />
     <PublicLayout
       v-model="searchQuery"
       @refresh="handleRefresh"
@@ -17,6 +18,7 @@
 import { ref, provide } from 'vue';
 import PublicLayout from './layouts/PublicLayout.vue';
 import AddMovieModal from './components/AddMovieModal.vue';
+import AgeVerification from './components/AgeVerification.vue';
 
 const searchQuery = ref('');
 const showAddModal = ref(false);
