@@ -142,6 +142,23 @@ function getInitials(name) {
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 8px;
+  height: 0;
+}
+
+.video-thumbnail-wrapper :deep(.optimized-image) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-thumbnail-wrapper :deep(.optimized-image picture),
+.video-thumbnail-wrapper :deep(.optimized-image img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .video-thumbnail-img {
@@ -169,6 +186,7 @@ function getInitials(name) {
 .video-info-section {
   display: flex;
   gap: 8px;
+  min-height: 0;
 }
 
 .video-channel-avatar {
@@ -201,9 +219,11 @@ function getInitials(name) {
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-height: 2.6em;
 }
 
 .video-meta-info {
@@ -257,6 +277,8 @@ function getInitials(name) {
   flex-wrap: wrap;
   gap: 3px;
   margin-top: 4px;
+  max-height: 1.5em;
+  overflow: hidden;
 }
 
 .category-badge {

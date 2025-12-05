@@ -147,6 +147,16 @@ watch(() => props.src, () => {
   display: block;
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.optimized-image picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .optimized-image img {
@@ -154,6 +164,9 @@ watch(() => props.src, () => {
   height: 100%;
   object-fit: cover;
   transition: filter 0.3s ease;
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 </style>
 
