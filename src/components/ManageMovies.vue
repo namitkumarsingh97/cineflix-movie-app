@@ -358,7 +358,7 @@ async function deleteMovie(id) {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 32px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .movies-list {
@@ -374,12 +374,12 @@ async function deleteMovie(id) {
   background: var(--dark);
   border-radius: 12px;
   padding: 16px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .movie-item.selected {
-  background: rgba(255, 0, 110, 0.1);
+  background: rgba(255, 69, 0, 0.1);
   border-color: var(--primary);
 }
 
@@ -522,7 +522,7 @@ async function deleteMovie(id) {
 
 .search-box:focus-within {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .search-box svg {
@@ -562,7 +562,7 @@ async function deleteMovie(id) {
 .filter-select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .select-all-bar {
@@ -570,7 +570,7 @@ async function deleteMovie(id) {
   background: var(--dark);
   border-radius: 12px;
   margin-bottom: 16px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .checkbox-label {
@@ -595,7 +595,7 @@ async function deleteMovie(id) {
 }
 
 .movie-item.selected {
-  background: rgba(255, 0, 110, 0.1);
+  background: rgba(255, 69, 0, 0.1);
   border-color: var(--primary);
 }
 

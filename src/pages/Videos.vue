@@ -43,6 +43,24 @@
       </div>
     </div>
 
+    <!-- Popular Categories -->
+    <div class="popular-tags" v-if="popularCategories.length">
+      <div class="popular-tags-header">
+        <h3>Popular Tags</h3>
+        <p>Select a tag to filter videos by title, description, or categories</p>
+      </div>
+      <div class="popular-tags-list">
+        <button
+          v-for="tag in popularCategories"
+          :key="tag"
+          class="popular-tag"
+          @click="selectPopularTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      </div>
+    </div>
+
     <!-- Category Tags (from video keywords) -->
     <div v-if="availableCategories.length > 0" class="categories-section">
       <div class="categories-header">
@@ -164,6 +182,10 @@ const {
 
 const searchInput = ref('');
 const selectedCategory = ref('');
+const popularCategories = [
+  'teen','milf','anal','blonde','brunette','asian','latina','amateur','big tits','big ass',
+  'threesome','hardcore','creampie','facial','public','lesbian','bj','bbw','gangbang','mature'
+];
 
 // Computed for display total pages (capped at 1000)
 const displayTotalPages = computed(() => {
@@ -285,6 +307,13 @@ function clearCategory() {
   loadVideos(1);
 }
 
+// Select a popular tag
+function selectPopularTag(tag) {
+  searchInput.value = tag;
+  selectedCategory.value = '';
+  searchVideos(tag, 1, { order: sortOrder.value });
+}
+
 // Navigate to video
 function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
@@ -343,8 +372,8 @@ watch(() => route.query.order, (newOrder) => {
 
 <style scoped>
 .videos-page {
-  padding: 2rem;
-  max-width: 1400px;
+  width: 100%;
+  padding: 40px;
   margin: 0 auto;
 }
 
@@ -395,7 +424,7 @@ watch(() => route.query.order, (newOrder) => {
 
 .search-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
 }
 
 .search-btn {
@@ -413,7 +442,7 @@ watch(() => route.query.order, (newOrder) => {
 
 .search-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 0, 110, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
 }
 
 .filters-container {
@@ -452,6 +481,47 @@ watch(() => route.query.order, (newOrder) => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.popular-tags {
+  margin-bottom: 1.5rem;
+}
+
+.popular-tags-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+}
+
+.popular-tags-header p {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.popular-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.popular-tag {
+  padding: 8px 14px;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.popular-tag:hover {
+  background: var(--dark-light);
+  border-color: var(--primary);
+  color: var(--text-primary);
 }
 
 .category-tag {
@@ -595,17 +665,13 @@ watch(() => route.query.order, (newOrder) => {
   color: var(--text-secondary);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .videos-page {
-    padding: 1rem;
+    padding: 24px;
   }
 
   .videos-controls {
     flex-direction: column;
-  }
-
-  .search-container {
-    min-width: 100%;
   }
 
   .filters-container {
@@ -614,6 +680,20 @@ watch(() => route.query.order, (newOrder) => {
 
   .filter-select {
     flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .videos-page {
+    padding: 16px;
+  }
+
+  .videos-controls {
+    flex-direction: column;
+  }
+
+  .search-container {
+    min-width: 100%;
   }
 
   .pagination {

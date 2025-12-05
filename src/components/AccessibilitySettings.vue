@@ -129,7 +129,7 @@ const {
   overflow-y: auto;
   z-index: 1000;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
 }
 
 .settings-header {
@@ -220,7 +220,7 @@ const {
   left: 2px;
   width: 20px;
   height: 20px;
-  background: white;
+  background: var(--dark-lighter);
   border-radius: 50%;
   transition: transform 0.3s ease;
 }

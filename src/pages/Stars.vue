@@ -1,21 +1,12 @@
 <template>
   <div class="stars-page">
-    <div class="stars-header">
-      <h1>
-        <Star :size="28" />
-        <span>Stars & Actors</span>
-      </h1>
-      <p class="stars-subtitle">Browse movies by your favorite stars</p>
-    </div>
+    <Loader v-if="loading" message="Loading starred videos..." />
 
-    <Loader v-if="loading" message="Loading stars..." />
-
-    <div v-else-if="stars.length > 0" class="youtube-videos-grid">
+    <div v-else-if="displayedStars.length > 0" class="youtube-videos-grid">
       <div
-        v-for="star in stars"
+        v-for="star in displayedStars"
         :key="star.star"
         class="category-card"
-        @click="navigateToStar(star.star)"
       >
         <div class="category-thumbnail-wrapper">
           <img
@@ -39,8 +30,10 @@
           <h3 class="category-title-text" :title="star.star">
             {{ star.star }}
           </h3>
-          <div class="category-meta-info">
-            <span class="category-count-text">{{ star.count }} {{ star.count === 1 ? 'movie' : 'movies' }}</span>
+          <div class="category-meta-info" v-if="star.count !== null && star.count !== undefined">
+            <span class="category-count-text" v-if="star.count !== null">
+              {{ star.count }} {{ star.count === 1 ? 'movie' : 'movies' }}
+            </span>
           </div>
         </div>
       </div>
@@ -48,26 +41,47 @@
 
     <div v-else class="empty-state">
       <Star :size="64" />
-      <h3>No stars found</h3>
-      <p>Stars will appear here once movies with star information are added.</p>
+      <h3 v-if="showingFollowed">No followed stars yet</h3>
+      <h3 v-else>No stars found</h3>
+      <p v-if="showingFollowed">Follow a star from any video page to see them here.</p>
+      <p v-else>Stars will appear here once movies with star information are added.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { Star } from 'lucide-vue-next';
 import { moviesApi } from '../api/movies';
 import Loader from '../components/Loader.vue';
+import { useStarFollows } from '../composables/useStarFollows';
 
 const router = useRouter();
+const route = useRoute();
+const { stars: followedStars } = useStarFollows();
 
 const stars = ref([]);
 const loading = ref(true);
+const filter = computed(() => route.query.filter || '');
+const showingFollowed = computed(() => filter.value === 'followed');
+
+const displayedStars = computed(() => {
+  if (showingFollowed.value) {
+    return followedStars.value.map(name => ({
+      star: name,
+      count: null,
+    }));
+  }
+  return stars.value;
+});
 
 onMounted(async () => {
-  await loadStars();
+  if (showingFollowed.value) {
+    loading.value = false;
+  } else {
+    await loadStars();
+  }
 });
 
 async function loadStars() {
@@ -82,10 +96,6 @@ async function loadStars() {
   } finally {
     loading.value = false;
   }
-}
-
-function navigateToStar(starName) {
-  router.push(`/star/${encodeURIComponent(starName)}`);
 }
 
 function handleThumbnailError(event) {
@@ -180,8 +190,8 @@ function handleThumbnailError(event) {
 }
 
 .category-card {
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+  transition: box-shadow 0.3s ease;
   border-radius: 20px;
   overflow: hidden;
   background: var(--card-bg);
@@ -189,7 +199,6 @@ function handleThumbnailError(event) {
 }
 
 .category-card:hover {
-  transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
@@ -200,7 +209,7 @@ function handleThumbnailError(event) {
   overflow: hidden;
   border-radius: 20px;
   margin-bottom: 20px;
-  background: var(--bg-secondary);
+  background: var(--dark-light);
 }
 
 .category-thumbnail-img {

@@ -231,7 +231,7 @@ async function handleProfileSaved() {
   gap: 8px;
   padding: 12px 24px;
   margin-bottom: 40px;
-  background: var(--bg-secondary);
+  background: var(--dark-light);
   border: none;
   border-radius: 8px;
   color: var(--text-primary);
@@ -242,7 +242,7 @@ async function handleProfileSaved() {
 }
 
 .back-btn:hover {
-  background: var(--bg-tertiary);
+  background: var(--dark-lighter);
 }
 
 /* Star Profile Section */
@@ -251,7 +251,7 @@ async function handleProfileSaved() {
   border-radius: 20px;
   padding: 40px;
   margin-bottom: 60px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .star-profile-content {
@@ -270,7 +270,7 @@ async function handleProfileSaved() {
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 16px;
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .star-photo-placeholder {
@@ -282,7 +282,7 @@ async function handleProfileSaved() {
   align-items: center;
   justify-content: center;
   color: var(--accent-color);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .edit-photo-btn {
@@ -419,7 +419,7 @@ async function handleProfileSaved() {
 .view-all-btn {
   padding: 10px 20px;
   background: var(--dark-lighter);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   border-radius: 8px;
   color: var(--text-primary);
   font-size: 14px;

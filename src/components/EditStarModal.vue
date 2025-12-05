@@ -336,7 +336,7 @@ async function handleSave() {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
 }
 
 .modal-header {
@@ -344,7 +344,7 @@ async function handleSave() {
   align-items: center;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .modal-header h3 {
@@ -433,7 +433,7 @@ async function handleSave() {
 .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .form-hint {
@@ -491,7 +491,7 @@ async function handleSave() {
   gap: 8px;
   padding: 16px;
   background: var(--dark);
-  border: 2px dashed rgba(255, 0, 110, 0.3);
+  border: 2px dashed rgba(255, 69, 0, 0.3);
   border-radius: 12px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -510,7 +510,7 @@ async function handleSave() {
   max-width: 300px;
   border-radius: 12px;
   overflow: hidden;
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .photo-preview img {
@@ -586,7 +586,7 @@ async function handleSave() {
 .btn-secondary {
   background: var(--dark);
   color: var(--text-primary);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .spinning {

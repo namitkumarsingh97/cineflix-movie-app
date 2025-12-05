@@ -252,7 +252,7 @@ function goBack() {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 40px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   width: 100%;
   box-sizing: border-box;
 }
@@ -260,7 +260,7 @@ function goBack() {
 .story-header {
   margin-bottom: 40px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .back-btn {
@@ -269,7 +269,7 @@ function goBack() {
   gap: 8px;
   padding: 8px 16px;
   background: var(--dark);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   border-radius: 10px;
   color: var(--text-secondary);
   font-size: 14px;
@@ -280,8 +280,8 @@ function goBack() {
 }
 
 .back-btn:hover {
-  background: rgba(255, 0, 110, 0.1);
-  border-color: rgba(255, 0, 110, 0.3);
+  background: rgba(255, 69, 0, 0.1);
+  border-color: rgba(255, 69, 0, 0.3);
   color: var(--text-primary);
 }
 
@@ -313,8 +313,8 @@ function goBack() {
 
 .story-category {
   padding: 4px 12px;
-  background: rgba(255, 0, 110, 0.1);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  background: rgba(255, 69, 0, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   border-radius: 8px;
   color: var(--primary);
   font-size: 12px;
@@ -394,7 +394,7 @@ function goBack() {
   height: auto;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   object-fit: contain;
 }
 
@@ -406,7 +406,7 @@ function goBack() {
   border-radius: 12px;
   margin: 24px auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   display: block;
   object-fit: contain;
 }
@@ -418,7 +418,7 @@ function goBack() {
   padding: 24px;
   background: var(--dark);
   border-radius: 12px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   margin-top: 40px;
 }
 
@@ -428,7 +428,7 @@ function goBack() {
   gap: 8px;
   padding: 12px 24px;
   background: var(--dark-lighter);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   color: var(--text-primary);
   font-size: 14px;

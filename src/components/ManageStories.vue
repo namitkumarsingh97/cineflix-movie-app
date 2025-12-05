@@ -279,7 +279,7 @@ function formatDate(date) {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 32px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .stories-header-actions {
@@ -331,7 +331,7 @@ function formatDate(date) {
 .search-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .filter-select {
@@ -348,7 +348,7 @@ function formatDate(date) {
 .filter-select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .stories-list {
@@ -364,7 +364,7 @@ function formatDate(date) {
   background: var(--dark);
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   transition: all 0.3s ease;
 }
 
@@ -408,8 +408,8 @@ function formatDate(date) {
 
 .story-category-badge {
   padding: 4px 10px;
-  background: rgba(255, 0, 110, 0.1);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  background: rgba(255, 69, 0, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   border-radius: 6px;
   color: var(--primary);
   font-size: 12px;
@@ -494,7 +494,7 @@ function formatDate(date) {
   gap: 12px;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 0, 110, 0.1);
+  border-top: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .pagination-btn {
@@ -503,7 +503,7 @@ function formatDate(date) {
   gap: 8px;
   padding: 10px 20px;
   background: var(--dark);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   color: var(--text-primary);
   font-size: 14px;
@@ -547,7 +547,7 @@ function formatDate(date) {
 
 .page-number:hover:not(.active):not(.disabled) {
   background: var(--dark-lighter);
-  border-color: rgba(255, 0, 110, 0.2);
+  border-color: rgba(255, 69, 0, 0.2);
 }
 
 .page-number.active {

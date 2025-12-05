@@ -57,17 +57,6 @@
               </li>
               <li class="navbar-nav-item">
                 <router-link
-                  to="/stars"
-                  class="navbar-link"
-                  active-class="active"
-                  @click="closeMobileMenu"
-                >
-                  <Star :size="16" />
-                  <span>Stars</span>
-                </router-link>
-              </li>
-              <li class="navbar-nav-item">
-                <router-link
                   to="/stories"
                   class="navbar-link"
                   active-class="active"
@@ -115,6 +104,26 @@
           </div>
 
           <div class="navbar-right">
+            <!-- Watch Later Badge -->
+            <router-link
+              to="/"
+              class="navbar-btn badge-wrapper"
+              title="Watch Later"
+              aria-label="Watch Later"
+            >
+              <Clock :size="20" />
+              <BadgeCount :count="watchLaterCount" />
+            </router-link>
+            <!-- Followed Stars badge -> Home anchor -->
+            <router-link
+              to="/?section=followed-stars"
+              class="navbar-btn badge-wrapper"
+              title="My Followed Stars"
+              aria-label="My Followed Stars"
+            >
+              <Star :size="20" />
+              <BadgeCount :count="followedStarsCount" />
+            </router-link>
             <button
               class="navbar-btn preferences-btn"
               @click="showPreferences = true"
@@ -241,15 +250,6 @@
           >
             <FolderOpen :size="20" />
             <span>Categories</span>
-          </router-link>
-          <router-link
-            to="/stars"
-            class="mobile-menu-link"
-            active-class="active"
-            @click="closeMobileMenu"
-          >
-            <Star :size="20" />
-            <span>Stars</span>
           </router-link>
           <router-link
             to="/stories"
@@ -401,11 +401,15 @@ import {
   LogOut,
   Settings,
   Accessibility,
+  Clock,
 } from "lucide-vue-next";
 import PreferencesModal from "../components/PreferencesModal.vue";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";
 import PWAInstallPrompt from "../components/PWAInstallPrompt.vue";
+import BadgeCount from "../components/BadgeCount.vue";
 import { useAccessibility } from "../composables/useAccessibility";
+import { useBadgeCounts } from "../composables/useBadgeCounts";
+import { usePushNotifications } from "../composables/usePushNotifications";
 
 const router = useRouter();
 const route = useRoute();
@@ -426,6 +430,8 @@ const adminId = ref("");
 const showPreferences = ref(false);
 const showAccessibility = ref(false);
 const { skipToMain } = useAccessibility();
+const { watchLaterCount, followedStarsCount } = useBadgeCounts();
+const { subscribe, requestPermission, isSupported: pushSupported } = usePushNotifications();
 
 // Get available categories for preferences
 const availableCategories = computed(() => {
@@ -593,11 +599,19 @@ const isAdminRoute = computed(() => {
   return route.path.startsWith('/admin');
 });
 
-onMounted(() => {
+onMounted(async () => {
   checkAdminStatus();
   // Check admin status periodically
   const interval = setInterval(checkAdminStatus, 1000);
   window._adminStatusInterval = interval;
+
+  // Initialize push notifications if supported and logged in
+  if (pushSupported.value && (localStorage.getItem('token') || localStorage.getItem('adminToken'))) {
+    const hasPermission = await requestPermission();
+    if (hasPermission) {
+      await subscribe();
+    }
+  }
 
   // Close admin menu when clicking outside
   const handleClickOutside = (event) => {

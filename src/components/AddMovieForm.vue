@@ -415,7 +415,7 @@ async function handleSave() {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 32px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .movie-form {
@@ -467,7 +467,7 @@ async function handleSave() {
 .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .form-input::placeholder,
@@ -551,7 +551,7 @@ async function handleSave() {
   gap: 8px;
   padding: 16px;
   background: var(--dark);
-  border: 2px dashed rgba(255, 0, 110, 0.3);
+  border: 2px dashed rgba(255, 69, 0, 0.3);
   border-radius: 12px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -562,7 +562,7 @@ async function handleSave() {
 .file-label:hover {
   border-color: var(--primary);
   color: var(--primary);
-  background: rgba(255, 0, 110, 0.05);
+  background: rgba(255, 69, 0, 0.05);
 }
 
 .file-label svg {
@@ -576,7 +576,7 @@ async function handleSave() {
   max-width: 400px;
   border-radius: 12px;
   overflow: hidden;
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .thumbnail-preview img {
@@ -664,12 +664,12 @@ async function handleSave() {
 .btn-secondary {
   background: var(--dark);
   color: var(--text-primary);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .btn-secondary:hover {
   border-color: var(--primary);
-  background: rgba(255, 0, 110, 0.05);
+  background: rgba(255, 69, 0, 0.05);
 }
 
 .spinning {

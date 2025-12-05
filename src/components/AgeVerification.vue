@@ -248,7 +248,7 @@ function preventShortcuts(e) {
   max-width: 500px;
   width: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 0, 110, 0.3);
+  border: 2px solid rgba(255, 69, 0, 0.3);
   animation: slideUp 0.4s ease;
 }
 
@@ -269,7 +269,7 @@ function preventShortcuts(e) {
 }
 
 .warning-icon {
-  color: #ff006e;
+  color: #ff4500;
   margin-bottom: 20px;
   animation: pulse 2s infinite;
 }
@@ -317,7 +317,7 @@ function preventShortcuts(e) {
   padding: 24px;
   border-radius: 12px;
   text-align: center;
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
 }
 
 .math-expression {
@@ -348,7 +348,7 @@ function preventShortcuts(e) {
 .answer-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
 }
 
 .answer-input::placeholder {
@@ -397,7 +397,7 @@ function preventShortcuts(e) {
 
 .verify-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 0, 110, 0.4);
+  box-shadow: 0 8px 20px rgba(255, 69, 0, 0.4);
 }
 
 .verify-btn:disabled {

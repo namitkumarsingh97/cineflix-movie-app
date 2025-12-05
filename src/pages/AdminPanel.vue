@@ -410,7 +410,7 @@ function handleMovieSaved() {
 
 .admin-panel-header {
   background: var(--dark-lighter);
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
   padding: 24px 40px;
 }
 
@@ -485,7 +485,7 @@ function handleMovieSaved() {
 .admin-sidebar {
   width: 280px;
   background: var(--dark-lighter);
-  border-right: 1px solid rgba(255, 0, 110, 0.1);
+  border-right: 1px solid rgba(255, 69, 0, 0.1);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -501,8 +501,8 @@ function handleMovieSaved() {
   align-items: center;
   justify-content: space-between;
   padding: 24px 20px;
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
-  background: rgba(255, 0, 110, 0.03);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
+  background: rgba(255, 69, 0, 0.03);
 }
 
 .sidebar-logo {
@@ -521,13 +521,13 @@ function handleMovieSaved() {
 }
 
 .sidebar-logo:hover {
-  background: rgba(255, 0, 110, 0.1);
+  background: rgba(255, 69, 0, 0.1);
   transform: translateX(2px);
 }
 
 .sidebar-logo svg {
   color: var(--primary);
-  filter: drop-shadow(0 0 6px rgba(255, 0, 110, 0.4));
+  filter: drop-shadow(0 0 6px rgba(255, 69, 0, 0.4));
 }
 
 .mobile-menu-toggle {
@@ -549,7 +549,7 @@ function handleMovieSaved() {
 .sidebar-footer {
   margin-top: auto;
   padding: 16px;
-  border-top: 1px solid rgba(255, 0, 110, 0.1);
+  border-top: 1px solid rgba(255, 69, 0, 0.1);
   background: rgba(0, 0, 0, 0.2);
 }
 
@@ -562,16 +562,16 @@ function handleMovieSaved() {
   align-items: center;
   gap: 12px;
   padding: 14px;
-  background: linear-gradient(135deg, rgba(255, 0, 110, 0.1) 0%, rgba(131, 56, 236, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.1) 0%, rgba(255, 140, 0, 0.1) 100%);
   border-radius: 14px;
   margin-bottom: 10px;
-  border: 1px solid rgba(255, 0, 110, 0.15);
+  border: 1px solid rgba(255, 69, 0, 0.15);
   transition: all 0.2s ease;
 }
 
 .profile-info:hover {
-  background: linear-gradient(135deg, rgba(255, 0, 110, 0.15) 0%, rgba(131, 56, 236, 0.15) 100%);
-  border-color: rgba(255, 0, 110, 0.25);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.15) 0%, rgba(255, 140, 0, 0.15) 100%);
+  border-color: rgba(255, 69, 0, 0.25);
   transform: translateY(-1px);
 }
 
@@ -585,7 +585,7 @@ function handleMovieSaved() {
   justify-content: center;
   color: white;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(255, 0, 110, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 69, 0, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -667,12 +667,12 @@ function handleMovieSaved() {
 }
 
 .admin-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 0, 110, 0.3);
+  background: rgba(255, 69, 0, 0.3);
   border-radius: 2px;
 }
 
 .admin-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 0, 110, 0.5);
+  background: rgba(255, 69, 0, 0.5);
 }
 
 .admin-nav-item {
@@ -714,7 +714,7 @@ function handleMovieSaved() {
 }
 
 .admin-nav-item:hover {
-  background: rgba(255, 0, 110, 0.08);
+  background: rgba(255, 69, 0, 0.08);
   color: var(--text-primary);
   transform: translateX(4px);
 }
@@ -724,15 +724,15 @@ function handleMovieSaved() {
 }
 
 .admin-nav-item.active {
-  background: linear-gradient(135deg, rgba(255, 0, 110, 0.15) 0%, rgba(131, 56, 236, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.15) 0%, rgba(255, 140, 0, 0.15) 100%);
   color: var(--primary);
   font-weight: 600;
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
 }
 
 .admin-nav-item.active::before {
   height: 70%;
-  box-shadow: 0 0 8px rgba(255, 0, 110, 0.6);
+  box-shadow: 0 0 8px rgba(255, 69, 0, 0.6);
 }
 
 .admin-nav-item.active svg {
@@ -821,7 +821,7 @@ function handleMovieSaved() {
   display: flex;
   align-items: center;
   gap: 16px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .stat-card svg {
@@ -846,7 +846,7 @@ function handleMovieSaved() {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .breakdown-title {
@@ -914,7 +914,7 @@ function handleMovieSaved() {
   gap: 16px;
   padding: 16px 20px;
   background: var(--dark-lighter);
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -927,7 +927,7 @@ function handleMovieSaved() {
   width: 44px;
   height: 44px;
   background: var(--dark);
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   border-radius: 10px;
   color: var(--text-primary);
   cursor: pointer;
@@ -935,8 +935,8 @@ function handleMovieSaved() {
 }
 
 .mobile-hamburger-btn:hover {
-  background: rgba(255, 0, 110, 0.1);
-  border-color: rgba(255, 0, 110, 0.2);
+  background: rgba(255, 69, 0, 0.1);
+  border-color: rgba(255, 69, 0, 0.2);
   transform: scale(1.05);
 }
 

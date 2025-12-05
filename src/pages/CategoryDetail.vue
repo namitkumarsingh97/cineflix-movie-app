@@ -185,7 +185,7 @@ function goBack() {
   gap: 10px;
   padding: 12px 20px;
   background: var(--dark-lighter);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 16px;
@@ -197,8 +197,8 @@ function goBack() {
 }
 
 .back-btn:hover {
-  background: rgba(255, 0, 110, 0.1);
-  border-color: rgba(255, 0, 110, 0.3);
+  background: rgba(255, 69, 0, 0.1);
+  border-color: rgba(255, 69, 0, 0.3);
   color: var(--text-primary);
 }
 
@@ -226,7 +226,7 @@ function goBack() {
   justify-content: center;
   color: white;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(255, 0, 110, 0.4);
+  box-shadow: 0 4px 16px rgba(255, 69, 0, 0.4);
 }
 
 .category-icon-large svg {
@@ -646,13 +646,13 @@ function goBack() {
 
   .back-btn:hover {
     background: var(--dark-lighter);
-    border-color: rgba(255, 0, 110, 0.2);
+    border-color: rgba(255, 69, 0, 0.2);
     color: var(--text-secondary);
   }
 
   .back-btn:active {
-    background: rgba(255, 0, 110, 0.1);
-    border-color: rgba(255, 0, 110, 0.3);
+    background: rgba(255, 69, 0, 0.1);
+    border-color: rgba(255, 69, 0, 0.3);
     color: var(--text-primary);
   }
 

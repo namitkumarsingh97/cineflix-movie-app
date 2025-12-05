@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline • Cineflix</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0e27;
+      --panel: #151b38;
+      --text: #ffffff;
+      --muted: #b8bcc8;
+      --primary: #ff006e;
+      --accent: #8338ec;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 20% 20%, #111842 0%, #0a0e27 45%), radial-gradient(circle at 80% 0%, #151b38 0%, #0a0e27 50%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+    .card {
+      background: linear-gradient(145deg, rgba(21, 27, 56, 0.9), rgba(10, 14, 39, 0.95));
+      border: 1px solid rgba(255, 0, 110, 0.2);
+      box-shadow: 0 15px 60px rgba(0, 0, 0, 0.45);
+      border-radius: 18px;
+      padding: 28px;
+      max-width: 420px;
+      width: calc(100% - 32px);
+      text-align: center;
+      backdrop-filter: blur(6px);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+    p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 0, 110, 0.1);
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid rgba(255, 0, 110, 0.2);
+      margin-bottom: 14px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(255, 0, 110, 0.35);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+    small {
+      display: block;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="pill">Offline mode</div>
+    <h1>You’re offline</h1>
+    <p>We couldn’t reach the network. Content you recently opened may still be available once you’re back online.</p>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="location.reload()">Retry</button>
+      <button class="btn btn-secondary" onclick="window.history.back()">Go Back</button>
+    </div>
+    <small>Tip: Install the app to keep key pages and assets cached for offline viewing.</small>
+  </div>
+</body>
+</html>
+

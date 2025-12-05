@@ -108,7 +108,7 @@ async function handleLogin() {
   max-width: 450px;
   width: 100%;
   box-shadow: var(--shadow-hover);
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .login-header {
@@ -174,7 +174,7 @@ async function handleLogin() {
 .form-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .form-input::placeholder {

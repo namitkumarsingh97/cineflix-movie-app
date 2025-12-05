@@ -512,7 +512,7 @@ async function handleSave() {
 .modal-content {
   background: var(--dark-lighter);
   border-radius: 16px;
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   max-width: 90vw;
   max-height: 90vh;
@@ -538,7 +538,7 @@ async function handleSave() {
   align-items: center;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .modal-header h3 {
@@ -636,7 +636,7 @@ async function handleSave() {
 .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .char-count {
@@ -664,7 +664,7 @@ async function handleSave() {
   gap: 8px;
   padding: 12px 20px;
   background: var(--dark);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 14px;
@@ -674,7 +674,7 @@ async function handleSave() {
 }
 
 .status-btn:hover {
-  border-color: rgba(255, 0, 110, 0.4);
+  border-color: rgba(255, 69, 0, 0.4);
   color: var(--text-primary);
 }
 
@@ -701,7 +701,7 @@ async function handleSave() {
   gap: 12px;
   justify-content: flex-end;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 0, 110, 0.1);
+  border-top: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .btn-secondary {
@@ -711,7 +711,7 @@ async function handleSave() {
   padding: 12px 24px;
   background: var(--dark);
   color: var(--text-primary);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
@@ -721,7 +721,7 @@ async function handleSave() {
 
 .btn-secondary:hover {
   border-color: var(--primary);
-  background: rgba(255, 0, 110, 0.05);
+  background: rgba(255, 69, 0, 0.05);
 }
 
 .btn-primary {
@@ -780,7 +780,7 @@ async function handleSave() {
   gap: 6px;
   padding: 8px 12px;
   background: var(--dark);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
   border-radius: 8px;
   color: var(--text-secondary);
   font-size: 13px;
@@ -790,7 +790,7 @@ async function handleSave() {
 }
 
 .toolbar-btn:hover {
-  background: rgba(255, 0, 110, 0.1);
+  background: rgba(255, 69, 0, 0.1);
   border-color: var(--primary);
   color: var(--primary);
 }
@@ -827,7 +827,7 @@ async function handleSave() {
   border-radius: 16px;
   max-width: 500px;
   width: 100%;
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
 }
 
 .image-modal-header {
@@ -835,7 +835,7 @@ async function handleSave() {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .image-modal-header h4 {
@@ -878,7 +878,7 @@ async function handleSave() {
   gap: 8px;
   padding: 12px;
   background: var(--dark);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 8px;
   color: var(--text-secondary);
   font-size: 14px;
@@ -905,7 +905,7 @@ async function handleSave() {
   max-height: 300px;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   margin-top: 12px;
 }
 
@@ -928,7 +928,7 @@ async function handleSave() {
   gap: 8px;
   padding: 16px;
   background: var(--dark);
-  border: 2px dashed rgba(255, 0, 110, 0.3);
+  border: 2px dashed rgba(255, 69, 0, 0.3);
   border-radius: 12px;
   color: var(--text-secondary);
   cursor: pointer;
@@ -939,7 +939,7 @@ async function handleSave() {
 .file-label:hover {
   border-color: var(--primary);
   color: var(--primary);
-  background: rgba(255, 0, 110, 0.05);
+  background: rgba(255, 69, 0, 0.05);
 }
 
 .image-modal-actions {
@@ -948,6 +948,6 @@ async function handleSave() {
   justify-content: flex-end;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 0, 110, 0.1);
+  border-top: 1px solid rgba(255, 69, 0, 0.1);
 }
 </style>

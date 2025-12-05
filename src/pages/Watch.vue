@@ -90,6 +90,24 @@
                   <Download :size="20" />
                   <span>Download for Offline Viewing</span>
                 </button>
+                <button
+                  class="action-btn"
+                  :class="{ active: isWatchLater }"
+                  @click="toggleWatchLater"
+                >
+                  <Clock :size="20" />
+                  <span>{{ isWatchLater ? 'Saved' : 'Watch Later' }}</span>
+                </button>
+                <button
+                  v-if="followTarget"
+                  class="action-btn"
+                  :class="{ active: isFollowingStar }"
+                  @click="toggleFollowStar"
+                  title="Follow star or creator"
+                >
+                  <Star :size="20" />
+                  <span>{{ isFollowingStar ? 'Following' : 'Follow' }}</span>
+                </button>
                 <button 
                   class="action-btn" 
                   :class="{ active: isFavorite }"
@@ -229,6 +247,8 @@ import { useVideos } from '../composables/useVideos';
 import { useMovies } from '../composables/useMovies';
 import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
 import { useDownloads } from '../composables/useDownloads';
+import { useWatchLater } from '../composables/useWatchLater';
+import { useStarFollows } from '../composables/useStarFollows';
 import VideoCard from '../components/VideoCard.vue';
 import MovieCard from '../components/MovieCard.vue';
 import Loader from '../components/Loader.vue';
@@ -239,6 +259,8 @@ import {
   Download,
   MoreVertical,
   Heart,
+  Clock,
+  Star,
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -264,8 +286,25 @@ const playbackSpeed = ref(1);
 const { addToHistory, updateProgress } = useWatchHistory();
 const { isFavorited, toggleFavorite } = useFavorites();
 const { downloadForOffline: downloadOffline } = useDownloads();
+const { add: addWatchLater, remove: removeWatchLater, isSaved: isInWatchLater } = useWatchLater();
+const { follow, unfollow, isFollowed } = useStarFollows();
 
 const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
+const isWatchLater = computed(() => video.value ? isInWatchLater(video.value._id || video.value.id) : false);
+const primaryStar = computed(() => {
+  if (!video.value) return '';
+  if (Array.isArray(video.value.stars) && video.value.stars.length) return video.value.stars[0];
+  if (video.value.channel) return video.value.channel;
+  return '';
+});
+
+const followTarget = computed(() => {
+  if (primaryStar.value) return primaryStar.value;
+  if (video.value?.title) return `${video.value.title} (creator)`;
+  return '';
+});
+
+const isFollowingStar = computed(() => followTarget.value ? isFollowed(followTarget.value) : false);
 
 // Debug computed for iframe rendering
 const shouldShowIframe = computed(() => {
@@ -632,6 +671,34 @@ async function downloadForOffline() {
   } catch (error) {
     console.error('Download error:', error);
     alert(t('download.downloadFailed'));
+  }
+}
+
+function toggleWatchLater() {
+  if (!video.value) return;
+  const id = video.value._id || video.value.id;
+  if (!id) return;
+  const type = isMovie.value ? 'movie' : (isEporner.value ? 'eporner' : 'video');
+  if (isWatchLater.value) {
+    removeWatchLater(id, type);
+  } else {
+    addWatchLater({
+      id,
+      title: video.value.title,
+      thumbnail: video.value.thumbnail,
+      type,
+      category: video.value.category,
+    });
+  }
+}
+
+function toggleFollowStar() {
+  const name = followTarget.value;
+  if (!name) return;
+  if (isFollowingStar.value) {
+    unfollow(name);
+  } else {
+    follow(name);
   }
 }
 

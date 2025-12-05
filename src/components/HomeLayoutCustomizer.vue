@@ -139,7 +139,7 @@ function getIcon(iconName) {
   overflow-y: auto;
   z-index: 1000;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
 }
 
 .customizer-header {
@@ -281,7 +281,7 @@ function getIcon(iconName) {
   gap: 8px;
   padding: 10px 20px;
   background: var(--dark);
-  border: 1px solid rgba(255, 0, 110, 0.3);
+  border: 1px solid rgba(255, 69, 0, 0.3);
   border-radius: 8px;
   color: var(--text-primary);
   font-size: 14px;
@@ -291,7 +291,7 @@ function getIcon(iconName) {
 }
 
 .reset-btn:hover {
-  background: rgba(255, 0, 110, 0.1);
+  background: rgba(255, 69, 0, 0.1);
   border-color: var(--primary);
 }
 

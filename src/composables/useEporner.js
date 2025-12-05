@@ -17,6 +17,9 @@ export function useEporner() {
   const thumbSize = ref('big');
   const includeGay = ref(0);
   const includeLowQuality = ref(1);
+  const queryCache = new Map();
+  const videoCache = new Map();
+  const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   /**
    * Transform Eporner video to app format
@@ -53,6 +56,60 @@ export function useEporner() {
     };
   };
 
+  const getNetworkPreferences = () => {
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
+
+    const saveData = Boolean(connection?.saveData);
+    const effectiveType = connection?.effectiveType || '';
+    const isSlow = effectiveType === 'slow-2g' || effectiveType === '2g';
+
+    return { saveData, isSlow, effectiveType };
+  };
+
+  const buildQueryCacheKey = (params) => {
+    return [
+      params.query,
+      params.page,
+      params.per_page,
+      params.thumbsize,
+      params.order,
+      params.gay,
+      params.lq,
+    ].join('|');
+  };
+
+  const cacheResult = (key, payload) => {
+    queryCache.set(key, {
+      ts: Date.now(),
+      payload,
+    });
+  };
+
+  const getCachedResult = (key) => {
+    const cached = queryCache.get(key);
+    if (!cached) return null;
+    if (Date.now() - cached.ts > CACHE_TTL_MS) {
+      queryCache.delete(key);
+      return null;
+    }
+    return cached.payload;
+  };
+
+  const getAdaptiveParams = (basePerPage, baseThumbsize, options) => {
+    const { saveData, isSlow } = getNetworkPreferences();
+    const perPageAdaptive = (saveData || isSlow)
+      ? Math.min(basePerPage, 12)
+      : basePerPage;
+    const thumbsizeAdaptive = (saveData || isSlow)
+      ? 'medium'
+      : (options.thumbsize || baseThumbsize);
+
+    return { perPageAdaptive, thumbsizeAdaptive };
+  };
+
   /**
    * Search videos
    */
@@ -61,16 +118,34 @@ export function useEporner() {
     error.value = null;
 
     try {
+      const { perPageAdaptive, thumbsizeAdaptive } = getAdaptiveParams(
+        options.perPage || perPage.value,
+        options.thumbsize || thumbSize.value,
+        options
+      );
+
       const params = {
         query: query || 'all',
         page: page || 1,
-        per_page: options.perPage || perPage.value,
-        thumbsize: options.thumbsize || thumbSize.value,
+        per_page: perPageAdaptive,
+        thumbsize: thumbsizeAdaptive,
         order: options.order || sortOrder.value,
         gay: options.gay !== undefined ? options.gay : includeGay.value,
         lq: options.lq !== undefined ? options.lq : includeLowQuality.value,
         format: 'json',
       };
+
+      const cacheKey = buildQueryCacheKey(params);
+      const cached = getCachedResult(cacheKey);
+      if (cached) {
+        videos.value = cached.videos;
+        currentPage.value = cached.page;
+        totalCount.value = cached.totalCount;
+        totalPages.value = cached.totalPages;
+        searchQuery.value = query;
+        loading.value = false;
+        return;
+      }
 
       const response = await epornerApi.search(params);
 
@@ -98,6 +173,13 @@ export function useEporner() {
         if (totalPages.value < 1) {
           totalPages.value = 1;
         }
+
+        cacheResult(cacheKey, {
+          videos: [...videos.value],
+          page: currentPage.value,
+          totalPages: totalPages.value,
+          totalCount: totalCount.value,
+        });
       } else {
         videos.value = [];
         totalPages.value = 1;
@@ -121,17 +203,23 @@ export function useEporner() {
 
     try {
       console.log('useEporner.getVideoById called with ID:', id);
-      const video = await epornerApi.getById(id, thumbSize.value);
-      console.log('useEporner.getVideoById raw video:', video);
-      
-      if (video) {
-        const transformed = transformVideo(video);
-        console.log('useEporner.getVideoById transformed video:', transformed);
-        return transformed;
-      } else {
-        console.warn('useEporner.getVideoById: video is null');
-        return null;
+      const cached = videoCache.get(id);
+      if (cached && Date.now() - cached.ts <= CACHE_TTL_MS) {
+        return cached.video;
       }
+
+      const networkVideo = await epornerApi.getById(id, thumbSize.value);
+      console.log('useEporner.getVideoById raw video:', networkVideo);
+      
+      if (networkVideo) {
+        const transformed = transformVideo(networkVideo);
+        console.log('useEporner.getVideoById transformed video:', transformed);
+        videoCache.set(id, { ts: Date.now(), video: transformed });
+        return transformed;
+      }
+
+      console.warn('useEporner.getVideoById: video is null');
+      return null;
     } catch (err) {
       console.error('Error fetching video by ID:', err);
       error.value = err.message || 'Failed to fetch video';

@@ -217,8 +217,8 @@ function handleThumbnailError(event) {
 <style scoped>
 .categories-page {
   min-height: calc(100vh - 200px);
+  width: 100%;
   padding: 60px;
-  max-width: 1600px;
   margin: 0 auto;
 }
 

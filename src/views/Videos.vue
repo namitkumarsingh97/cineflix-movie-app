@@ -289,7 +289,7 @@ export default {
 
 .video-card:hover .play-button-large {
   transform: scale(1.1);
-  background: white;
+  background: var(--dark-lighter);
 }
 
 .video-duration {

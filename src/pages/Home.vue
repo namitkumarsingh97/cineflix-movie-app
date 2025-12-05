@@ -62,6 +62,35 @@
       </div>
     </section>
 
+    <!-- Watch Later Section -->
+    <section
+      id="watch-later-section"
+      v-if="watchLaterItems.length > 0"
+      class="movies-section"
+      aria-label="Watch later"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Clock :size="24" class="title-icon" />
+          <span>Watch Later</span>
+        </h2>
+      </div>
+      <div class="youtube-videos-grid">
+        <MovieCard
+          v-for="item in watchLaterMovies"
+          :key="`wl-movie-${item._id}`"
+          :movie="item"
+          @click="navigateToMovie"
+        />
+        <VideoCard
+          v-for="item in watchLaterVideos"
+          :key="`wl-video-${item.id}`"
+          :video="item"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
     <!-- Trending Section (Latest Eporner Videos) -->
     <section 
       v-if="latestVideos.length > 0 && isSectionEnabled('trending')" 
@@ -84,6 +113,29 @@
           :key="video.id"
           :video="video"
           @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Personalized Stars Section -->
+    <section
+      id="followed-stars-section"
+      v-if="personalizedByStars.length > 0"
+      class="movies-section"
+      aria-label="Your favorite stars"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Star :size="24" class="title-icon" />
+          <span>Your Stars</span>
+        </h2>
+      </div>
+      <div class="youtube-videos-grid">
+        <MovieCard
+          v-for="movie in personalizedByStars"
+          :key="`favstar-${movie._id}`"
+          :movie="movie"
+          @click="navigateToMovie"
         />
       </div>
     </section>
@@ -277,7 +329,7 @@
 
 <script setup>
 import { ref, computed, onMounted, inject, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useMovies } from "../composables/useMovies";
 import { usePagination } from "../composables/usePagination";
 import { useWatchHistory, useFavorites } from "../composables/useWatchHistory";
@@ -287,6 +339,10 @@ import MovieCard from "../components/MovieCard.vue";
 import AdvancedSearch from "../components/AdvancedSearch.vue";
 import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
 import { useHomeLayout } from "../composables/useHomeLayout";
+import { useWatchLater } from "../composables/useWatchLater";
+import { useStarFollows } from "../composables/useStarFollows";
+import { useNotifications } from "../composables/useNotifications";
+import { useVideos } from "../composables/useVideos";
 
 import {
   Film,
@@ -300,11 +356,13 @@ import {
   Shuffle,
   Filter,
   Layout,
+  Star,
 } from "lucide-vue-next";
 import { useEporner } from "../composables/useEporner";
 import VideoCard from "../components/VideoCard.vue";
 
 const router = useRouter();
+const route = useRoute();
 
 // Get search query and refresh trigger from parent
 const searchQuery = inject("searchQuery", ref(""));
@@ -317,6 +375,9 @@ const { movies, sortBy, loading, featuredMovie, loadMovies } =
 const { getContinueWatching, clearHistory, getWatchHistory } = useWatchHistory();
 const { getPreferredCategories } = usePreferences();
 const { isSectionEnabled } = useHomeLayout();
+const { items: watchLaterItems } = useWatchLater();
+const { stars: followedStars } = useStarFollows();
+const { notify, requestPermission } = useNotifications();
 
 // Eporner videos
 const {
@@ -327,11 +388,15 @@ const {
   searchVideos,
 } = useEporner();
 
+// Regular videos (from backend)
+const { videos, loadVideos: loadBackendVideos } = useVideos();
+
 const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
 const latestVideos = ref([]);
 
 const showLayoutCustomizer = ref(false);
+const lastNotifiedAtKey = 'cineflix_last_content_notified';
 
 // Local state
 const viewMode = ref("grid");
@@ -438,6 +503,29 @@ const continueWatching = computed(() => {
   return getContinueWatching();
 });
 
+const watchLaterMovies = computed(() =>
+  watchLaterItems.value
+    .filter((item) => item.type === 'movie')
+    .map((saved) => movies.value.find((m) => m._id === saved.id))
+    .filter(Boolean)
+);
+
+const watchLaterVideos = computed(() =>
+  watchLaterItems.value
+    .filter((item) => item.type === 'eporner' || item.type === 'video')
+    .map((saved) => {
+      // Try eporner videos first
+      const epornerVideo = epornerVideos.value.find((v) => v.id === saved.id);
+      if (epornerVideo) return epornerVideo;
+      // Then try backend videos
+      if (videos.value && Array.isArray(videos.value)) {
+        return videos.value.find((v) => v.id === saved.id || v._id === saved.id);
+      }
+      return null;
+    })
+    .filter(Boolean)
+);
+
 // Trending movies (most viewed/liked)
 const trendingMovies = computed(() => {
   const allMovies = [...filteredMovies.value];
@@ -504,6 +592,18 @@ const uniqueStars = computed(() => {
     }
   });
   return Array.from(starsSet).sort();
+});
+
+// Personalized movies based on followed stars
+const personalizedByStars = computed(() => {
+  if (!followedStars.value.length) return [];
+  return movies.value
+    .filter(
+      (movie) =>
+        Array.isArray(movie.stars) &&
+        movie.stars.some((star) => followedStars.value.includes(star))
+    )
+    .slice(0, 12);
 });
 
 // Apply filters from AdvancedSearch component
@@ -579,10 +679,64 @@ async function loadEpornerSections() {
   }
 }
 
+function latestContentTimestamp() {
+  const movieNewest = movies.value[0]?.createdAt
+    ? new Date(movies.value[0].createdAt).getTime()
+    : 0;
+  const epornerNewest = latestVideos.value[0]?.added
+    ? new Date(latestVideos.value[0].added).getTime()
+    : 0;
+  return Math.max(movieNewest, epornerNewest);
+}
+
+async function maybeNotifyNewContent() {
+  const lastSeen = Number(localStorage.getItem(lastNotifiedAtKey) || 0);
+  const newest = latestContentTimestamp();
+  if (!newest || newest <= lastSeen) return;
+  const permission = await requestPermission();
+  if (permission !== 'granted') return;
+  await notify('New videos just dropped', {
+    body: 'Tap to open the latest additions.',
+  });
+  localStorage.setItem(lastNotifiedAtKey, String(newest));
+}
+
 onMounted(() => {
   loadMovies();
+  loadBackendVideos();
   loadEpornerSections();
+  maybeNotifyNewContent();
+
+  const section = route.query.section;
+  if (section) {
+    scrollToSection(section);
+  }
 });
+
+watch(
+  () => route.query.section,
+  (section) => {
+    if (section) {
+      scrollToSection(section);
+    }
+  }
+);
+
+function scrollToSection(section) {
+  const id =
+    section === "watch-later"
+      ? "watch-later-section"
+      : section === "followed-stars"
+      ? "followed-stars-section"
+      : "";
+  if (!id) return;
+  requestAnimationFrame(() => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
 </script>
 
 <style scoped>
@@ -605,13 +759,13 @@ onMounted(() => {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(255, 0, 110, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
   transition: all 0.3s ease;
 }
 
 .layout-customizer-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 0, 110, 0.5);
+  box-shadow: 0 6px 20px rgba(255, 69, 0, 0.5);
 }
 
 .layout-customizer-btn:focus {
@@ -633,7 +787,7 @@ onMounted(() => {
 }
 
 .view-all-link:hover {
-  background: rgba(255, 0, 110, 0.1);
+  background: rgba(255, 69, 0, 0.1);
   color: var(--primary);
   transform: translateX(4px);
 }

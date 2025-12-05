@@ -248,8 +248,8 @@ function getRating(story) {
 <style scoped>
 .stories-page {
   min-height: calc(100vh - 200px);
+  width: 100%;
   padding: 40px;
-  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -295,14 +295,14 @@ function getRating(story) {
 .filter-select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .stories-table-container {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   overflow-x: visible;
   width: 100%;
   box-sizing: border-box;
@@ -327,7 +327,7 @@ function getRating(story) {
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 2px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 2px solid rgba(255, 69, 0, 0.1);
 }
 
 .story-row {
@@ -337,7 +337,7 @@ function getRating(story) {
 }
 
 .story-row:hover {
-  background: rgba(255, 0, 110, 0.05);
+  background: rgba(255, 69, 0, 0.05);
   transform: translateX(4px);
 }
 
@@ -444,7 +444,7 @@ function getRating(story) {
   gap: 12px;
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 0, 110, 0.1);
+  border-top: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .pagination-btn {
@@ -453,7 +453,7 @@ function getRating(story) {
   gap: 8px;
   padding: 10px 20px;
   background: var(--dark);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   color: var(--text-primary);
   font-size: 14px;
@@ -497,7 +497,7 @@ function getRating(story) {
 
 .page-number:hover:not(.active):not(.disabled) {
   background: var(--dark-lighter);
-  border-color: rgba(255, 0, 110, 0.2);
+  border-color: rgba(255, 69, 0, 0.2);
 }
 
 .page-number.active {
@@ -607,7 +607,7 @@ function getRating(story) {
     padding: 16px;
     background: var(--dark);
     border-radius: 12px;
-    border: 1px solid rgba(255, 0, 110, 0.1);
+    border: 1px solid rgba(255, 69, 0, 0.1);
   }
 
   .story-row td {

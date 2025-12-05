@@ -70,7 +70,7 @@ const shouldShow = computed(() => {
   max-width: 400px;
   width: calc(100% - 40px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 0, 110, 0.3);
+  border: 1px solid rgba(255, 69, 0, 0.3);
   z-index: 1000;
   animation: slideUp 0.3s ease;
 }
@@ -147,7 +147,7 @@ const shouldShow = computed(() => {
 
 .install-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 0, 110, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
 }
 
 .dismiss-btn {

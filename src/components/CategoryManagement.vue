@@ -322,7 +322,7 @@ async function deleteCategory(categoryName) {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 32px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .category-header {
@@ -370,7 +370,7 @@ async function deleteCategory(categoryName) {
   background: var(--dark);
   border-radius: 12px;
   padding: 16px 20px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
   transition: all 0.3s ease;
 }
 
@@ -481,7 +481,7 @@ async function deleteCategory(categoryName) {
   border-radius: 20px;
   max-width: 500px;
   width: 100%;
-  border: 1px solid rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.2);
 }
 
 .modal-header {
@@ -489,7 +489,7 @@ async function deleteCategory(categoryName) {
   align-items: center;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 1px solid rgba(255, 0, 110, 0.1);
+  border-bottom: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .modal-header h3 {
@@ -560,7 +560,7 @@ async function deleteCategory(categoryName) {
 .form-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 0, 110, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
 }
 
 .error-message {
@@ -589,7 +589,7 @@ async function deleteCategory(categoryName) {
   padding: 12px 24px;
   background: var(--dark);
   color: var(--text-primary);
-  border: 2px solid rgba(255, 0, 110, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.2);
   border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
@@ -599,7 +599,7 @@ async function deleteCategory(categoryName) {
 
 .btn-secondary:hover {
   border-color: var(--primary);
-  background: rgba(255, 0, 110, 0.05);
+  background: rgba(255, 69, 0, 0.05);
 }
 
 .spinning {

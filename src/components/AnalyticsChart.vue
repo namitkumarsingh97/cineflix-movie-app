@@ -69,11 +69,11 @@ const maxValue = computed(() => {
 
 function getBarColor(index) {
   const colors = [
-    'linear-gradient(135deg, #ff006e 0%, #ff4d9a 100%)',
-    'linear-gradient(135deg, #8338ec 0%, #a855f7 100%)',
-    'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-    'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-    'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+    'linear-gradient(135deg, #ff4500 0%, #ff6347 100%)',
+    'linear-gradient(135deg, #ff8c00 0%, #ffa500 100%)',
+    'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+    'linear-gradient(135deg, #32cd32 0%, #7cfc00 100%)',
+    'linear-gradient(135deg, #ff6347 0%, #ff4500 100%)',
   ];
   return colors[index % colors.length];
 }
@@ -84,7 +84,7 @@ function getBarColor(index) {
   background: var(--dark-lighter);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 69, 0, 0.1);
 }
 
 .chart-header {
