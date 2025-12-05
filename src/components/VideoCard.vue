@@ -20,17 +20,11 @@
       </div>
     </div>
     <div class="video-info-section">
-      <div class="video-channel-avatar" v-if="showChannel">
-        <div class="avatar-circle">
-          {{ getInitials(video.channel || 'Video') }}
-        </div>
-      </div>
       <div class="video-details">
         <h3 class="video-title-text" :title="video.title">
           {{ video.title }}
         </h3>
         <div class="video-meta-info">
-          <span class="channel-name" v-if="showChannel">{{ video.channel || 'Video' }}</span>
           <span class="view-count" v-if="video.views">{{ formatViews(video.views) }} views</span>
           <span class="upload-time" v-if="video.added || video.uploadedAt">{{ formatTimeAgo(video.added || video.uploadedAt) }}</span>
         </div>
@@ -64,7 +58,7 @@ const props = defineProps({
   },
   showChannel: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 
@@ -189,26 +183,10 @@ function getInitials(name) {
   min-height: 0;
 }
 
-.video-channel-avatar {
-  flex-shrink: 0;
-}
-
-.avatar-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--gradient-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-}
-
 .video-details {
   flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .video-title-text {
@@ -235,13 +213,11 @@ function getInitials(name) {
   line-height: 1.3;
 }
 
-.channel-name,
 .view-count,
 .upload-time {
   display: inline-block;
 }
 
-.channel-name::after,
 .view-count::after {
   content: '•';
   margin-left: 4px;
@@ -305,12 +281,6 @@ function getInitials(name) {
   .video-meta-info {
     font-size: 10px;
     gap: 2px 4px;
-  }
-
-  .avatar-circle {
-    width: 28px;
-    height: 28px;
-    font-size: 11px;
   }
 
   .video-info-section {
