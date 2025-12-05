@@ -230,7 +230,7 @@ function handleThumbnailError(event) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  background: linear-gradient(135deg, var(--dark-light) 0%, var(--dark-lighter) 100%);
   color: var(--text-secondary);
 }
 
