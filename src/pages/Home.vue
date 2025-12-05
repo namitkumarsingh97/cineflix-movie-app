@@ -164,7 +164,7 @@
 
     <!-- Trending Videos Section (Eporner) -->
     <section 
-      v-if="trendingVideos.length > 0 && isSectionEnabled('trendingVideos')" 
+      v-if="isSectionEnabled('trendingVideos')" 
       class="movies-section"
       aria-label="Trending videos"
     >
@@ -178,7 +178,13 @@
           <ChevronRight :size="16" />
         </router-link>
       </div>
-      <div class="youtube-videos-grid">
+      <SkeletonSection 
+        v-if="epornerLoading && trendingVideos.length === 0" 
+        :count="12" 
+        :columns="4"
+        :show-header="false"
+      />
+      <div v-else-if="trendingVideos.length > 0" class="youtube-videos-grid">
         <VideoCard
           v-for="video in trendingVideos"
           :key="video.id"
@@ -190,7 +196,7 @@
 
     <!-- Recently Added Videos Section (Eporner) -->
     <section 
-      v-if="recentlyAddedVideos.length > 0 && isSectionEnabled('recentlyAddedVideos')" 
+      v-if="isSectionEnabled('recentlyAddedVideos')" 
       class="movies-section"
       aria-label="Recently added videos"
     >
@@ -204,7 +210,13 @@
           <ChevronRight :size="16" />
         </router-link>
       </div>
-      <div class="youtube-videos-grid">
+      <SkeletonSection 
+        v-if="epornerLoading && recentlyAddedVideos.length === 0" 
+        :count="12" 
+        :columns="4"
+        :show-header="false"
+      />
+      <div v-else-if="recentlyAddedVideos.length > 0" class="youtube-videos-grid">
         <VideoCard
           v-for="video in recentlyAddedVideos"
           :key="video.id"
@@ -262,7 +274,12 @@
         </div>
       </div>
 
-      <Loader v-if="loading" message="Loading movies..." />
+      <SkeletonSection 
+        v-if="loading" 
+        :count="maxThumbnailsPerPage" 
+        :columns="4"
+        :show-header="false"
+      />
 
       <div
         v-else-if="filteredMovies.length > 0"
@@ -335,6 +352,7 @@ import { usePagination } from "../composables/usePagination";
 import { useWatchHistory, useFavorites } from "../composables/useWatchHistory";
 import { usePreferences } from "../composables/usePreferences";
 import Loader from "../components/Loader.vue";
+import SkeletonSection from "../components/SkeletonSection.vue";
 import MovieCard from "../components/MovieCard.vue";
 import AdvancedSearch from "../components/AdvancedSearch.vue";
 import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
@@ -344,6 +362,7 @@ import { useStarFollows } from "../composables/useStarFollows";
 import { useNotifications } from "../composables/useNotifications";
 import { useVideos } from "../composables/useVideos";
 import { useNetworkQuality } from "../composables/useNetworkQuality";
+import { useRecommendations } from "../composables/useRecommendations";
 
 import {
   Film,
@@ -394,6 +413,9 @@ const { videos, loadVideos: loadBackendVideos } = useVideos();
 
 // Network quality detection
 const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } = useNetworkQuality();
+
+// Smart recommendations
+const { getTrendingByContext, getPersonalized } = useRecommendations();
 
 const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
@@ -530,10 +552,18 @@ const watchLaterVideos = computed(() =>
     .filter(Boolean)
 );
 
-// Trending movies (most viewed/liked) - network-aware limit
+// Trending movies (most viewed/liked) - network-aware limit with smart recommendations
 const trendingMovies = computed(() => {
   const allMovies = [...filteredMovies.value];
   const limit = Math.min(maxThumbnailsPerPage.value, 12);
+  
+  // Use smart recommendations for trending
+  const smartTrending = getTrendingByContext(allMovies, limit);
+  if (smartTrending.length > 0) {
+    return smartTrending;
+  }
+  
+  // Fallback to simple sorting
   return allMovies
     .sort((a, b) => {
       const aScore = (a.views || 0) + (a.likes || 0) * 2;
@@ -601,7 +631,21 @@ const uniqueStars = computed(() => {
 });
 
 // Personalized movies based on followed stars
+// Personalized by followed stars - enhanced with smart recommendations
 const personalizedByStars = computed(() => {
+  const allItems = [
+    ...movies.value,
+    ...epornerVideos.value,
+    ...(videos.value || [])
+  ];
+  
+  // Use smart personalized recommendations
+  const smartPersonalized = getPersonalized(allItems, 12);
+  if (smartPersonalized.length > 0) {
+    return smartPersonalized;
+  }
+  
+  // Fallback to simple star filtering
   if (!followedStars.value.length) return [];
   return movies.value
     .filter(

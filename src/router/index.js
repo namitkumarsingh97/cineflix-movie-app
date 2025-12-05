@@ -1,60 +1,124 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../pages/Home.vue'
-import Videos from '../pages/Videos.vue'
-import Watch from '../pages/Watch.vue'
-import Stories from '../pages/Stories.vue'
-import StoryDetail from '../pages/StoryDetail.vue'
-import Categories from '../pages/Categories.vue'
-import CategoryDetail from '../pages/CategoryDetail.vue'
-import AdminLogin from '../pages/AdminLogin.vue'
-import AdminPanel from '../pages/AdminPanel.vue'
 
+// Route-based code splitting with lazy loading
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: () => import('../pages/Home.vue'),
+    meta: { 
+      preload: true, // Critical route - preload immediately
+      title: 'Home'
+    }
   },
   {
     path: '/videos',
     name: 'Videos',
-    component: Videos
+    component: () => import('../pages/Videos.vue'),
+    meta: { 
+      preload: true, // Critical route - preload on idle
+      title: 'Videos'
+    }
   },
   {
     path: '/watch/:id',
     name: 'Watch',
-    component: Watch
+    component: () => import('../pages/Watch.vue'),
+    meta: { 
+      preload: true, // Critical route - preload on idle
+      title: 'Watch'
+    }
   },
   {
     path: '/stories',
     name: 'Stories',
-    component: Stories
+    component: () => import('../pages/Stories.vue'),
+    meta: { 
+      preload: false, // Less critical - load on demand
+      title: 'Stories'
+    }
   },
   {
     path: '/story/:id',
     name: 'StoryDetail',
-    component: StoryDetail
+    component: () => import('../pages/StoryDetail.vue'),
+    meta: { 
+      preload: false,
+      title: 'Story'
+    }
   },
   {
     path: '/categories',
     name: 'Categories',
-    component: Categories
+    component: () => import('../pages/Categories.vue'),
+    meta: { 
+      preload: false,
+      title: 'Categories'
+    }
   },
   {
     path: '/category/:category',
     name: 'CategoryDetail',
-    component: CategoryDetail
+    component: () => import('../pages/CategoryDetail.vue'),
+    meta: { 
+      preload: false,
+      title: 'Category'
+    }
   },
   {
     path: '/admin/login',
     name: 'AdminLogin',
-    component: AdminLogin
+    component: () => import('../pages/AdminLogin.vue'),
+    meta: { 
+      preload: false,
+      title: 'Admin Login'
+    }
   },
   {
     path: '/admin/panel',
     name: 'AdminPanel',
-    component: AdminPanel,
-    meta: { requiresAuth: true }
+    component: () => import('../pages/AdminPanel.vue'),
+    meta: { 
+      requiresAuth: true,
+      preload: false,
+      title: 'Admin Panel'
+    }
+  },
+  {
+    path: '/playlists',
+    name: 'Playlists',
+    component: () => import('../pages/Playlists.vue'),
+    meta: { 
+      preload: false,
+      title: 'Playlists'
+    }
+  },
+  {
+    path: '/playlist/:id',
+    name: 'PlaylistDetail',
+    component: () => import('../pages/PlaylistDetail.vue'),
+    meta: { 
+      preload: false,
+      title: 'Playlist'
+    }
+  },
+  {
+    path: '/mood-mix/:mood',
+    name: 'MoodMix',
+    component: () => import('../pages/MoodMix.vue'),
+    meta: { 
+      preload: false,
+      title: 'Mood Mix'
+    }
+  },
+  {
+    path: '/creator/:id',
+    name: 'CreatorHub',
+    component: () => import('../pages/CreatorHub.vue'),
+    meta: { 
+      preload: false,
+      title: 'Creator Hub'
+    }
   }
 ]
 
@@ -97,6 +161,30 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     next()
+  }
+})
+
+// Update document title on route change
+router.afterEach((to) => {
+  if (to.meta.title) {
+    document.title = `${to.meta.title} - Cineflix`;
+  }
+  
+  // Prefetch critical routes on idle
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      const criticalRoutes = router.getRoutes().filter(
+        route => route.meta?.preload && route.name !== to.name
+      );
+      
+      criticalRoutes.forEach((route) => {
+        if (route.components?.default && typeof route.components.default === 'function') {
+          route.components.default().catch(() => {
+            // Silently fail prefetch
+          });
+        }
+      });
+    }, { timeout: 2000 });
   }
 })
 

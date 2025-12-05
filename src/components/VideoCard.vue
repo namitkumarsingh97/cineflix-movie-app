@@ -1,11 +1,14 @@
 <template>
   <div class="youtube-video-card" @click="handleClick">
     <div class="video-thumbnail-wrapper">
-      <img
+      <OptimizedImage
         :src="video.thumbnail || getDefaultThumbnail()"
         :alt="video.title"
         :loading="shouldPreloadThumbnails ? 'eager' : 'lazy'"
-        class="video-thumbnail-img"
+        :fetchpriority="shouldPreloadThumbnails ? 'high' : 'auto'"
+        :blurhash="video.blurhash"
+        :sizes="'(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'"
+        image-class="video-thumbnail-img"
         @error="handleThumbnailError"
       />
       <div class="video-duration-badge" v-if="video.duration || video.durationFormatted">
@@ -50,6 +53,7 @@
 import { formatDuration } from '../utils/date';
 import { Star } from 'lucide-vue-next';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
+import OptimizedImage from './OptimizedImage.vue';
 
 const { shouldPreloadThumbnails } = useNetworkQuality();
 

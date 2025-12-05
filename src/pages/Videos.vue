@@ -86,7 +86,11 @@
     </div>
 
     <!-- Loading State -->
-    <Loader v-if="loading" message="Loading videos..." />
+    <SkeletonSection 
+      v-if="loading" 
+      :count="maxThumbnailsPerPage" 
+      :columns="4"
+    />
 
     <!-- Videos Grid -->
     <div v-else-if="videos.length > 0" class="videos-content">
@@ -159,6 +163,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useEporner } from '../composables/useEporner';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
 import Loader from '../components/Loader.vue';
+import SkeletonSection from '../components/SkeletonSection.vue';
 import VideoCard from '../components/VideoCard.vue';
 import { Video, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 

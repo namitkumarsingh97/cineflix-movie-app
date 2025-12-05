@@ -9,6 +9,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Cineflix" />
+    
+    <!-- CDN and Performance Optimizations -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- HTTP/2 Server Push hints (if supported) -->
+    <link rel="preload" href="/icon-192.png" as="image" />
+    <link rel="preload" href="/icon-512.png" as="image" />
+    
+    <!-- Resource hints for CDN -->
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+    
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />

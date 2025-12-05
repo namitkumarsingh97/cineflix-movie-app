@@ -1,11 +1,14 @@
 <template>
   <div class="youtube-video-card" @click="handleClick">
     <div class="video-thumbnail-wrapper">
-      <img
+      <OptimizedImage
         :src="getThumbnail(movie)"
         :alt="movie.title"
         :loading="shouldPreloadThumbnails ? 'eager' : 'lazy'"
-        class="video-thumbnail-img"
+        :fetchpriority="shouldPreloadThumbnails ? 'high' : 'auto'"
+        :blurhash="movie.blurhash"
+        :sizes="'(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'"
+        image-class="video-thumbnail-img"
         @error="handleThumbnailError"
       />
     </div>
@@ -31,6 +34,7 @@
 <script setup>
 import { getThumbnail } from '../utils/video';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
+import OptimizedImage from './OptimizedImage.vue';
 
 const { shouldPreloadThumbnails } = useNetworkQuality();
 

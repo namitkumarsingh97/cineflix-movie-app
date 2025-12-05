@@ -3,6 +3,48 @@ import { userApi } from '../api/user';
 
 const STORAGE_KEY = 'cineflix_watch_later';
 
+// Check if online
+const isOnline = () => navigator.onLine;
+
+// Queue action for background sync
+const queueBackgroundSync = async (action) => {
+  if (!('serviceWorker' in navigator)) {
+    return false;
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    if (registration.active) {
+      // Send message to service worker to queue the action
+      registration.active.postMessage({
+        type: 'queue-watch-later',
+        action: {
+          type: action.type, // 'add' or 'remove'
+          data: action.data,
+        },
+      });
+      
+      // Register background sync if supported
+      if ('sync' in registration) {
+        try {
+          await registration.sync.register('sync-watch-later');
+          return true;
+        } catch (err) {
+          console.warn('Background sync registration failed:', err);
+          // Still return true as message was sent
+          return true;
+        }
+      } else {
+        // Background sync not supported, but message was sent
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to queue background sync:', err);
+  }
+  return false;
+};
+
 const isLoggedIn = () => {
   return !!(localStorage.getItem('token') || localStorage.getItem('adminToken'));
 };
@@ -104,15 +146,40 @@ export function useWatchLater() {
     
     // Sync to backend if logged in
     if (isLoggedIn()) {
-      try {
-        await userApi.addWatchLater({
-          id: entry.id,
-          type: entry.type,
-          title: entry.title,
-          thumbnail: entry.thumbnail,
+      if (isOnline()) {
+        try {
+          await userApi.addWatchLater({
+            id: entry.id,
+            type: entry.type,
+            title: entry.title,
+            thumbnail: entry.thumbnail,
+          });
+        } catch (err) {
+          console.warn('Failed to sync add to backend:', err);
+          // Queue for background sync if network error
+          if (!err.response || err.response.status >= 500) {
+            await queueBackgroundSync({
+              type: 'add',
+              data: {
+                id: entry.id,
+                type: entry.type,
+                title: entry.title,
+                thumbnail: entry.thumbnail,
+              },
+            });
+          }
+        }
+      } else {
+        // Offline - queue for background sync
+        await queueBackgroundSync({
+          type: 'add',
+          data: {
+            id: entry.id,
+            type: entry.type,
+            title: entry.title,
+            thumbnail: entry.thumbnail,
+          },
         });
-      } catch (err) {
-        console.warn('Failed to sync add to backend:', err);
       }
     }
   };
@@ -123,10 +190,25 @@ export function useWatchLater() {
     
     // Sync to backend if logged in
     if (isLoggedIn()) {
-      try {
-        await userApi.removeWatchLater({ id, type });
-      } catch (err) {
-        console.warn('Failed to sync remove to backend:', err);
+      if (isOnline()) {
+        try {
+          await userApi.removeWatchLater({ id, type });
+        } catch (err) {
+          console.warn('Failed to sync remove to backend:', err);
+          // Queue for background sync if network error
+          if (!err.response || err.response.status >= 500) {
+            await queueBackgroundSync({
+              type: 'remove',
+              data: { id, type },
+            });
+          }
+        }
+      } else {
+        // Offline - queue for background sync
+        await queueBackgroundSync({
+          type: 'remove',
+          data: { id, type },
+        });
       }
     }
   };

@@ -66,6 +66,17 @@
                   <span>Stories</span>
                 </router-link>
               </li>
+              <li class="navbar-nav-item">
+                <router-link
+                  to="/playlists"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
+                  <ListMusic :size="16" />
+                  <span>Playlists</span>
+                </router-link>
+              </li>
             </ul>
           </div>
 
@@ -402,6 +413,7 @@ import {
   Settings,
   Accessibility,
   Clock,
+  ListMusic,
 } from "lucide-vue-next";
 import PreferencesModal from "../components/PreferencesModal.vue";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";

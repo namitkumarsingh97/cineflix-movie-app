@@ -133,12 +133,27 @@
                   <h3 class="channel-name-main">{{ video.channel || 'MovieHub' }}</h3>
                   <p class="subscriber-count" v-if="!isMovie">{{ formatViews(video.subscribers || 0) }} subscribers</p>
                 </div>
-                <button class="subscribe-btn" v-if="!isMovie">Subscribe</button>
+                <button 
+                  class="subscribe-btn" 
+                  v-if="!isMovie"
+                  @click="handleFollowCreator"
+                  :class="{ active: isCreatorFollowed }"
+                >
+                  {{ isCreatorFollowed ? 'Following' : 'Follow Creator' }}
+                </button>
               </div>
               <div class="video-description" v-if="video.description">
                 <p>{{ video.description }}</p>
               </div>
             </div>
+            
+            <!-- Scene Navigation -->
+            <SceneNavigation
+              v-if="scenes.length > 0"
+              :scenes="scenes"
+              :current-scene="currentScene"
+              @scene-click="handleSceneJump"
+            />
 
             <!-- Related Content Section -->
             <div v-if="relatedContent.length > 0" class="related-section">
@@ -236,6 +251,14 @@
         </div>
       </div>
     </div>
+    
+    <!-- Because You Watched Section - Outside container for full width -->
+    <BecauseYouWatched
+      v-if="becauseYouWatched.length > 0"
+      :recommendations="becauseYouWatched"
+      :source-title="video?.title || 'this'"
+      @item-click="navigateToVideo"
+    />
   </div>
 </template>
 
@@ -253,8 +276,13 @@ import { useDownloads } from '../composables/useDownloads';
 import { useWatchLater } from '../composables/useWatchLater';
 import { useStarFollows } from '../composables/useStarFollows';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
+import { useRecommendations } from '../composables/useRecommendations';
+import { useScenes } from '../composables/useScenes';
+import { useCreators } from '../composables/useCreators';
 import VideoCard from '../components/VideoCard.vue';
 import MovieCard from '../components/MovieCard.vue';
+import SceneNavigation from '../components/SceneNavigation.vue';
+import BecauseYouWatched from '../components/BecauseYouWatched.vue';
 import Loader from '../components/Loader.vue';
 import {
   ThumbsUp,
@@ -298,9 +326,23 @@ const { downloadForOffline: downloadOffline } = useDownloads();
 const { add: addWatchLater, remove: removeWatchLater, isSaved: isInWatchLater } = useWatchLater();
 const { follow, unfollow, isFollowed } = useStarFollows();
 const { shouldAutoplay, playerBitrate, videoQuality, shouldDeferRecommendations } = useNetworkQuality();
+const { getBecauseYouWatched, updateSession } = useRecommendations();
+const { scenes, currentScene, generateScenes, jumpToScene, getSceneAtTime } = useScenes();
+const { extractCreator, followCreator, unfollowCreator, isCreatorFollowed: checkCreatorFollowed } = useCreators();
 
 const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
 const isWatchLater = computed(() => video.value ? isInWatchLater(video.value._id || video.value.id) : false);
+
+// Creator follow status
+const creatorInfo = computed(() => {
+  if (!video.value) return null;
+  return extractCreator(video.value);
+});
+
+const isCreatorFollowed = computed(() => {
+  if (!creatorInfo.value) return false;
+  return checkCreatorFollowed(creatorInfo.value.id);
+});
 const primaryStar = computed(() => {
   if (!video.value) return '';
   if (Array.isArray(video.value.stars) && video.value.stars.length) return video.value.stars[0];
@@ -443,6 +485,24 @@ const recommendations = computed(() => {
   }
 });
 
+// Because you watched recommendations
+const becauseYouWatched = computed(() => {
+  if (!video.value) return [];
+  
+  const allItems = isEporner.value 
+    ? [...epornerVideos.value, ...videos.value]
+    : isMovie.value
+    ? movies.value
+    : [...videos.value, ...movies.value];
+  
+  try {
+    return getBecauseYouWatched(video.value, allItems, 12) || [];
+  } catch (error) {
+    console.warn('Error getting recommendations:', error);
+    return [];
+  }
+});
+
 // Related content (same category or similar)
 const relatedContent = computed(() => {
   if (!video.value || !isMovie.value) return [];
@@ -537,6 +597,16 @@ async function loadVideo() {
             type: 'eporner',
             category: video.value.categories?.[0] || ''
           });
+          
+          // Update session for recommendations
+          updateSession({
+            id: video.value.id,
+            title: video.value.title,
+            categories: video.value.categories || [],
+            stars: video.value.stars || [],
+            duration: video.value.duration || 0,
+          });
+          
           // Load related videos (defer on slow networks)
           if (!shouldDeferRecommendations.value && video.value.categories && video.value.categories.length > 0) {
             await searchVideos(video.value.categories[0], 1, { perPage: 10 });
@@ -571,6 +641,15 @@ async function loadVideo() {
             type: 'video',
             category: video.value.category
           });
+          
+          // Update session for recommendations
+          updateSession({
+            id: video.value.id,
+            title: video.value.title,
+            categories: video.value.category ? [video.value.category] : [],
+            stars: video.value.stars || [],
+            duration: video.value.duration || 0,
+          });
           // Increment view for videos
           try {
             await videosApi.incrementView?.(videoId.value);
@@ -604,6 +683,16 @@ async function loadVideo() {
             type: 'movie',
             category: video.value.category
           });
+          
+          // Update session for recommendations
+          updateSession({
+            id: video.value._id,
+            title: video.value.title,
+            categories: video.value.category ? [video.value.category] : [],
+            stars: video.value.stars || [],
+            duration: video.value.duration || 0,
+          });
+          
           // Increment view for movies
           try {
             await moviesApi.incrementView(videoId.value);
@@ -641,6 +730,16 @@ async function loadVideo() {
             type: 'eporner',
             category: video.value.categories?.[0] || ''
           });
+          
+          // Update session for recommendations
+          updateSession({
+            id: video.value.id,
+            title: video.value.title,
+            categories: video.value.categories || [],
+            stars: video.value.stars || [],
+            duration: video.value.duration || 0,
+          });
+          
           // Load related videos (defer on slow networks)
           if (!shouldDeferRecommendations.value && video.value.categories && video.value.categories.length > 0) {
             await searchVideos(video.value.categories[0], 1, { perPage: 10 });
@@ -808,6 +907,24 @@ function toggleFollowStar() {
   }
 }
 
+// Handle scene jump
+function handleSceneJump(scene) {
+  if (videoPlayer.value) {
+    jumpToScene(scene.id, videoPlayer.value);
+  }
+}
+
+// Handle follow creator
+function handleFollowCreator() {
+  if (!creatorInfo.value) return;
+  
+  if (isCreatorFollowed.value) {
+    unfollowCreator(creatorInfo.value.id);
+  } else {
+    followCreator(creatorInfo.value);
+  }
+}
+
 async function submitComment() {
   if (!commentText.value.trim() || !isMovie.value || !videoId.value || submittingComment.value) return;
   
@@ -890,6 +1007,12 @@ function handleTimeUpdate() {
     if (duration > 0) {
       const progress = Math.round((currentTime / duration) * 100);
       updateProgress(video.value._id || video.value.id, progress, duration);
+      
+      // Update current scene
+      const sceneAtTime = getSceneAtTime(currentTime);
+      if (sceneAtTime && (!currentScene.value || sceneAtTime.id !== currentScene.value.id)) {
+        currentScene.value = sceneAtTime;
+      }
     }
   }
 }
@@ -960,9 +1083,11 @@ onBeforeUnmount(() => {
 .watch-page {
   background: var(--dark);
   min-height: 100vh;
-  padding: 24px 24px 24px 0;
+  padding: 24px;
   margin-top: -64px; /* Offset navbar height */
   padding-top: 88px; /* Navbar height + padding */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .watch-container {
@@ -970,11 +1095,31 @@ onBeforeUnmount(() => {
   margin: 0 auto;
   display: flex;
   gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Large screens (L screens and above) */
+@media (min-width: 1920px) {
+  .watch-container {
+    max-width: 95%;
+    gap: 32px;
+  }
+}
+
+/* 4K screens */
+@media (min-width: 2560px) {
+  .watch-container {
+    max-width: 95%;
+    gap: 40px;
+  }
 }
 
 .watch-main {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .video-player-section {
@@ -991,6 +1136,22 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
   max-height: calc(100vh - 200px);
   min-height: 400px;
+}
+
+/* Large screens (L screens and above) */
+@media (min-width: 1920px) {
+  .video-player-wrapper {
+    max-height: calc(100vh - 220px);
+    min-height: 500px;
+  }
+}
+
+/* 4K screens */
+@media (min-width: 2560px) {
+  .video-player-wrapper {
+    max-height: calc(100vh - 240px);
+    min-height: 600px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -1236,6 +1397,22 @@ onBeforeUnmount(() => {
 .watch-sidebar {
   width: 402px;
   flex-shrink: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Large screens (L screens and above) */
+@media (min-width: 1920px) {
+  .watch-sidebar {
+    width: 450px;
+  }
+}
+
+/* 4K screens */
+@media (min-width: 2560px) {
+  .watch-sidebar {
+    width: 500px;
+  }
 }
 
 .recommendations-header {
