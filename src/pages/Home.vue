@@ -172,6 +172,70 @@
       </div>
     </section>
 
+    <!-- Recent POV Videos Section -->
+    <section 
+      v-if="povVideos.length > 0 && isSectionEnabled('pov')" 
+      class="movies-section"
+      aria-label="Recent POV videos"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Film :size="24" class="title-icon" />
+          <span>Recent POV Videos</span>
+        </h2>
+        <router-link to="/videos?q=pov" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <SkeletonSection 
+        v-if="epornerLoading && povVideos.length === 0" 
+        :count="maxThumbnailsPerPage" 
+        :columns="4"
+        :show-header="false"
+      />
+      <div v-else-if="povVideos.length > 0" class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in povVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Recent Family Videos Section -->
+    <section 
+      v-if="familyVideos.length > 0 && isSectionEnabled('family')" 
+      class="movies-section"
+      aria-label="Recent Family videos"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Film :size="24" class="title-icon" />
+          <span>Recent Family Videos</span>
+        </h2>
+        <router-link to="/videos?q=family" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <SkeletonSection 
+        v-if="epornerLoading && familyVideos.length === 0" 
+        :count="maxThumbnailsPerPage" 
+        :columns="4"
+        :show-header="false"
+      />
+      <div v-else-if="familyVideos.length > 0" class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in familyVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
     <!-- Trending Videos Section (Eporner) -->
     <section 
       v-if="isSectionEnabled('trendingVideos')" 
@@ -432,6 +496,8 @@ const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
 const latestVideos = ref([]);
 const indianVideos = ref([]);
+const povVideos = ref([]);
+const familyVideos = ref([]);
 
 const showLayoutCustomizer = ref(false);
 const lastNotifiedAtKey = 'cineflix_last_content_notified';
@@ -752,6 +818,34 @@ async function loadEpornerSections() {
         return categories.some(cat => cat.toLowerCase().includes('indian')) ||
                title.includes('indian') ||
                tags.some(tag => tag.includes('indian'));
+      })
+      .slice(0, limit);
+    
+    // Load POV category videos (recent)
+    await searchVideos('pov', 1, { perPage: limit * 2, order: 'latest' });
+    povVideos.value = epornerVideos.value
+      .filter(video => {
+        // Check if video has "pov" in categories, title, or tags
+        const categories = video.categories || [];
+        const title = (video.title || '').toLowerCase();
+        const tags = (video.tags || []).map(t => t.toLowerCase());
+        return categories.some(cat => cat.toLowerCase().includes('pov')) ||
+               title.includes('pov') ||
+               tags.some(tag => tag.includes('pov'));
+      })
+      .slice(0, limit);
+    
+    // Load Family category videos (recent)
+    await searchVideos('family', 1, { perPage: limit * 2, order: 'latest' });
+    familyVideos.value = epornerVideos.value
+      .filter(video => {
+        // Check if video has "family" in categories, title, or tags
+        const categories = video.categories || [];
+        const title = (video.title || '').toLowerCase();
+        const tags = (video.tags || []).map(t => t.toLowerCase());
+        return categories.some(cat => cat.toLowerCase().includes('family')) ||
+               title.includes('family') ||
+               tags.some(tag => tag.includes('family'));
       })
       .slice(0, limit);
   } catch (error) {
