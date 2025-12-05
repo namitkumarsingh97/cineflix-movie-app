@@ -344,30 +344,28 @@
           <div class="footer-section">
             <h3 class="footer-title">Quick Links</h3>
             <ul class="footer-links">
-              <li><a href="#" class="footer-link">Home</a></li>
-              <li><a href="#" class="footer-link">Trending</a></li>
-              <li><a href="#" class="footer-link">Categories</a></li>
-              <li><a href="#" class="footer-link">Favorites</a></li>
+              <li><router-link to="/" class="footer-link">Home</router-link></li>
+              <li><router-link to="/videos" class="footer-link">Videos</router-link></li>
+              <li><router-link to="/categories" class="footer-link">Categories</router-link></li>
+              <li><router-link to="/playlists" class="footer-link">Playlists</router-link></li>
             </ul>
           </div>
 
           <div class="footer-section">
-            <h3 class="footer-title">Support</h3>
+            <h3 class="footer-title">Legal</h3>
             <ul class="footer-links">
-              <li><a href="#" class="footer-link">Help Center</a></li>
-              <li><a href="#" class="footer-link">Contact Us</a></li>
-              <li><a href="#" class="footer-link">Privacy Policy</a></li>
-              <li><a href="#" class="footer-link">Terms of Service</a></li>
+              <li><router-link to="/privacy" class="footer-link">Privacy Policy</router-link></li>
+              <li><router-link to="/terms" class="footer-link">Terms of Service</router-link></li>
+              <li><router-link to="/cookies" class="footer-link">Cookie Policy</router-link></li>
             </ul>
           </div>
 
           <div class="footer-section">
             <h3 class="footer-title">About</h3>
             <ul class="footer-links">
-              <li><a href="#" class="footer-link">About Us</a></li>
-              <li><a href="#" class="footer-link">Blog</a></li>
-              <li><a href="#" class="footer-link">Careers</a></li>
-              <li><a href="#" class="footer-link">Newsletter</a></li>
+              <li><router-link to="/about" class="footer-link">About Us</router-link></li>
+              <li><router-link to="/contact" class="footer-link">Contact Us</router-link></li>
+              <li><router-link to="/help" class="footer-link">Help Center</router-link></li>
             </ul>
           </div>
         </div>
@@ -375,11 +373,11 @@
         <div class="footer-bottom">
           <p class="footer-copyright">© 2025 MovieHub. All rights reserved.</p>
           <div class="footer-bottom-links">
-            <a href="#" class="footer-bottom-link">Privacy</a>
+            <router-link to="/privacy" class="footer-bottom-link">Privacy</router-link>
             <span class="footer-separator">|</span>
-            <a href="#" class="footer-bottom-link">Terms</a>
+            <router-link to="/terms" class="footer-bottom-link">Terms</router-link>
             <span class="footer-separator">|</span>
-            <a href="#" class="footer-bottom-link">Cookies</a>
+            <router-link to="/cookies" class="footer-bottom-link">Cookies</router-link>
           </div>
         </div>
       </div>

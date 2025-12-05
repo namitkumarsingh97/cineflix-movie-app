@@ -119,6 +119,60 @@ const routes = [
       preload: false,
       title: 'Creator Hub'
     }
+  },
+  {
+    path: '/privacy',
+    name: 'Privacy',
+    component: () => import('../pages/Privacy.vue'),
+    meta: { 
+      preload: false,
+      title: 'Privacy Policy'
+    }
+  },
+  {
+    path: '/terms',
+    name: 'Terms',
+    component: () => import('../pages/Terms.vue'),
+    meta: { 
+      preload: false,
+      title: 'Terms of Service'
+    }
+  },
+  {
+    path: '/cookies',
+    name: 'Cookies',
+    component: () => import('../pages/Cookies.vue'),
+    meta: { 
+      preload: false,
+      title: 'Cookie Policy'
+    }
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../pages/About.vue'),
+    meta: { 
+      preload: false,
+      title: 'About Us'
+    }
+  },
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: () => import('../pages/Contact.vue'),
+    meta: { 
+      preload: false,
+      title: 'Contact Us'
+    }
+  },
+  {
+    path: '/help',
+    name: 'Help',
+    component: () => import('../pages/Help.vue'),
+    meta: { 
+      preload: false,
+      title: 'Help Center'
+    }
   }
 ]
 
