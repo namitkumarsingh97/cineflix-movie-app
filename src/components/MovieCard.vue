@@ -4,6 +4,7 @@
       <img
         :src="getThumbnail(movie)"
         :alt="movie.title"
+        :loading="shouldPreloadThumbnails ? 'eager' : 'lazy'"
         class="video-thumbnail-img"
         @error="handleThumbnailError"
       />
@@ -29,6 +30,9 @@
 
 <script setup>
 import { getThumbnail } from '../utils/video';
+import { useNetworkQuality } from '../composables/useNetworkQuality';
+
+const { shouldPreloadThumbnails } = useNetworkQuality();
 
 const props = defineProps({
   movie: {

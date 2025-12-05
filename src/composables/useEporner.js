@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 import { epornerApi } from '../api/eporner';
+import { useNetworkQuality } from './useNetworkQuality';
 
 /**
  * Composable for Eporner API integration
@@ -20,6 +21,9 @@ export function useEporner() {
   const queryCache = new Map();
   const videoCache = new Map();
   const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+  
+  // Network quality detection
+  const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } = useNetworkQuality();
 
   /**
    * Transform Eporner video to app format
@@ -100,12 +104,20 @@ export function useEporner() {
 
   const getAdaptiveParams = (basePerPage, baseThumbsize, options) => {
     const { saveData, isSlow } = getNetworkPreferences();
-    const perPageAdaptive = (saveData || isSlow)
-      ? Math.min(basePerPage, 12)
-      : basePerPage;
-    const thumbsizeAdaptive = (saveData || isSlow)
-      ? 'medium'
-      : (options.thumbsize || baseThumbsize);
+    // Use network-aware max thumbnails
+    const perPageAdaptive = Math.min(
+      basePerPage,
+      maxThumbnailsPerPage.value
+    );
+    // Adjust thumbnail size based on network density
+    let thumbsizeAdaptive = baseThumbsize;
+    if (thumbnailDensity.value === 'low') {
+      thumbsizeAdaptive = 'small';
+    } else if (thumbnailDensity.value === 'medium') {
+      thumbsizeAdaptive = 'medium';
+    } else {
+      thumbsizeAdaptive = options.thumbsize || baseThumbsize;
+    }
 
     return { perPageAdaptive, thumbsizeAdaptive };
   };

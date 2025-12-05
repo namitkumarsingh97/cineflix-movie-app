@@ -4,6 +4,7 @@
       <img
         :src="video.thumbnail || getDefaultThumbnail()"
         :alt="video.title"
+        :loading="shouldPreloadThumbnails ? 'eager' : 'lazy'"
         class="video-thumbnail-img"
         @error="handleThumbnailError"
       />
@@ -48,6 +49,9 @@
 <script setup>
 import { formatDuration } from '../utils/date';
 import { Star } from 'lucide-vue-next';
+import { useNetworkQuality } from '../composables/useNetworkQuality';
+
+const { shouldPreloadThumbnails } = useNetworkQuality();
 
 const props = defineProps({
   video: {

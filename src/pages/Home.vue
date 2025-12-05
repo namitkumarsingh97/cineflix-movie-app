@@ -343,6 +343,7 @@ import { useWatchLater } from "../composables/useWatchLater";
 import { useStarFollows } from "../composables/useStarFollows";
 import { useNotifications } from "../composables/useNotifications";
 import { useVideos } from "../composables/useVideos";
+import { useNetworkQuality } from "../composables/useNetworkQuality";
 
 import {
   Film,
@@ -390,6 +391,9 @@ const {
 
 // Regular videos (from backend)
 const { videos, loadVideos: loadBackendVideos } = useVideos();
+
+// Network quality detection
+const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } = useNetworkQuality();
 
 const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
@@ -526,31 +530,33 @@ const watchLaterVideos = computed(() =>
     .filter(Boolean)
 );
 
-// Trending movies (most viewed/liked)
+// Trending movies (most viewed/liked) - network-aware limit
 const trendingMovies = computed(() => {
   const allMovies = [...filteredMovies.value];
+  const limit = Math.min(maxThumbnailsPerPage.value, 12);
   return allMovies
     .sort((a, b) => {
       const aScore = (a.views || 0) + (a.likes || 0) * 2;
       const bScore = (b.views || 0) + (b.likes || 0) * 2;
       return bScore - aScore;
     })
-    .slice(0, 12);
+    .slice(0, limit);
 });
 
-// Recently added movies
+// Recently added movies - network-aware limit
 const recentlyAdded = computed(() => {
   const allMovies = [...filteredMovies.value];
+  const limit = Math.min(maxThumbnailsPerPage.value, 12);
   return allMovies
     .sort((a, b) => {
       const dateA = new Date(a.createdAt || a.uploadedAt || 0);
       const dateB = new Date(b.createdAt || b.uploadedAt || 0);
       return dateB - dateA;
     })
-    .slice(0, 12);
+    .slice(0, limit);
 });
 
-// Pagination - reduced items per page for better UX
+// Pagination - network-aware items per page
 const {
   currentPage,
   totalPages,
@@ -559,7 +565,7 @@ const {
   goToPage,
   nextPage,
   prevPage,
-} = usePagination(filteredMovies, 12);
+} = usePagination(filteredMovies, maxThumbnailsPerPage);
 
 // Reset to page 1 when filteredMovies changes (search/filter)
 watch(filteredMovies, () => {
@@ -660,20 +666,22 @@ function pickRandom() {
   navigateToMovie(randomMovie);
 }
 
-// Load Eporner videos
+// Load Eporner videos - network-aware limits
 async function loadEpornerSections() {
   try {
+    const limit = Math.min(maxThumbnailsPerPage.value, 12);
+    
     // Load trending videos (Most Popular)
     await getPopularVideos(1);
-    trendingVideos.value = epornerVideos.value.slice(0, 12);
+    trendingVideos.value = epornerVideos.value.slice(0, limit);
     
     // Load recently added videos (Latest)
     await loadEpornerVideos(1);
-    recentlyAddedVideos.value = epornerVideos.value.slice(0, 12);
+    recentlyAddedVideos.value = epornerVideos.value.slice(0, limit);
     
     // Load latest videos for "Trending Now" section
-    await searchVideos('all', 1, { perPage: 12, order: 'latest' });
-    latestVideos.value = epornerVideos.value.slice(0, 12);
+    await searchVideos('all', 1, { perPage: limit, order: 'latest' });
+    latestVideos.value = epornerVideos.value.slice(0, limit);
   } catch (error) {
     console.error('Error loading Eporner videos:', error);
   }

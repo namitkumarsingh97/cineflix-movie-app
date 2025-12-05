@@ -157,6 +157,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useEporner } from '../composables/useEporner';
+import { useNetworkQuality } from '../composables/useNetworkQuality';
 import Loader from '../components/Loader.vue';
 import VideoCard from '../components/VideoCard.vue';
 import { Video, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next';

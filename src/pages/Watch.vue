@@ -23,9 +23,11 @@
             <video
               v-else-if="video && video.url && !isEporner"
               ref="videoPlayer"
-              :src="video.url"
+              :src="isHlsSource ? '' : video.url"
               controls
-              autoplay
+              :autoplay="shouldAutoplay"
+              :preload="shouldAutoplay ? 'auto' : 'metadata'"
+              playsinline
               class="watch-video-player"
               @loadedmetadata="handleVideoLoaded"
               @timeupdate="handleTimeUpdate"
@@ -238,7 +240,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from 'vue';
+import Hls from 'hls.js';
 import { useRoute, useRouter } from 'vue-router';
 import { videosApi } from '../api/videos';
 import { moviesApi } from '../api/movies';
@@ -249,6 +252,7 @@ import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
 import { useDownloads } from '../composables/useDownloads';
 import { useWatchLater } from '../composables/useWatchLater';
 import { useStarFollows } from '../composables/useStarFollows';
+import { useNetworkQuality } from '../composables/useNetworkQuality';
 import VideoCard from '../components/VideoCard.vue';
 import MovieCard from '../components/MovieCard.vue';
 import Loader from '../components/Loader.vue';
@@ -274,6 +278,10 @@ const { getVideoById, videos: epornerVideos, searchVideos } = useEporner();
 const videoId = computed(() => route.params.id);
 const isMovie = ref(false);
 const isEporner = computed(() => route.query.source === 'eporner');
+const isHlsSource = computed(() => {
+  const url = video.value?.url || '';
+  return /\.m3u8($|\?)/i.test(url) || url.includes('format=m3u8');
+});
 const isLiked = ref(false);
 const isDisliked = ref(false);
 const comments = ref([]);
@@ -283,11 +291,13 @@ const commentAuthor = ref('');
 const submittingComment = ref(false);
 const videoPlayer = ref(null);
 const playbackSpeed = ref(1);
+const hlsInstance = ref(null);
 const { addToHistory, updateProgress } = useWatchHistory();
 const { isFavorited, toggleFavorite } = useFavorites();
 const { downloadForOffline: downloadOffline } = useDownloads();
 const { add: addWatchLater, remove: removeWatchLater, isSaved: isInWatchLater } = useWatchLater();
 const { follow, unfollow, isFollowed } = useStarFollows();
+const { shouldAutoplay, playerBitrate, videoQuality, shouldDeferRecommendations } = useNetworkQuality();
 
 const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
 const isWatchLater = computed(() => video.value ? isInWatchLater(video.value._id || video.value.id) : false);
@@ -305,6 +315,94 @@ const followTarget = computed(() => {
 });
 
 const isFollowingStar = computed(() => followTarget.value ? isFollowed(followTarget.value) : false);
+
+function getHlsConfig() {
+  const connection =
+    navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection ||
+    {};
+  const saveData = Boolean(connection.saveData);
+  const effectiveType = connection.effectiveType || '';
+  const isSlow = effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g';
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const bitrate = playerBitrate.value;
+
+  // Adjust buffer based on network quality
+  const maxBufferLength = saveData || isSlow || isMobile ? 4 : 6;
+  const liveSync = saveData || isSlow ? 2 : 3;
+  
+  // Set start level based on bitrate preference
+  let startLevel = -1; // Auto-select
+  if (bitrate === 'low') {
+    startLevel = 0; // Start with lowest quality
+  } else if (bitrate === 'medium') {
+    startLevel = -1; // Let ABR decide
+  }
+
+  return {
+    enableWorker: true,
+    lowLatencyMode: true,
+    backBufferLength: 30,
+    maxBufferLength,
+    maxMaxBufferLength: maxBufferLength + 4,
+    maxBufferSize: bitrate === 'low' ? 15 * 1000 * 1000 : 30 * 1000 * 1000,
+    startLevel,
+    liveSyncDurationCount: liveSync,
+    liveMaxLatencyDurationCount: liveSync + 2,
+    fragLoadingTimeOut: isSlow ? 12000 : 8000,
+    manifestLoadingTimeOut: isSlow ? 12000 : 8000,
+    progressive: true,
+    capLevelOnFPSDrop: true,
+    nudgeMaxRetry: 3,
+    abrEwmaDefaultEstimate: bitrate === 'low' ? 500000 : undefined, // Lower initial estimate for slow networks
+  };
+}
+
+function destroyHls() {
+  if (hlsInstance.value) {
+    hlsInstance.value.destroy();
+    hlsInstance.value = null;
+  }
+}
+
+async function setupStreaming() {
+  if (!videoPlayer.value || !video.value) return;
+
+  destroyHls();
+
+  if (!isHlsSource.value) {
+    // Non-HLS: use native playback
+    videoPlayer.value.src = video.value.url || '';
+    return;
+  }
+
+  // HLS playback
+  if (Hls.isSupported()) {
+    hlsInstance.value = new Hls(getHlsConfig());
+    hlsInstance.value.loadSource(video.value.url);
+    hlsInstance.value.attachMedia(videoPlayer.value);
+    hlsInstance.value.on(Hls.Events.ERROR, (_event, data) => {
+      if (!hlsInstance.value) return;
+      if (data.fatal) {
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          hlsInstance.value.startLoad();
+        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          hlsInstance.value.recoverMediaError();
+        } else {
+          destroyHls();
+        }
+      }
+    });
+  } else if (videoPlayer.value.canPlayType('application/vnd.apple.mpegurl')) {
+    // Safari
+    videoPlayer.value.src = video.value.url;
+    videoPlayer.value.load();
+  } else {
+    // Fallback
+    videoPlayer.value.src = video.value.url || '';
+  }
+}
 
 // Debug computed for iframe rendering
 const shouldShowIframe = computed(() => {
@@ -330,15 +428,18 @@ const shouldShowIframe = computed(() => {
 });
 
 const recommendations = computed(() => {
+  // Limit recommendations on slow networks
+  const limit = shouldDeferRecommendations.value ? 5 : 10;
+  
   if (isEporner.value) {
     // Show other Eporner videos as recommendations
-    return epornerVideos.value.filter(v => v.id !== videoId.value).slice(0, 10);
+    return epornerVideos.value.filter(v => v.id !== videoId.value).slice(0, limit);
   } else if (isMovie.value) {
     // Show other movies as recommendations
-    return movies.value.filter(m => m._id !== videoId.value).slice(0, 10);
+    return movies.value.filter(m => m._id !== videoId.value).slice(0, limit);
   } else {
     // Show other videos as recommendations
-    return videos.value.filter(v => v.id !== videoId.value).slice(0, 10);
+    return videos.value.filter(v => v.id !== videoId.value).slice(0, limit);
   }
 });
 
@@ -392,6 +493,7 @@ async function loadVideo() {
   if (!videoId.value) return;
   
   loading.value = true;
+  destroyHls();
   try {
     // Determine video type based on ID format
     const isEpornerId = isEpornerVideoId(videoId.value);
@@ -435,8 +537,8 @@ async function loadVideo() {
             type: 'eporner',
             category: video.value.categories?.[0] || ''
           });
-          // Load related videos
-          if (video.value.categories && video.value.categories.length > 0) {
+          // Load related videos (defer on slow networks)
+          if (!shouldDeferRecommendations.value && video.value.categories && video.value.categories.length > 0) {
             await searchVideos(video.value.categories[0], 1, { perPage: 10 });
           }
           return;
@@ -475,6 +577,8 @@ async function loadVideo() {
           } catch (e) {
             console.log('View increment not available for videos');
           }
+          await nextTick();
+          await setupStreaming();
           return;
         }
       } catch (videoError) {
@@ -509,6 +613,8 @@ async function loadVideo() {
           }
           // Load comments
           await loadComments();
+          await nextTick();
+          await setupStreaming();
           return;
         }
       } catch (movieError) {
@@ -535,8 +641,8 @@ async function loadVideo() {
             type: 'eporner',
             category: video.value.categories?.[0] || ''
           });
-          // Load related videos
-          if (video.value.categories && video.value.categories.length > 0) {
+          // Load related videos (defer on slow networks)
+          if (!shouldDeferRecommendations.value && video.value.categories && video.value.categories.length > 0) {
             await searchVideos(video.value.categories[0], 1, { perPage: 10 });
           }
           return;
@@ -834,6 +940,19 @@ onMounted(async () => {
   await Promise.all([loadVideos(), loadMovies()]);
   await loadVideo();
   processIframe();
+  
+  // Load recommendations after initial load if deferred
+  if (shouldDeferRecommendations.value && video.value) {
+    setTimeout(async () => {
+      if (video.value?.categories && video.value.categories.length > 0) {
+        await searchVideos(video.value.categories[0], 1, { perPage: 5 });
+      }
+    }, 2000); // Delay 2 seconds on slow networks
+  }
+});
+
+onBeforeUnmount(() => {
+  destroyHls();
 });
 </script>
 
