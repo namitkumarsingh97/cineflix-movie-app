@@ -140,24 +140,34 @@
       </div>
     </section>
 
-    <!-- Recently Added Section -->
+    <!-- Indian Section -->
     <section 
-      v-if="recentlyAdded.length > 0 && isSectionEnabled('recentlyAdded')" 
+      v-if="indianVideos.length > 0 && isSectionEnabled('indian')" 
       class="movies-section"
-      aria-label="Recently added movies"
+      aria-label="Indian videos"
     >
       <div class="section-header">
         <h2 class="section-title">
-          <Calendar :size="24" class="title-icon" />
-          <span>Recently Added</span>
+          <Film :size="24" class="title-icon" />
+          <span>Indian</span>
         </h2>
+        <router-link to="/videos?q=indian" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
       </div>
-      <div class="youtube-videos-grid">
-        <MovieCard
-          v-for="movie in recentlyAdded"
-          :key="movie._id"
-          :movie="movie"
-          @click="navigateToMovie"
+      <SkeletonSection 
+        v-if="epornerLoading && indianVideos.length === 0" 
+        :count="maxThumbnailsPerPage" 
+        :columns="4"
+        :show-header="false"
+      />
+      <div v-else-if="indianVideos.length > 0" class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in indianVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
         />
       </div>
     </section>
@@ -275,7 +285,7 @@
       </div>
 
       <SkeletonSection 
-        v-if="loading" 
+        v-if="loading && movies.length === 0" 
         :count="maxThumbnailsPerPage" 
         :columns="4"
         :show-header="false"
@@ -293,10 +303,11 @@
         />
       </div>
 
-      <div v-else class="empty-state">
+      <div v-else-if="!loading" class="empty-state">
         <Film :size="80" class="empty-icon" />
         <h3>No movies found</h3>
-        <p>Click "Add Movie" to add your first movie!</p>
+        <p v-if="movies.length === 0">Click "Add Movie" to add your first movie!</p>
+        <p v-else>No movies match your current filters. Try adjusting your search or filters.</p>
       </div>
 
       <!-- Pagination -->
@@ -420,6 +431,7 @@ const { getTrendingByContext, getPersonalized } = useRecommendations();
 const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
 const latestVideos = ref([]);
+const indianVideos = ref([]);
 
 const showLayoutCustomizer = ref(false);
 const lastNotifiedAtKey = 'cineflix_last_content_notified';
@@ -681,11 +693,13 @@ function navigateToVideo(video) {
 }
 
 function getStartIndex() {
-  return (currentPage.value - 1) * 12 + 1;
+  const perPage = maxThumbnailsPerPage.value || 12;
+  return (currentPage.value - 1) * perPage + 1;
 }
 
 function getEndIndex() {
-  return Math.min(currentPage.value * 12, filteredMovies.value.length);
+  const perPage = maxThumbnailsPerPage.value || 12;
+  return Math.min(currentPage.value * perPage, filteredMovies.value.length);
 }
 
 function getMovieById(id) {
@@ -726,6 +740,20 @@ async function loadEpornerSections() {
     // Load latest videos for "Trending Now" section
     await searchVideos('all', 1, { perPage: limit, order: 'latest' });
     latestVideos.value = epornerVideos.value.slice(0, limit);
+    
+    // Load Indian category videos
+    await searchVideos('indian', 1, { perPage: limit * 2, order: 'most-popular' });
+    indianVideos.value = epornerVideos.value
+      .filter(video => {
+        // Check if video has "indian" in categories, title, or tags
+        const categories = video.categories || [];
+        const title = (video.title || '').toLowerCase();
+        const tags = (video.tags || []).map(t => t.toLowerCase());
+        return categories.some(cat => cat.toLowerCase().includes('indian')) ||
+               title.includes('indian') ||
+               tags.some(tag => tag.includes('indian'));
+      })
+      .slice(0, limit);
   } catch (error) {
     console.error('Error loading Eporner videos:', error);
   }

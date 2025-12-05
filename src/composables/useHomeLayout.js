@@ -7,7 +7,7 @@ export const availableSections = [
   { id: 'hero', label: 'Hero Section', icon: 'Film', defaultEnabled: true, order: 0 },
   { id: 'continueWatching', label: 'Continue Watching', icon: 'Clock', defaultEnabled: true, order: 1 },
   { id: 'trending', label: 'Trending', icon: 'TrendingUp', defaultEnabled: true, order: 2 },
-  { id: 'recentlyAdded', label: 'Recently Added', icon: 'Calendar', defaultEnabled: true, order: 3 },
+  { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 3 },
   { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 4 },
 ];
 

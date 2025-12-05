@@ -1,15 +1,21 @@
-import { ref, computed } from 'vue';
+import { ref, computed, unref } from 'vue';
 
 export function usePagination(items, itemsPerPage = 40) {
   const currentPage = ref(1);
 
   const totalPages = computed(() => {
-    return Math.ceil(items.value.length / itemsPerPage);
+    const perPage = typeof itemsPerPage === 'function' || (itemsPerPage && typeof itemsPerPage.value !== 'undefined') 
+      ? unref(itemsPerPage) 
+      : itemsPerPage;
+    return Math.ceil(items.value.length / perPage);
   });
 
   const paginatedItems = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
+    const perPage = typeof itemsPerPage === 'function' || (itemsPerPage && typeof itemsPerPage.value !== 'undefined') 
+      ? unref(itemsPerPage) 
+      : itemsPerPage;
+    const start = (currentPage.value - 1) * perPage;
+    const end = start + perPage;
     return items.value.slice(start, end);
   });
 
