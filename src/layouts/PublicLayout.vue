@@ -85,13 +85,13 @@
               <Search :size="18" class="search-icon" />
               <input
                 type="text"
-                placeholder="Search movies..."
+                placeholder="Search movies and videos..."
                 class="search-input"
                 :value="modelValue"
                 @input="handleSearchInput"
                 @focus="showSuggestions = true"
                 @blur="handleBlur"
-                @keydown.enter="selectFirstSuggestion"
+                @keydown.enter="handleSearch"
                 @keydown.down.prevent="navigateSuggestions(1)"
                 @keydown.up.prevent="navigateSuggestions(-1)"
                 ref="searchInput"
@@ -107,7 +107,8 @@
                   @mouseenter="selectedIndex = index"
                 >
                   <Search :size="14" />
-                  <span>{{ suggestion }}</span>
+                  <span class="suggestion-title">{{ suggestion.title || suggestion }}</span>
+                  <span v-if="suggestion.type" class="suggestion-type">{{ suggestion.type }}</span>
                 </div>
               </div>
             </div>
@@ -379,6 +380,7 @@
 import { ref, onMounted, onUnmounted, computed, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useMovies } from "../composables/useMovies";
+import { useEporner } from "../composables/useEporner";
 import {
   Film,
   Search,
@@ -439,17 +441,20 @@ const availableCategories = computed(() => {
 // Search autocomplete
 const searchQuery = inject("searchQuery", ref(""));
 const { movies, loadMovies } = useMovies(searchQuery);
+const { videos: epornerVideos, searchVideos } = useEporner();
 const showSuggestions = ref(false);
 const suggestions = ref([]);
 const selectedIndex = ref(-1);
 const searchInput = ref(null);
 
-// Load movies on mount for autocomplete
-onMounted(() => {
-  loadMovies();
+// Load movies and videos on mount for autocomplete
+onMounted(async () => {
+  await loadMovies();
+  // Load some popular videos for autocomplete
+  await searchVideos('all', 1, { perPage: 20, order: 'most-popular' });
 });
 
-// Generate search suggestions
+// Generate search suggestions from both movies and videos
 const generateSuggestions = (query) => {
   if (!query || query.length < 2) {
     suggestions.value = [];
@@ -457,25 +462,68 @@ const generateSuggestions = (query) => {
   }
 
   const queryLower = query.toLowerCase();
-  const suggestionsSet = new Set();
+  const suggestionsList = [];
   
   // Add movie titles
   movies.value.forEach(movie => {
     if (movie.title && movie.title.toLowerCase().includes(queryLower)) {
-      suggestionsSet.add(movie.title);
+      suggestionsList.push({
+        title: movie.title,
+        type: 'Movie',
+        id: movie._id,
+        source: 'movie'
+      });
     }
     // Add stars
     if (movie.stars && Array.isArray(movie.stars)) {
       movie.stars.forEach(star => {
         if (star && star.toLowerCase().includes(queryLower)) {
-          suggestionsSet.add(star);
+          suggestionsList.push({
+            title: star,
+            type: 'Star',
+            id: movie._id,
+            source: 'movie'
+          });
         }
       });
     }
   });
   
-  // Convert to array and limit to 5 suggestions
-  suggestions.value = Array.from(suggestionsSet).slice(0, 5);
+  // Add Eporner video titles
+  epornerVideos.value.forEach(video => {
+    if (video.title && video.title.toLowerCase().includes(queryLower)) {
+      suggestionsList.push({
+        title: video.title,
+        type: 'Video',
+        id: video.id,
+        source: 'eporner'
+      });
+    }
+    // Add video categories
+    if (video.categories && Array.isArray(video.categories)) {
+      video.categories.forEach(cat => {
+        if (cat && cat.toLowerCase().includes(queryLower)) {
+          suggestionsList.push({
+            title: cat,
+            type: 'Category',
+            id: video.id,
+            source: 'eporner'
+          });
+        }
+      });
+    }
+  });
+  
+  // Limit to 8 suggestions and remove duplicates
+  const seen = new Set();
+  suggestions.value = suggestionsList
+    .filter(item => {
+      const key = `${item.title}-${item.type}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 8);
 };
 
 const handleSearchInput = (event) => {
@@ -487,17 +535,38 @@ const handleSearchInput = (event) => {
 };
 
 const selectSuggestion = (suggestion) => {
-  emit("update:modelValue", suggestion);
+  const searchText = typeof suggestion === 'string' ? suggestion : suggestion.title;
+  emit("update:modelValue", searchText);
   showSuggestions.value = false;
   suggestions.value = [];
-  searchInput.value?.focus();
+  
+  // Navigate to search results or watch page
+  if (typeof suggestion === 'object' && suggestion.id) {
+    if (suggestion.source === 'eporner') {
+      router.push(`/watch/${suggestion.id}?source=eporner`);
+    } else {
+      router.push(`/watch/${suggestion.id}`);
+    }
+  } else {
+    // Navigate to Videos page with search query
+    handleSearch();
+  }
 };
 
-const selectFirstSuggestion = () => {
-  if (suggestions.value.length > 0 && selectedIndex.value >= 0) {
-    selectSuggestion(suggestions.value[selectedIndex.value]);
-  } else if (suggestions.value.length > 0) {
-    selectSuggestion(suggestions.value[0]);
+const handleSearch = () => {
+  const query = props.modelValue || searchInput.value?.value || '';
+  if (query.trim()) {
+    showSuggestions.value = false;
+    // Navigate to Videos page with search query
+    router.push({
+      path: '/videos',
+      query: { q: query.trim() }
+    });
+    emit("update:modelValue", '');
+    if (searchInput.value) {
+      searchInput.value.value = '';
+      searchInput.value.blur();
+    }
   }
 };
 

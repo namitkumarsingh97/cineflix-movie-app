@@ -6,13 +6,22 @@
         <!-- Video Player -->
         <div class="video-player-section">
           <div class="video-player-wrapper">
-            <!-- Iframe for movies -->
-            <div v-if="video && video.iframe" class="watch-iframe-container">
-              <div v-html="video.iframe" class="watch-iframe-player"></div>
+            <!-- Iframe for movies and Eporner videos -->
+            <div v-if="video && (video.iframe || ((isEporner || video._source === 'eporner') && (video.embedUrl || video.url)))" class="watch-iframe-container">
+              <div v-if="video.iframe" v-html="video.iframe" class="watch-iframe-player"></div>
+              <iframe
+                v-else-if="(isEporner || video._source === 'eporner') && (video.embedUrl || video.url)"
+                :src="video.embedUrl || video.url"
+                frameborder="0"
+                allowfullscreen
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                class="watch-iframe-player"
+                loading="lazy"
+              ></iframe>
             </div>
             <!-- Video tag for S3 videos -->
             <video
-              v-else-if="video && video.url"
+              v-else-if="video && video.url && !isEporner"
               ref="videoPlayer"
               :src="video.url"
               controls
@@ -188,15 +197,15 @@
           <h3>Up next</h3>
         </div>
         <div class="recommendations-list">
-          <template v-if="!isMovie">
+          <template v-if="isEporner || (!isMovie && !isEporner)">
             <VideoCard
               v-for="recVideo in recommendations"
-              :key="recVideo.id"
+              :key="recVideo.id || recVideo._id"
               :video="recVideo"
               @click="navigateToVideo(recVideo)"
             />
           </template>
-          <template v-else>
+          <template v-else-if="isMovie">
             <MovieCard
               v-for="recMovie in recommendations"
               :key="recMovie._id"
@@ -215,6 +224,7 @@ import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { videosApi } from '../api/videos';
 import { moviesApi } from '../api/movies';
+import { useEporner } from '../composables/useEporner';
 import { useVideos } from '../composables/useVideos';
 import { useMovies } from '../composables/useMovies';
 import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
@@ -237,9 +247,11 @@ const video = ref(null);
 const loading = ref(true);
 const { videos, loadVideos } = useVideos();
 const { movies, loadMovies } = useMovies();
+const { getVideoById, videos: epornerVideos, searchVideos } = useEporner();
 
 const videoId = computed(() => route.params.id);
 const isMovie = ref(false);
+const isEporner = computed(() => route.query.source === 'eporner');
 const isLiked = ref(false);
 const isDisliked = ref(false);
 const comments = ref([]);
@@ -255,8 +267,34 @@ const { downloadForOffline: downloadOffline } = useDownloads();
 
 const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
 
+// Debug computed for iframe rendering
+const shouldShowIframe = computed(() => {
+  if (!video.value) return false;
+  const hasIframe = !!video.value.iframe;
+  const isEpornerVideo = isEporner.value || video.value._source === 'eporner';
+  const hasEmbedUrl = !!(video.value.embedUrl || video.value.url);
+  const result = hasIframe || (isEpornerVideo && hasEmbedUrl);
+  
+  console.log('Iframe rendering check:', {
+    hasVideo: !!video.value,
+    hasIframe,
+    isEpornerVideo,
+    hasEmbedUrl,
+    embedUrl: video.value.embedUrl,
+    url: video.value.url,
+    _source: video.value._source,
+    isEporner: isEporner.value,
+    shouldShow: result
+  });
+  
+  return result;
+});
+
 const recommendations = computed(() => {
-  if (isMovie.value) {
+  if (isEporner.value) {
+    // Show other Eporner videos as recommendations
+    return epornerVideos.value.filter(v => v.id !== videoId.value).slice(0, 10);
+  } else if (isMovie.value) {
     // Show other movies as recommendations
     return movies.value.filter(m => m._id !== videoId.value).slice(0, 10);
   } else {
@@ -297,67 +335,182 @@ watch(() => route.params.id, () => {
   commentAuthor.value = '';
 });
 
+// Helper function to check if ID looks like Eporner video ID (11 chars, alphanumeric)
+function isEpornerVideoId(id) {
+  if (!id) return false;
+  // Eporner IDs are typically 11 characters, alphanumeric
+  // MongoDB ObjectIds are 24 hex characters, so if it's 11 chars and not hex, it's likely Eporner
+  return /^[a-zA-Z0-9]{11}$/.test(id) && !/^[0-9a-fA-F]{24}$/.test(id);
+}
+
+// Helper function to check if ID looks like MongoDB ObjectId (24 hex chars)
+function isMongoObjectId(id) {
+  if (!id) return false;
+  return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
 async function loadVideo() {
   if (!videoId.value) return;
   
   loading.value = true;
   try {
-    // Try to load as video first
-    try {
-      const videoResponse = await videosApi.getById(videoId.value);
-      if (videoResponse.data.success) {
-        video.value = videoResponse.data.data;
-        isMovie.value = false;
-        loading.value = false;
-        // Add to watch history
-        addToHistory({
-          id: video.value.id,
-          title: video.value.title,
-          thumbnail: video.value.thumbnail,
-          type: 'video',
-          category: video.value.category
-        });
-        // Increment view for videos
-        try {
-          await videosApi.incrementView?.(videoId.value);
-        } catch (e) {
-          console.log('View increment not available for videos');
+    // Determine video type based on ID format
+    const isEpornerId = isEpornerVideoId(videoId.value);
+    const isMongoId = isMongoObjectId(videoId.value);
+    
+    // Priority 1: If explicitly marked as Eporner OR ID matches Eporner format (and not MongoDB)
+    // Try Eporner API first and skip backend entirely
+    if (isEporner.value || (isEpornerId && !isMongoId)) {
+      console.log('Loading Eporner video:', {
+        videoId: videoId.value,
+        isEporner: isEporner.value,
+        isEpornerId,
+        isMongoId
+      });
+      
+      try {
+        const epornerVideo = await getVideoById(videoId.value);
+        console.log('Eporner API response:', epornerVideo);
+        
+        if (epornerVideo) {
+          video.value = epornerVideo;
+          isMovie.value = false;
+          loading.value = false;
+          
+          console.log('Video set:', {
+            id: video.value.id,
+            title: video.value.title,
+            embedUrl: video.value.embedUrl,
+            url: video.value.url,
+            hasEmbedUrl: !!video.value.embedUrl,
+            hasUrl: !!video.value.url,
+            _source: video.value._source,
+            isEporner: isEporner.value
+          });
+          
+          // Add to watch history
+          addToHistory({
+            id: video.value.id,
+            title: video.value.title,
+            thumbnail: video.value.thumbnail,
+            type: 'eporner',
+            category: video.value.categories?.[0] || ''
+          });
+          // Load related videos
+          if (video.value.categories && video.value.categories.length > 0) {
+            await searchVideos(video.value.categories[0], 1, { perPage: 10 });
+          }
+          return;
+        } else {
+          console.warn('Eporner video not found for ID:', videoId.value);
         }
-        return;
+      } catch (epornerError) {
+        console.error('Error loading Eporner video:', epornerError);
       }
-    } catch (videoError) {
-      // If not found as video, try as movie
+      // If Eporner fails, don't try backend - it's clearly an Eporner ID
+      loading.value = false;
+      return;
     }
     
-    // Try to load as movie
-    try {
-      const movieResponse = await moviesApi.getById(videoId.value);
-      if (movieResponse.data.success || movieResponse.data) {
-        video.value = movieResponse.data.data || movieResponse.data;
-        isMovie.value = true;
-        // Add to watch history
-        addToHistory({
-          id: video.value._id,
-          title: video.value.title,
-          thumbnail: video.value.thumbnail,
-          type: 'movie',
-          category: video.value.category
-        });
-        // Increment view for movies
-        try {
-          await moviesApi.incrementView(videoId.value);
-          video.value.views = (video.value.views || 0) + 1;
-        } catch (e) {
-          console.error('Error incrementing view:', e);
+    // Priority 2: Only try backend APIs if it looks like a MongoDB ObjectId
+    // Skip backend entirely if it's an Eporner ID format
+    if (isMongoId) {
+      // Try to load as video from backend
+      try {
+        const videoResponse = await videosApi.getById(videoId.value);
+        if (videoResponse.data && videoResponse.data.success) {
+          video.value = videoResponse.data.data;
+          isMovie.value = false;
+          loading.value = false;
+          // Add to watch history
+          addToHistory({
+            id: video.value.id,
+            title: video.value.title,
+            thumbnail: video.value.thumbnail,
+            type: 'video',
+            category: video.value.category
+          });
+          // Increment view for videos
+          try {
+            await videosApi.incrementView?.(videoId.value);
+          } catch (e) {
+            console.log('View increment not available for videos');
+          }
+          return;
         }
-        // Load comments
-        await loadComments();
+      } catch (videoError) {
+        // Only log if it's not a 404/400 (expected for wrong video type)
+        if (videoError.response && videoError.response.status !== 404 && videoError.response.status !== 400) {
+          console.error('Error loading video from backend:', videoError);
+        }
+        // Continue to try as movie
       }
-    } catch (movieError) {
-      console.error('Error loading video/movie:', movieError);
+      
+      // Try to load as movie from backend
+      try {
+        const movieResponse = await moviesApi.getById(videoId.value);
+        if (movieResponse.data && (movieResponse.data.success || movieResponse.data._id)) {
+          video.value = movieResponse.data.data || movieResponse.data;
+          isMovie.value = true;
+          loading.value = false;
+          // Add to watch history
+          addToHistory({
+            id: video.value._id,
+            title: video.value.title,
+            thumbnail: video.value.thumbnail,
+            type: 'movie',
+            category: video.value.category
+          });
+          // Increment view for movies
+          try {
+            await moviesApi.incrementView(videoId.value);
+            video.value.views = (video.value.views || 0) + 1;
+          } catch (e) {
+            console.error('Error incrementing view:', e);
+          }
+          // Load comments
+          await loadComments();
+          return;
+        }
+      } catch (movieError) {
+        // Only log if it's not a 404/400 (expected for wrong video type)
+        if (movieError.response && movieError.response.status !== 404 && movieError.response.status !== 400) {
+          console.error('Error loading movie from backend:', movieError);
+        }
+      }
     }
+    
+    // Priority 3: Final fallback - try Eporner API if not already tried and not a MongoDB ID
+    if (!isMongoId && !isEporner.value) {
+      try {
+        const epornerVideo = await getVideoById(videoId.value);
+        if (epornerVideo) {
+          video.value = epornerVideo;
+          isMovie.value = false;
+          loading.value = false;
+          // Add to watch history
+          addToHistory({
+            id: video.value.id,
+            title: video.value.title,
+            thumbnail: video.value.thumbnail,
+            type: 'eporner',
+            category: video.value.categories?.[0] || ''
+          });
+          // Load related videos
+          if (video.value.categories && video.value.categories.length > 0) {
+            await searchVideos(video.value.categories[0], 1, { perPage: 10 });
+          }
+          return;
+        }
+      } catch (epornerError) {
+        console.error('Error loading Eporner video (fallback):', epornerError);
+      }
+    }
+    
+    // If we get here, video was not found in any source
+    console.warn('Video not found in any source:', videoId.value);
   } catch (error) {
-    console.error('Error loading video:', error);
+    console.error('Unexpected error loading video:', error);
   } finally {
     loading.value = false;
   }
@@ -508,7 +661,8 @@ async function submitComment() {
 }
 
 function navigateToVideo(video) {
-  router.push(`/watch/${video.id || video._id}`);
+  const source = video._source === 'eporner' ? '?source=eporner' : '';
+  router.push(`/watch/${video.id || video._id}${source}`);
 }
 
 function formatViews(views) {
@@ -653,6 +807,57 @@ onMounted(async () => {
   min-height: 400px;
 }
 
+@media (max-width: 1200px) {
+  .watch-page {
+    padding: 20px 20px 20px 0;
+  }
+
+  .watch-container {
+    gap: 20px;
+  }
+
+  .video-player-wrapper {
+    min-height: 350px;
+    max-height: calc(100vh - 180px);
+  }
+
+  .watch-sidebar {
+    width: 300px;
+  }
+}
+
+@media (max-width: 900px) {
+  .watch-page {
+    padding: 16px 16px 16px 0;
+  }
+
+  .watch-sidebar {
+    width: 280px;
+  }
+
+  .recommendations-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .video-player-wrapper {
+    min-height: 250px;
+    max-height: calc(100vh - 150px);
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-player-wrapper {
+    min-height: 200px;
+    max-height: calc(100vh - 120px);
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+}
+
 .watch-video-player {
   position: absolute;
   top: 0;
@@ -685,7 +890,8 @@ onMounted(async () => {
   position: relative;
 }
 
-.watch-iframe-player iframe {
+.watch-iframe-player iframe,
+.watch-iframe-player > iframe {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
@@ -709,6 +915,7 @@ onMounted(async () => {
   color: var(--text-primary);
   margin: 0 0 12px 0;
   line-height: 1.4;
+  word-break: break-word;
 }
 
 .video-actions-bar {
@@ -727,6 +934,7 @@ onMounted(async () => {
   gap: 12px;
   color: var(--text-secondary);
   font-size: 14px;
+  flex-wrap: wrap;
 }
 
 .action-buttons {
@@ -748,6 +956,8 @@ onMounted(async () => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .action-btn:hover {
@@ -755,9 +965,14 @@ onMounted(async () => {
   opacity: 0.8;
 }
 
+.action-btn:active {
+  transform: scale(0.95);
+}
+
 .action-btn svg {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .channel-info {
@@ -771,6 +986,7 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .channel-avatar-large {
@@ -853,6 +1069,19 @@ onMounted(async () => {
   gap: 8px;
 }
 
+/* Responsive breakpoints */
+@media (max-width: 1400px) {
+  .watch-sidebar {
+    width: 360px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .watch-sidebar {
+    width: 320px;
+  }
+}
+
 @media (max-width: 1024px) {
   .watch-container {
     flex-direction: column;
@@ -864,7 +1093,7 @@ onMounted(async () => {
   
   .recommendations-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
   }
 }
@@ -1117,36 +1346,443 @@ onMounted(async () => {
 
 @media (max-width: 768px) {
   .watch-page {
-    padding: 16px;
+    padding: 16px 12px;
     margin-top: 0;
-    padding-top: 80px;
+    padding-top: 72px;
+  }
+
+  .watch-container {
+    gap: 20px;
+  }
+
+  .video-info-section {
+    padding: 0 4px;
   }
   
   .video-title-main {
     font-size: 18px;
+    margin-bottom: 10px;
   }
   
   .video-actions-bar {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .video-stats {
+    font-size: 13px;
+    gap: 8px;
   }
   
   .action-buttons {
     width: 100%;
-    justify-content: space-between;
+    gap: 6px;
   }
   
   .action-btn {
     flex: 1;
     justify-content: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 0;
+  }
+
+  .action-btn span {
+    font-size: 12px;
+  }
+
+  .action-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .download-offline-btn span {
+    display: none;
+  }
+
+  .channel-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .channel-avatar-large {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .channel-name-main {
+    font-size: 15px;
+  }
+
+  .subscribe-btn {
+    padding: 8px 20px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .video-description {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .playback-controls {
+    padding: 10px;
+    margin-top: 12px;
+  }
+
+  .speed-control {
+    gap: 8px;
+  }
+
+  .speed-control label {
+    font-size: 13px;
+  }
+
+  .speed-select {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .related-section {
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+
+  .related-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .related-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .comments-section {
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+
+  .comments-title {
+    font-size: 16px;
+    margin-bottom: 16px;
   }
 
   .comment-form {
     padding: 12px;
+    margin-bottom: 24px;
+  }
+
+  .comment-input-wrapper {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .comment-author-input,
+  .comment-text-input {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .comment-text-input {
+    min-height: 70px;
+  }
+
+  .comment-form-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .char-count {
+    font-size: 11px;
+  }
+
+  .comment-submit-btn {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+
+  .comments-list {
+    gap: 16px;
   }
 
   .comment-item {
     padding: 12px;
+    gap: 10px;
+  }
+
+  .comment-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .comment-author {
+    font-size: 13px;
+  }
+
+  .comment-date {
+    font-size: 11px;
+  }
+
+  .comment-text {
+    font-size: 13px;
+  }
+
+  .recommendations-header h3 {
+    font-size: 15px;
+  }
+
+  .recommendations-list {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .watch-page {
+    padding: 12px 8px;
+    padding-top: 64px;
+  }
+
+  .watch-container {
+    gap: 16px;
+  }
+
+  .video-player-wrapper {
+    border-radius: 6px;
+    margin-bottom: 10px;
+    min-height: 200px;
+  }
+
+  .video-title-main {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .video-actions-bar {
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .video-stats {
+    font-size: 12px;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .action-buttons {
+    gap: 4px;
+    width: 100%;
+  }
+
+  .action-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 16px;
+    flex: 1 1 calc(50% - 2px);
+    min-width: calc(50% - 2px);
+  }
+
+  .action-btn span {
+    font-size: 11px;
+    display: none;
+  }
+
+  .action-btn:has(svg:only-child) {
+    flex: 0 0 auto;
+    min-width: auto;
+    padding: 8px;
+  }
+
+  .download-offline-btn {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .download-offline-btn span {
+    display: inline;
+    font-size: 11px;
+  }
+
+  .channel-header {
+    gap: 10px;
+  }
+
+  .channel-avatar-large {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .channel-name-main {
+    font-size: 14px;
+  }
+
+  .subscriber-count {
+    font-size: 12px;
+  }
+
+  .subscribe-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .video-description {
+    padding: 8px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .playback-controls {
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 6px;
+  }
+
+  .speed-control {
+    gap: 6px;
+  }
+
+  .speed-control label {
+    font-size: 12px;
+  }
+
+  .speed-select {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .related-section {
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+
+  .related-title {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .related-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .comments-section {
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+
+  .comments-title {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .comment-form {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+  }
+
+  .comment-input-wrapper {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .comment-author-input,
+  .comment-text-input {
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .comment-text-input {
+    min-height: 60px;
+  }
+
+  .comment-form-actions {
+    gap: 6px;
+  }
+
+  .char-count {
+    font-size: 10px;
+  }
+
+  .comment-submit-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    border-radius: 16px;
+  }
+
+  .comments-list {
+    gap: 12px;
+  }
+
+  .comment-item {
+    padding: 10px;
+    gap: 8px;
+    border-radius: 8px;
+  }
+
+  .comment-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .comment-author {
+    font-size: 12px;
+  }
+
+  .comment-date {
+    font-size: 10px;
+  }
+
+  .comment-text {
+    font-size: 12px;
+  }
+
+  .recommendations-header h3 {
+    font-size: 14px;
+  }
+
+  .recommendations-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .action-btn:hover {
+    background: var(--dark-lighter);
+    opacity: 1;
+  }
+
+  .action-btn:active {
+    background: var(--dark-light);
+    opacity: 0.9;
+  }
+
+  .subscribe-btn:hover {
+    background: var(--primary);
+  }
+
+  .subscribe-btn:active {
+    background: var(--primary-dark);
+    transform: scale(0.98);
+  }
+
+  .comment-submit-btn:hover {
+    background: var(--primary);
+  }
+
+  .comment-submit-btn:active {
+    background: var(--primary-dark);
+    transform: scale(0.98);
   }
 }
 </style>

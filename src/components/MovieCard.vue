@@ -89,9 +89,9 @@ function getInitials(name) {
   width: 100%;
   padding-top: 56.25%; /* 16:9 aspect ratio */
   background: var(--dark-lighter);
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .video-thumbnail-img {
@@ -105,7 +105,7 @@ function getInitials(name) {
 
 .video-info-section {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .video-channel-avatar {
@@ -113,14 +113,14 @@ function getInitials(name) {
 }
 
 .avatar-circle {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: white;
 }
@@ -131,11 +131,11 @@ function getInitials(name) {
 }
 
 .video-title-text {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
-  margin: 0 0 4px 0;
-  line-height: 1.4;
+  margin: 0 0 3px 0;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -146,10 +146,10 @@ function getInitials(name) {
 .video-meta-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 8px;
-  font-size: 13px;
+  gap: 3px 6px;
+  font-size: 11px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .channel-name,
@@ -167,12 +167,29 @@ function getInitials(name) {
 }
 
 @media (max-width: 768px) {
+  .video-thumbnail-wrapper {
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+
   .video-title-text {
-    font-size: 13px;
+    font-size: 12px;
+    margin-bottom: 2px;
   }
   
   .video-meta-info {
-    font-size: 12px;
+    font-size: 10px;
+    gap: 2px 4px;
+  }
+
+  .avatar-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .video-info-section {
+    gap: 6px;
   }
 }
 </style>

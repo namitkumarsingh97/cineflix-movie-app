@@ -62,24 +62,28 @@
       </div>
     </section>
 
-    <!-- Trending Section -->
+    <!-- Trending Section (Latest Eporner Videos) -->
     <section 
-      v-if="trendingMovies.length > 0 && isSectionEnabled('trending')" 
+      v-if="latestVideos.length > 0 && isSectionEnabled('trending')" 
       class="movies-section"
-      aria-label="Trending movies"
+      aria-label="Trending now"
     >
       <div class="section-header">
         <h2 class="section-title">
           <TrendingUp :size="24" class="title-icon" />
           <span>Trending Now</span>
         </h2>
+        <router-link to="/videos?order=latest" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
       </div>
       <div class="youtube-videos-grid">
-        <MovieCard
-          v-for="movie in trendingMovies"
-          :key="movie._id"
-          :movie="movie"
-          @click="navigateToMovie"
+        <VideoCard
+          v-for="video in latestVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
         />
       </div>
     </section>
@@ -102,6 +106,58 @@
           :key="movie._id"
           :movie="movie"
           @click="navigateToMovie"
+        />
+      </div>
+    </section>
+
+    <!-- Trending Videos Section (Eporner) -->
+    <section 
+      v-if="trendingVideos.length > 0 && isSectionEnabled('trendingVideos')" 
+      class="movies-section"
+      aria-label="Trending videos"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <TrendingUp :size="24" class="title-icon" />
+          <span>Trending Videos</span>
+        </h2>
+        <router-link to="/videos" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in trendingVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Recently Added Videos Section (Eporner) -->
+    <section 
+      v-if="recentlyAddedVideos.length > 0 && isSectionEnabled('recentlyAddedVideos')" 
+      class="movies-section"
+      aria-label="Recently added videos"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Calendar :size="24" class="title-icon" />
+          <span>Recently Added Videos</span>
+        </h2>
+        <router-link to="/videos" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in recentlyAddedVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
         />
       </div>
     </section>
@@ -245,6 +301,8 @@ import {
   Filter,
   Layout,
 } from "lucide-vue-next";
+import { useEporner } from "../composables/useEporner";
+import VideoCard from "../components/VideoCard.vue";
 
 const router = useRouter();
 
@@ -259,6 +317,19 @@ const { movies, sortBy, loading, featuredMovie, loadMovies } =
 const { getContinueWatching, clearHistory, getWatchHistory } = useWatchHistory();
 const { getPreferredCategories } = usePreferences();
 const { isSectionEnabled } = useHomeLayout();
+
+// Eporner videos
+const {
+  videos: epornerVideos,
+  loading: epornerLoading,
+  getPopularVideos,
+  loadVideos: loadEpornerVideos,
+  searchVideos,
+} = useEporner();
+
+const trendingVideos = ref([]);
+const recentlyAddedVideos = ref([]);
+const latestVideos = ref([]);
 
 const showLayoutCustomizer = ref(false);
 
@@ -454,6 +525,11 @@ function navigateToMovie(movie) {
   router.push(`/watch/${movie._id}`);
 }
 
+function navigateToVideo(video) {
+  // Navigate to watch page with video ID and eporner source
+  router.push(`/watch/${video.id}?source=eporner`);
+}
+
 function getStartIndex() {
   return (currentPage.value - 1) * 12 + 1;
 }
@@ -484,8 +560,28 @@ function pickRandom() {
   navigateToMovie(randomMovie);
 }
 
+// Load Eporner videos
+async function loadEpornerSections() {
+  try {
+    // Load trending videos (Most Popular)
+    await getPopularVideos(1);
+    trendingVideos.value = epornerVideos.value.slice(0, 12);
+    
+    // Load recently added videos (Latest)
+    await loadEpornerVideos(1);
+    recentlyAddedVideos.value = epornerVideos.value.slice(0, 12);
+    
+    // Load latest videos for "Trending Now" section
+    await searchVideos('all', 1, { perPage: 12, order: 'latest' });
+    latestVideos.value = epornerVideos.value.slice(0, 12);
+  } catch (error) {
+    console.error('Error loading Eporner videos:', error);
+  }
+}
+
 onMounted(() => {
   loadMovies();
+  loadEpornerSections();
 });
 </script>
 
@@ -521,6 +617,33 @@ onMounted(() => {
 .layout-customizer-btn:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+.view-all-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.view-all-link:hover {
+  background: rgba(255, 0, 110, 0.1);
+  color: var(--primary);
+  transform: translateX(4px);
+}
+
+.view-all-link svg {
+  transition: transform 0.3s ease;
+}
+
+.view-all-link:hover svg {
+  transform: translateX(2px);
 }
 
 @media (max-width: 768px) {

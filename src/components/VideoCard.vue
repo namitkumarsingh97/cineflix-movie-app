@@ -7,14 +7,18 @@
         class="video-thumbnail-img"
         @error="handleThumbnailError"
       />
-      <div class="video-duration-badge" v-if="video.duration">
-        {{ formatDuration(video.duration) }}
+      <div class="video-duration-badge" v-if="video.duration || video.durationFormatted">
+        {{ video.durationFormatted || formatDuration(video.duration) }}
+      </div>
+      <div class="video-rating-badge" v-if="video.rating && video.rating > 0">
+        <Star :size="12" fill="currentColor" />
+        {{ video.rating.toFixed(1) }}
       </div>
     </div>
     <div class="video-info-section">
       <div class="video-channel-avatar" v-if="showChannel">
         <div class="avatar-circle">
-          {{ getInitials(video.channel || 'Channel') }}
+          {{ getInitials(video.channel || 'Video') }}
         </div>
       </div>
       <div class="video-details">
@@ -22,9 +26,19 @@
           {{ video.title }}
         </h3>
         <div class="video-meta-info">
-          <span class="channel-name" v-if="showChannel">{{ video.channel || 'Channel Name' }}</span>
+          <span class="channel-name" v-if="showChannel">{{ video.channel || 'Video' }}</span>
           <span class="view-count" v-if="video.views">{{ formatViews(video.views) }} views</span>
-          <span class="upload-time">{{ formatTimeAgo(video.uploadedAt) }}</span>
+          <span class="upload-time" v-if="video.added || video.uploadedAt">{{ formatTimeAgo(video.added || video.uploadedAt) }}</span>
+        </div>
+        <!-- Categories/Tags -->
+        <div class="video-categories" v-if="video.categories && video.categories.length > 0">
+          <span
+            v-for="(cat, index) in video.categories.slice(0, 3)"
+            :key="index"
+            class="category-badge"
+          >
+            {{ cat }}
+          </span>
         </div>
       </div>
     </div>
@@ -33,6 +47,7 @@
 
 <script setup>
 import { formatDuration } from '../utils/date';
+import { Star } from 'lucide-vue-next';
 
 const props = defineProps({
   video: {
@@ -61,8 +76,21 @@ function handleThumbnailError(event) {
 
 function formatTimeAgo(date) {
   if (!date) return '';
+  
+  // Handle Eporner date format: "2019-11-21 11:42:47"
   const now = new Date();
-  const uploadDate = new Date(date);
+  let uploadDate;
+  
+  try {
+    uploadDate = new Date(date);
+    // Check if date is valid
+    if (isNaN(uploadDate.getTime())) {
+      return '';
+    }
+  } catch (e) {
+    return '';
+  }
+  
   const diffInSeconds = Math.floor((now - uploadDate) / 1000);
   
   if (diffInSeconds < 60) return 'just now';
@@ -103,9 +131,9 @@ function getInitials(name) {
   width: 100%;
   padding-top: 56.25%; /* 16:9 aspect ratio */
   background: var(--dark-lighter);
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .video-thumbnail-img {
@@ -119,20 +147,20 @@ function getInitials(name) {
 
 .video-duration-badge {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 6px;
+  right: 6px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 10px;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .video-info-section {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .video-channel-avatar {
@@ -140,14 +168,14 @@ function getInitials(name) {
 }
 
 .avatar-circle {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: white;
 }
@@ -158,11 +186,11 @@ function getInitials(name) {
 }
 
 .video-title-text {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
-  margin: 0 0 4px 0;
-  line-height: 1.4;
+  margin: 0 0 3px 0;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -173,10 +201,10 @@ function getInitials(name) {
 .video-meta-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 8px;
-  font-size: 13px;
+  gap: 3px 6px;
+  font-size: 11px;
   color: var(--text-secondary);
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .channel-name,
@@ -195,13 +223,97 @@ function getInitials(name) {
   display: none;
 }
 
+.video-rating-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffd700;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.3;
+}
+
+.video-rating-badge svg {
+  width: 10px;
+  height: 10px;
+}
+
+.video-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.category-badge {
+  padding: 2px 5px;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
 @media (max-width: 768px) {
+  .video-thumbnail-wrapper {
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+
   .video-title-text {
-    font-size: 13px;
+    font-size: 12px;
+    margin-bottom: 2px;
   }
   
   .video-meta-info {
-    font-size: 12px;
+    font-size: 10px;
+    gap: 2px 4px;
+  }
+
+  .avatar-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .video-info-section {
+    gap: 6px;
+  }
+
+  .video-duration-badge {
+    bottom: 4px;
+    right: 4px;
+    padding: 1px 4px;
+    font-size: 9px;
+  }
+
+  .video-rating-badge {
+    top: 4px;
+    right: 4px;
+    padding: 2px 5px;
+    font-size: 9px;
+  }
+
+  .video-rating-badge svg {
+    width: 9px;
+    height: 9px;
+  }
+
+  .category-badge {
+    padding: 1px 4px;
+    font-size: 9px;
+  }
+
+  .video-categories {
+    gap: 2px;
+    margin-top: 3px;
   }
 }
 </style>
