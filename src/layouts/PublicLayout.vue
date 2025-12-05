@@ -81,7 +81,12 @@
           </div>
 
           <div class="navbar-center">
-            <div class="navbar-search" :class="{ 'has-suggestions': showSuggestions && suggestions.length > 0 }">
+            <div
+              class="navbar-search"
+              :class="{
+                'has-suggestions': showSuggestions && suggestions.length > 0,
+              }"
+            >
               <Search :size="18" class="search-icon" />
               <input
                 type="text"
@@ -97,7 +102,10 @@
                 ref="searchInput"
               />
               <!-- Search Suggestions Dropdown -->
-              <div v-if="showSuggestions && suggestions.length > 0" class="search-suggestions">
+              <div
+                v-if="showSuggestions && suggestions.length > 0"
+                class="search-suggestions"
+              >
                 <div
                   v-for="(suggestion, index) in suggestions"
                   :key="index"
@@ -107,8 +115,12 @@
                   @mouseenter="selectedIndex = index"
                 >
                   <Search :size="14" />
-                  <span class="suggestion-title">{{ suggestion.title || suggestion }}</span>
-                  <span v-if="suggestion.type" class="suggestion-type">{{ suggestion.type }}</span>
+                  <span class="suggestion-title">{{
+                    suggestion.title || suggestion
+                  }}</span>
+                  <span v-if="suggestion.type" class="suggestion-type">{{
+                    suggestion.type
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -202,6 +214,7 @@
               v-else
               to="/admin/login"
               class="navbar-link admin-link"
+              style="display: none"
             >
               <Shield :size="16" />
               <span>Admin</span>
@@ -344,28 +357,66 @@
           <div class="footer-section">
             <h3 class="footer-title">Quick Links</h3>
             <ul class="footer-links">
-              <li><router-link to="/" class="footer-link">Home</router-link></li>
-              <li><router-link to="/videos" class="footer-link">Videos</router-link></li>
-              <li><router-link to="/categories" class="footer-link">Categories</router-link></li>
-              <li><router-link to="/playlists" class="footer-link">Playlists</router-link></li>
+              <li>
+                <router-link to="/" class="footer-link">Home</router-link>
+              </li>
+              <li>
+                <router-link to="/videos" class="footer-link"
+                  >Videos</router-link
+                >
+              </li>
+              <li>
+                <router-link to="/categories" class="footer-link"
+                  >Categories</router-link
+                >
+              </li>
+              <li>
+                <router-link to="/playlists" class="footer-link"
+                  >Playlists</router-link
+                >
+              </li>
             </ul>
           </div>
 
           <div class="footer-section">
             <h3 class="footer-title">Legal</h3>
             <ul class="footer-links">
-              <li><router-link to="/privacy" class="footer-link">Privacy Policy</router-link></li>
-              <li><router-link to="/terms" class="footer-link">Terms of Service</router-link></li>
-              <li><router-link to="/cookies" class="footer-link">Cookie Policy</router-link></li>
+              <li>
+                <router-link to="/privacy" class="footer-link"
+                  >Privacy Policy</router-link
+                >
+              </li>
+              <li>
+                <router-link to="/terms" class="footer-link"
+                  >Terms of Service</router-link
+                >
+              </li>
+              <li>
+                <router-link to="/cookies" class="footer-link"
+                  >Cookie Policy</router-link
+                >
+              </li>
             </ul>
           </div>
 
           <div class="footer-section">
             <h3 class="footer-title">About</h3>
             <ul class="footer-links">
-              <li><router-link to="/about" class="footer-link">About Us</router-link></li>
-              <li><router-link to="/contact" class="footer-link">Contact Us</router-link></li>
-              <li><router-link to="/help" class="footer-link">Help Center</router-link></li>
+              <li>
+                <router-link to="/about" class="footer-link"
+                  >About Us</router-link
+                >
+              </li>
+              <li>
+                <router-link to="/contact" class="footer-link"
+                  >Contact Us</router-link
+                >
+              </li>
+              <li>
+                <router-link to="/help" class="footer-link"
+                  >Help Center</router-link
+                >
+              </li>
             </ul>
           </div>
         </div>
@@ -373,11 +424,17 @@
         <div class="footer-bottom">
           <p class="footer-copyright">© 2025 MovieHub. All rights reserved.</p>
           <div class="footer-bottom-links">
-            <router-link to="/privacy" class="footer-bottom-link">Privacy</router-link>
+            <router-link to="/privacy" class="footer-bottom-link"
+              >Privacy</router-link
+            >
             <span class="footer-separator">|</span>
-            <router-link to="/terms" class="footer-bottom-link">Terms</router-link>
+            <router-link to="/terms" class="footer-bottom-link"
+              >Terms</router-link
+            >
             <span class="footer-separator">|</span>
-            <router-link to="/cookies" class="footer-bottom-link">Cookies</router-link>
+            <router-link to="/cookies" class="footer-bottom-link"
+              >Cookies</router-link
+            >
           </div>
         </div>
       </div>
@@ -441,12 +498,16 @@ const showPreferences = ref(false);
 const showAccessibility = ref(false);
 const { skipToMain } = useAccessibility();
 const { watchLaterCount, followedStarsCount } = useBadgeCounts();
-const { subscribe, requestPermission, isSupported: pushSupported } = usePushNotifications();
+const {
+  subscribe,
+  requestPermission,
+  isSupported: pushSupported,
+} = usePushNotifications();
 
 // Get available categories for preferences
 const availableCategories = computed(() => {
   const categories = new Set();
-  movies.value.forEach(movie => {
+  movies.value.forEach((movie) => {
     if (movie.category) {
       categories.add(movie.category);
     }
@@ -467,7 +528,7 @@ const searchInput = ref(null);
 onMounted(async () => {
   await loadMovies();
   // Load some popular videos for autocomplete
-  await searchVideos('all', 1, { perPage: 20, order: 'most-popular' });
+  await searchVideos("all", 1, { perPage: 20, order: "most-popular" });
 });
 
 // Generate search suggestions from both movies and videos
@@ -479,61 +540,61 @@ const generateSuggestions = (query) => {
 
   const queryLower = query.toLowerCase();
   const suggestionsList = [];
-  
+
   // Add movie titles
-  movies.value.forEach(movie => {
+  movies.value.forEach((movie) => {
     if (movie.title && movie.title.toLowerCase().includes(queryLower)) {
       suggestionsList.push({
         title: movie.title,
-        type: 'Movie',
+        type: "Movie",
         id: movie._id,
-        source: 'movie'
+        source: "movie",
       });
     }
     // Add stars
     if (movie.stars && Array.isArray(movie.stars)) {
-      movie.stars.forEach(star => {
+      movie.stars.forEach((star) => {
         if (star && star.toLowerCase().includes(queryLower)) {
           suggestionsList.push({
             title: star,
-            type: 'Star',
+            type: "Star",
             id: movie._id,
-            source: 'movie'
+            source: "movie",
           });
         }
       });
     }
   });
-  
+
   // Add Eporner video titles
-  epornerVideos.value.forEach(video => {
+  epornerVideos.value.forEach((video) => {
     if (video.title && video.title.toLowerCase().includes(queryLower)) {
       suggestionsList.push({
         title: video.title,
-        type: 'Video',
+        type: "Video",
         id: video.id,
-        source: 'eporner'
+        source: "eporner",
       });
     }
     // Add video categories
     if (video.categories && Array.isArray(video.categories)) {
-      video.categories.forEach(cat => {
+      video.categories.forEach((cat) => {
         if (cat && cat.toLowerCase().includes(queryLower)) {
           suggestionsList.push({
             title: cat,
-            type: 'Category',
+            type: "Category",
             id: video.id,
-            source: 'eporner'
+            source: "eporner",
           });
         }
       });
     }
   });
-  
+
   // Limit to 8 suggestions and remove duplicates
   const seen = new Set();
   suggestions.value = suggestionsList
-    .filter(item => {
+    .filter((item) => {
       const key = `${item.title}-${item.type}`;
       if (seen.has(key)) return false;
       seen.add(key);
@@ -551,14 +612,15 @@ const handleSearchInput = (event) => {
 };
 
 const selectSuggestion = (suggestion) => {
-  const searchText = typeof suggestion === 'string' ? suggestion : suggestion.title;
+  const searchText =
+    typeof suggestion === "string" ? suggestion : suggestion.title;
   emit("update:modelValue", searchText);
   showSuggestions.value = false;
   suggestions.value = [];
-  
+
   // Navigate to search results or watch page
-  if (typeof suggestion === 'object' && suggestion.id) {
-    if (suggestion.source === 'eporner') {
+  if (typeof suggestion === "object" && suggestion.id) {
+    if (suggestion.source === "eporner") {
       router.push(`/watch/${suggestion.id}?source=eporner`);
     } else {
       router.push(`/watch/${suggestion.id}`);
@@ -570,17 +632,17 @@ const selectSuggestion = (suggestion) => {
 };
 
 const handleSearch = () => {
-  const query = props.modelValue || searchInput.value?.value || '';
+  const query = props.modelValue || searchInput.value?.value || "";
   if (query.trim()) {
     showSuggestions.value = false;
     // Navigate to Videos page with search query
     router.push({
-      path: '/videos',
-      query: { q: query.trim() }
+      path: "/videos",
+      query: { q: query.trim() },
     });
-    emit("update:modelValue", '');
+    emit("update:modelValue", "");
     if (searchInput.value) {
-      searchInput.value.value = '';
+      searchInput.value.value = "";
       searchInput.value.blur();
     }
   }
@@ -588,9 +650,9 @@ const handleSearch = () => {
 
 const navigateSuggestions = (direction) => {
   if (suggestions.value.length === 0) return;
-  
+
   selectedIndex.value += direction;
-  
+
   if (selectedIndex.value < 0) {
     selectedIndex.value = suggestions.value.length - 1;
   } else if (selectedIndex.value >= suggestions.value.length) {
@@ -606,7 +668,7 @@ const handleBlur = () => {
 };
 
 const isAdminRoute = computed(() => {
-  return route.path.startsWith('/admin');
+  return route.path.startsWith("/admin");
 });
 
 onMounted(async () => {
@@ -616,7 +678,10 @@ onMounted(async () => {
   window._adminStatusInterval = interval;
 
   // Initialize push notifications if supported and logged in
-  if (pushSupported.value && (localStorage.getItem('token') || localStorage.getItem('adminToken'))) {
+  if (
+    pushSupported.value &&
+    (localStorage.getItem("token") || localStorage.getItem("adminToken"))
+  ) {
     const hasPermission = await requestPermission();
     if (hasPermission) {
       await subscribe();
