@@ -12,33 +12,6 @@
       </button>
     </div>
 
-    <!-- Hero Section -->
-    <section 
-      class="hero-section" 
-      v-if="featuredMovie && isSectionEnabled('hero')"
-      aria-label="Featured movie"
-    >
-      <div
-        class="hero-backdrop"
-        :style="{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920')`,
-        }"
-      >
-        <div class="hero-content">
-          <div class="hero-badge">Featured</div>
-          <h1 class="hero-title">{{ featuredMovie.title }}</h1>
-          <p class="hero-description">Watch now in high quality</p>
-          <!-- <button
-            class="hero-play-btn"
-            @click="scrollToMovie(featuredMovie._id)"
-          >
-            <Play :size="20" fill="currentColor" />
-            <span>Play Now</span>
-          </button> -->
-        </div>
-      </div>
-    </section>
-
     <!-- Continue Watching Section -->
     <section 
       v-if="continueWatching.length > 0 && isSectionEnabled('continueWatching')" 
@@ -452,6 +425,7 @@ import {
   Filter,
   Layout,
   Star,
+  Play,
 } from "lucide-vue-next";
 import { useEporner } from "../composables/useEporner";
 import VideoCard from "../components/VideoCard.vue";
@@ -757,6 +731,7 @@ function navigateToVideo(video) {
   // Navigate to watch page with video ID and eporner source
   router.push(`/watch/${video.id}?source=eporner`);
 }
+
 
 function getStartIndex() {
   const perPage = maxThumbnailsPerPage.value || 12;
