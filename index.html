@@ -10,13 +10,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Cineflix" />
     
+    <!-- Permissions Policy to suppress XR warnings -->
+    <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(), geolocation=(), camera=(), microphone=()" />
+    
     <!-- CDN and Performance Optimizations -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
-    <!-- HTTP/2 Server Push hints (if supported) -->
-    <link rel="preload" href="/icon-192.png" as="image" />
-    <link rel="preload" href="/icon-512.png" as="image" />
+    <!-- Icons are loaded via manifest.json, no need to preload -->
     
     <!-- Resource hints for CDN -->
     <meta http-equiv="x-dns-prefetch-control" content="on" />

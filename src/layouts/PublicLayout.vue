@@ -79,6 +79,17 @@
                   <span>Playlists</span>
                 </router-link>
               </li>
+              <li class="navbar-nav-item">
+                <router-link
+                  to="/premium"
+                  class="navbar-link premium-nav-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
+                  <Crown :size="16" />
+                  <span>Premium</span>
+                </router-link>
+              </li>
             </ul>
           </div>
 
@@ -277,6 +288,15 @@
             <FolderOpen :size="20" />
             <span>Categories</span>
           </router-link>
+          <router-link
+            to="/premium"
+            class="mobile-menu-link premium-nav-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
+            <Crown :size="20" />
+            <span>Premium</span>
+          </router-link>
           <!-- <router-link
             to="/stories"
             class="mobile-menu-link"
@@ -472,6 +492,7 @@ import {
   Accessibility,
   Clock,
   ListMusic,
+  Crown,
 } from "lucide-vue-next";
 import PreferencesModal from "../components/PreferencesModal.vue";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";

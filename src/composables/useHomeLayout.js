@@ -10,7 +10,8 @@ export const availableSections = [
   { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 3 },
   { id: 'pov', label: 'Recent POV Videos', icon: 'Film', defaultEnabled: true, order: 4 },
   { id: 'family', label: 'Recent Family Videos', icon: 'Film', defaultEnabled: true, order: 5 },
-  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 6 },
+  { id: 'premium', label: 'Premium Content', icon: 'Crown', defaultEnabled: true, order: 6 },
+  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 7 },
 ];
 
 // Load preferences from localStorage
@@ -18,7 +19,23 @@ function loadPreferences() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const savedPrefs = JSON.parse(stored);
+      // Merge with available sections to include any new sections
+      const merged = availableSections.map(section => {
+        const saved = savedPrefs.find(p => p.id === section.id);
+        if (saved) {
+          return saved; // Use saved preference
+        }
+        // Add new section with default values
+        return {
+          id: section.id,
+          enabled: section.defaultEnabled,
+          order: section.order
+        };
+      });
+      // Save merged preferences back
+      savePreferences(merged);
+      return merged;
     }
   } catch (error) {
     console.error('Error loading layout preferences:', error);
@@ -121,7 +138,22 @@ export function useHomeLayout() {
   // Check if section is enabled
   function isSectionEnabled(sectionId) {
     const pref = preferences.value.find(p => p.id === sectionId);
-    return pref ? pref.enabled : false;
+    if (pref) {
+      return pref.enabled;
+    }
+    // If section not in preferences yet, check if it exists in availableSections and return its default
+    const section = availableSections.find(s => s.id === sectionId);
+    if (section) {
+      // Add it to preferences with default value
+      preferences.value.push({
+        id: section.id,
+        enabled: section.defaultEnabled,
+        order: section.order
+      });
+      savePreferences(preferences.value);
+      return section.defaultEnabled;
+    }
+    return false;
   }
 
   return {

@@ -25,9 +25,12 @@ if ('serviceWorker' in navigator) {
 app.mount('#app')
 
 // Initialize prefetching for critical routes after app is mounted
+// Pass router instance to avoid context issues
 setTimeout(() => {
   import('./composables/usePrefetch.js').then(({ usePrefetch }) => {
-    const { init } = usePrefetch();
+    // Store router on window for access outside component context
+    window.__VUE_ROUTER__ = router;
+    const { init } = usePrefetch(router);
     init();
   });
 }, 100);

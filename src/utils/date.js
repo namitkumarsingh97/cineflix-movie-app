@@ -8,6 +8,13 @@ export function formatDate(date) {
   });
 }
 
+export function formatViews(views) {
+  if (!views) return '0';
+  if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+  if (views >= 1000) return `${(views / 1000).toFixed(1)}k`;
+  return views.toString();
+}
+
 export function formatDuration(seconds) {
   if (!seconds) return '0:00';
   const mins = Math.floor(seconds / 60);

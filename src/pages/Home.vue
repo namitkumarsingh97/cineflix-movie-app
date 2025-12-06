@@ -209,6 +209,114 @@
       </div>
     </section>
 
+    <!-- Premium Section - Professional Showcase -->
+    <section 
+      v-if="isSectionEnabled('premium')" 
+      class="movies-section premium-section premium-showcase"
+      aria-label="Premium content"
+    >
+      <div class="premium-section-background">
+        <div class="premium-gradient-overlay"></div>
+      </div>
+      <div class="premium-content-wrapper">
+        <div class="section-header premium-header">
+          <div class="section-title-wrapper">
+            <div class="premium-badge-header">
+              <Crown :size="20" />
+              <span>Premium</span>
+            </div>
+            <h2 class="section-title premium-title">
+              Exclusive Premium Content
+            </h2>
+            <p class="section-description premium-description">
+              Unlock unlimited access to premium videos with HD & 4K quality, ad-free experience, offline downloads, and exclusive releases
+            </p>
+          </div>
+          <router-link to="/premium" class="premium-cta-header">
+            <span>View All Premium</span>
+            <ChevronRight :size="18" />
+          </router-link>
+        </div>
+        
+        <SkeletonSection 
+          v-if="epornerLoading && (!premiumPreviewVideos || premiumPreviewVideos.length === 0) && (!blurredPreviewVideos || blurredPreviewVideos.length === 0)" 
+          :count="maxThumbnailsPerPage" 
+          :columns="4"
+          :show-header="false"
+        />
+        <div v-else class="premium-videos-showcase-wrapper">
+          <!-- Premium Videos (if available) -->
+          <div v-if="premiumPreviewVideos && premiumPreviewVideos.length > 0" class="premium-videos-showcase">
+            <PremiumVideoCard
+              v-for="video in premiumPreviewVideos"
+              :key="video.id"
+              :video="video"
+              :is-premium="isPremium"
+            />
+          </div>
+          
+          <!-- Blurred Video Grid from Regular Videos -->
+          <div v-else-if="blurredPreviewVideos && blurredPreviewVideos.length > 0" class="premium-blurred-videos-grid">
+            <div
+              v-for="video in blurredPreviewVideos"
+              :key="video.id"
+              class="blurred-video-card"
+              @click.stop="handlePremiumVideoClick(video, $event)"
+            >
+              <div class="blurred-video-thumbnail-wrapper">
+                <OptimizedImage
+                  :src="video.thumbnail || getDefaultThumbnail(video)"
+                  :alt="video.title"
+                  image-class="blurred-video-thumbnail"
+                />
+                <div class="blurred-video-overlay">
+                  <div class="blurred-lock-icon">
+                    <Lock :size="28" />
+                  </div>
+                  <div class="blurred-premium-badge">
+                    <Crown :size="14" />
+                    <span>Premium</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Video info hidden for more mystery -->
+            </div>
+          </div>
+          
+          <!-- Empty State Overlay (only if no videos at all) -->
+          <div v-if="(!premiumPreviewVideos || premiumPreviewVideos.length === 0) && (!blurredPreviewVideos || blurredPreviewVideos.length === 0)" class="premium-empty-overlay">
+            <div class="empty-premium-state">
+              <div class="empty-premium-icon">
+                <Crown :size="64" />
+              </div>
+              <h3>Premium Content Coming Soon</h3>
+              <p>Exclusive premium videos will be available here</p>
+              <router-link to="/premium" class="premium-cta-button">
+                <Crown :size="18" />
+                <span>Explore Premium Plans</span>
+              </router-link>
+            </div>
+          </div>
+        </div>
+        
+        <div v-if="!isPremium && premiumPreviewVideos.length > 0" class="premium-unlock-banner">
+          <div class="unlock-banner-content">
+            <div class="unlock-icon">
+              <Lock :size="24" />
+            </div>
+            <div class="unlock-text">
+              <h3>Unlock Premium Access</h3>
+              <p>Get instant access to all premium content and exclusive features</p>
+            </div>
+            <router-link to="/premium" class="unlock-button">
+              <Crown :size="18" />
+              <span>Subscribe Now</span>
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Trending Videos Section (Eporner) -->
     <section 
       v-if="isSectionEnabled('trendingVideos')" 
@@ -411,6 +519,7 @@ import { useNotifications } from "../composables/useNotifications";
 import { useVideos } from "../composables/useVideos";
 import { useNetworkQuality } from "../composables/useNetworkQuality";
 import { useRecommendations } from "../composables/useRecommendations";
+import { useSubscription } from "../composables/useSubscription";
 
 import {
   Film,
@@ -426,9 +535,14 @@ import {
   Layout,
   Star,
   Play,
+  Crown,
+  Lock,
 } from "lucide-vue-next";
 import { useEporner } from "../composables/useEporner";
 import VideoCard from "../components/VideoCard.vue";
+import PremiumVideoCard from "../components/PremiumVideoCard.vue";
+import OptimizedImage from "../components/OptimizedImage.vue";
+import { formatViews, formatDuration } from "../utils/date";
 
 const router = useRouter();
 const route = useRoute();
@@ -472,7 +586,11 @@ const latestVideos = ref([]);
 const indianVideos = ref([]);
 const povVideos = ref([]);
 const familyVideos = ref([]);
+const premiumPreviewVideos = ref([]);
+const blurredPreviewVideos = ref([]);
 
+// Premium subscription
+const { isPremium, checkPremiumStatus } = useSubscription();
 
 const showLayoutCustomizer = ref(false);
 const lastNotifiedAtKey = 'cineflix_last_content_notified';
@@ -733,6 +851,24 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
 }
 
+function handlePremiumVideoClick(video, event) {
+  // ALWAYS prevent default behavior and stop all propagation
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+  }
+  
+  // FORCE redirect to premium page - NO other navigation allowed in this section
+  console.log('Premium section: All clicks blocked, redirecting to /premium');
+  router.push('/premium').catch(() => {});
+  return false;
+}
+
+function getDefaultThumbnail(video) {
+  return video?.thumbnail || 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video';
+}
+
 
 function getStartIndex() {
   const perPage = maxThumbnailsPerPage.value || 12;
@@ -824,6 +960,33 @@ async function loadEpornerSections() {
                tags.some(tag => tag.includes('family'));
       })
       .slice(0, limit);
+    
+    // Load Premium preview videos (blurred for non-premium users)
+    await searchVideos('premium', 1, { perPage: limit, order: 'most-popular' });
+    premiumPreviewVideos.value = epornerVideos.value
+      .filter(video => video.isPremium || video.tags?.includes('premium'))
+      .slice(0, limit);
+    
+    // If no premium videos, use regular videos with blur effect for hype
+    if (!premiumPreviewVideos.value || premiumPreviewVideos.value.length === 0) {
+      // Get popular/trending videos and use them as blurred preview
+      const allVideos = [
+        ...(latestVideos.value || []), 
+        ...(trendingVideos.value || []), 
+        ...(recentlyAddedVideos.value || []),
+        ...(epornerVideos.value || [])
+      ];
+      // Remove duplicates and get unique videos
+      const uniqueVideos = Array.from(
+        new Map(allVideos.filter(v => v && v.id).map(v => [v.id, v])).values()
+      );
+      blurredPreviewVideos.value = uniqueVideos
+        .filter(video => video && video.thumbnail && video.title)
+        .slice(0, 12); // Show 12 blurred videos
+    } else {
+      // Clear blurred videos if premium videos are available
+      blurredPreviewVideos.value = [];
+    }
   } catch (error) {
     console.error('Error loading Eporner videos:', error);
   }
@@ -857,6 +1020,8 @@ onMounted(() => {
   loadBackendVideos();
   loadEpornerSections();
   maybeNotifyNewContent();
+  checkPremiumStatus();
+  checkPremiumStatus();
 
   const section = route.query.section;
   if (section) {

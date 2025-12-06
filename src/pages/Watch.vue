@@ -6,8 +6,33 @@
         <!-- Video Player -->
         <div class="video-player-section">
           <div class="video-player-wrapper">
+            <!-- Premium Lock Screen -->
+            <div v-if="video && video.isPremium && !isPremium" class="premium-lock-screen">
+              <div class="premium-lock-content">
+                <Crown :size="64" />
+                <h2>Premium Content</h2>
+                <p>This video is available only to premium members</p>
+                <div class="premium-features-preview">
+                  <div class="premium-feature-item">
+                    <Check :size="20" />
+                    <span>HD & 4K Quality</span>
+                  </div>
+                  <div class="premium-feature-item">
+                    <Check :size="20" />
+                    <span>Ad-Free Experience</span>
+                  </div>
+                  <div class="premium-feature-item">
+                    <Check :size="20" />
+                    <span>Exclusive Content</span>
+                  </div>
+                </div>
+                <button class="premium-unlock-btn" @click="goToPremium">
+                  Unlock Premium
+                </button>
+              </div>
+            </div>
             <!-- Iframe for movies and Eporner videos -->
-            <div v-if="video && (video.iframe || ((isEporner || video._source === 'eporner') && (video.embedUrl || video.url)))" class="watch-iframe-container">
+            <div v-else-if="video && (video.iframe || ((isEporner || video._source === 'eporner') && (video.embedUrl || video.url)))" class="watch-iframe-container">
               <div v-if="video.iframe" v-html="video.iframe" class="watch-iframe-player"></div>
               <iframe
                 v-else-if="(isEporner || video._source === 'eporner') && (video.embedUrl || video.url)"
@@ -21,7 +46,7 @@
             </div>
             <!-- Video tag for S3 videos -->
             <video
-              v-else-if="video && video.url && !isEporner"
+              v-else-if="video && video.url && !isEporner && (!video.isPremium || isPremium)"
               ref="videoPlayer"
               :src="isHlsSource ? '' : video.url"
               controls
@@ -279,6 +304,7 @@ import { useNetworkQuality } from '../composables/useNetworkQuality';
 import { useRecommendations } from '../composables/useRecommendations';
 import { useScenes } from '../composables/useScenes';
 import { useCreators } from '../composables/useCreators';
+import { useSubscription } from '../composables/useSubscription';
 import VideoCard from '../components/VideoCard.vue';
 import MovieCard from '../components/MovieCard.vue';
 import SceneNavigation from '../components/SceneNavigation.vue';
@@ -329,6 +355,7 @@ const { shouldAutoplay, playerBitrate, videoQuality, shouldDeferRecommendations 
 const { getBecauseYouWatched, updateSession } = useRecommendations();
 const { scenes, currentScene, generateScenes, jumpToScene, getSceneAtTime } = useScenes();
 const { extractCreator, followCreator, unfollowCreator, isCreatorFollowed: checkCreatorFollowed } = useCreators();
+const { isPremium, checkPremiumStatus } = useSubscription();
 
 const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
 const isWatchLater = computed(() => video.value ? isInWatchLater(video.value._id || video.value.id) : false);
@@ -955,6 +982,10 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id || video._id}${source}`);
 }
 
+function goToPremium() {
+  router.push('/premium');
+}
+
 function formatViews(views) {
   if (!views) return '0';
   if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
@@ -1060,6 +1091,7 @@ watch(() => video.value, () => {
 }, { deep: true });
 
 onMounted(async () => {
+  await checkPremiumStatus();
   await Promise.all([loadVideos(), loadMovies()]);
   await loadVideo();
   processIframe();
@@ -1203,6 +1235,83 @@ onBeforeUnmount(() => {
     border-radius: 6px;
     margin-bottom: 10px;
   }
+}
+
+.premium-lock-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.premium-lock-content {
+  text-align: center;
+  padding: 40px;
+  max-width: 500px;
+}
+
+.premium-lock-content svg {
+  color: var(--primary);
+  margin-bottom: 24px;
+}
+
+.premium-lock-content h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.premium-lock-content > p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0 0 32px 0;
+}
+
+.premium-features-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.premium-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.premium-feature-item svg {
+  color: var(--primary);
+  margin: 0;
+}
+
+.premium-unlock-btn {
+  padding: 14px 32px;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
+}
+
+.premium-unlock-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 69, 0, 0.6);
 }
 
 .watch-video-player {

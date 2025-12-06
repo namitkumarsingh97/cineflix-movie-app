@@ -30,6 +30,15 @@ const routes = [
     }
   },
   {
+    path: '/premium',
+    name: 'Premium',
+    component: () => import('../pages/Premium.vue'),
+    meta: { 
+      preload: false,
+      title: 'Premium'
+    }
+  },
+  {
     path: '/stories',
     name: 'Stories',
     component: () => import('../pages/Stories.vue'),

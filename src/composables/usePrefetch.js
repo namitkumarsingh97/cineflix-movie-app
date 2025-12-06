@@ -1,16 +1,25 @@
-import { onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
-
 /**
  * Composable for prefetching critical routes and resources
+ * @param {Router} router - Vue Router instance (optional, will try to get from context if not provided)
  */
-export function usePrefetch() {
-  const router = useRouter();
+export function usePrefetch(router = null) {
+  // Get router from context if not provided
+  let routerInstance = router;
+  
+  // Try to get router from window if available (set by main.js)
+  if (!routerInstance && window.__VUE_ROUTER__) {
+    routerInstance = window.__VUE_ROUTER__;
+  }
 
   // Prefetch a route component
   const prefetchRoute = async (routeName) => {
     try {
-      const route = router.resolve({ name: routeName });
+      if (!routerInstance) {
+        console.warn('Router not available for prefetching');
+        return;
+      }
+      
+      const route = routerInstance.resolve({ name: routeName });
       if (route.matched && route.matched.length > 0) {
         const component = route.matched[0].components?.default;
         if (component && typeof component === 'function') {
