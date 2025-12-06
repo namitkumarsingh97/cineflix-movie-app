@@ -473,6 +473,7 @@ const indianVideos = ref([]);
 const povVideos = ref([]);
 const familyVideos = ref([]);
 
+
 const showLayoutCustomizer = ref(false);
 const lastNotifiedAtKey = 'cineflix_last_content_notified';
 
@@ -849,6 +850,7 @@ async function maybeNotifyNewContent() {
   });
   localStorage.setItem(lastNotifiedAtKey, String(newest));
 }
+
 
 onMounted(() => {
   loadMovies();

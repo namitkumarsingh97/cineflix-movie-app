@@ -18,8 +18,10 @@
               <X v-else :size="20" />
             </button>
             <div class="navbar-logo">
-              <Film :size="24" class="navbar-logo-icon" />
-              <span class="navbar-logo-text">MovieHub</span>
+              <router-link to="/" @click="closeMobileMenu">
+                <Film :size="24" class="navbar-logo-icon" />
+                <span class="navbar-logo-text">MovieHub</span>
+              </router-link>
             </div>
             <ul class="navbar-nav">
               <li class="navbar-nav-item">
@@ -55,7 +57,7 @@
                   <span>Categories</span>
                 </router-link>
               </li>
-              <li class="navbar-nav-item">
+              <!-- <li class="navbar-nav-item">
                 <router-link
                   to="/stories"
                   class="navbar-link"
@@ -65,7 +67,7 @@
                   <Heart :size="16" />
                   <span>Stories</span>
                 </router-link>
-              </li>
+              </li> -->
               <li class="navbar-nav-item">
                 <router-link
                   to="/playlists"
@@ -128,7 +130,7 @@
 
           <div class="navbar-right">
             <!-- Watch Later Badge -->
-            <router-link
+            <!-- <router-link
               to="/"
               class="navbar-btn badge-wrapper"
               title="Watch Later"
@@ -136,9 +138,9 @@
             >
               <Clock :size="20" />
               <BadgeCount :count="watchLaterCount" />
-            </router-link>
+            </router-link> -->
             <!-- Followed Stars badge -> Home anchor -->
-            <router-link
+            <!-- <router-link
               to="/?section=followed-stars"
               class="navbar-btn badge-wrapper"
               title="My Followed Stars"
@@ -146,7 +148,7 @@
             >
               <Star :size="20" />
               <BadgeCount :count="followedStarsCount" />
-            </router-link>
+            </router-link> -->
             <button
               class="navbar-btn preferences-btn"
               @click="showPreferences = true"
@@ -275,7 +277,7 @@
             <FolderOpen :size="20" />
             <span>Categories</span>
           </router-link>
-          <router-link
+          <!-- <router-link
             to="/stories"
             class="mobile-menu-link"
             active-class="active"
@@ -283,7 +285,7 @@
           >
             <Heart :size="20" />
             <span>Stories</span>
-          </router-link>
+          </router-link> -->
           <router-link
             v-if="isAdminLoggedIn"
             to="/admin/panel"
@@ -293,7 +295,7 @@
             <Shield :size="20" />
             <span>Admin Panel</span>
           </router-link>
-          <router-link
+          <!-- <router-link
             v-else
             to="/admin/login"
             class="mobile-menu-link"
@@ -301,7 +303,7 @@
           >
             <Shield :size="20" />
             <span>Admin</span>
-          </router-link>
+          </router-link> -->
         </nav>
       </div>
 
@@ -453,6 +455,7 @@ import {
   RefreshCw,
   Home,
   TrendingUp,
+  Image,
   FolderOpen,
   Star,
   Heart,
