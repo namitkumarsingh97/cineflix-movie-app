@@ -11,7 +11,9 @@
             <CreditCard :size="32" />
           </div>
           <h2 class="modal-title">Pay with UPI</h2>
-          <p class="modal-subtitle">Scan QR code or use UPI ID to complete payment</p>
+          <p class="modal-subtitle">
+            Scan QR code or use UPI ID to complete payment
+          </p>
         </div>
 
         <div class="plan-summary">
@@ -43,13 +45,15 @@
                 <p>Click "Generate QR Code" to proceed</p>
               </div>
             </div>
-            <button 
+            <button
               class="generate-qr-btn"
               @click="generateQRCode"
               :disabled="loadingQR"
             >
               <QrCode :size="18" />
-              <span>{{ qrCodeUrl ? 'Regenerate QR Code' : 'Generate QR Code' }}</span>
+              <span>{{
+                qrCodeUrl ? "Regenerate QR Code" : "Generate QR Code"
+              }}</span>
             </button>
           </div>
 
@@ -61,19 +65,28 @@
                 <span class="upi-id-label">UPI ID:</span>
                 <div class="upi-id-value">
                   <code>{{ upiId }}</code>
-                  <button class="copy-btn" @click="copyUPIId" title="Copy UPI ID">
+                  <button
+                    class="copy-btn"
+                    @click="copyUPIId"
+                    title="Copy UPI ID"
+                  >
                     <Copy :size="16" />
                   </button>
                 </div>
               </div>
               <p class="upi-instructions">
-                Send ₹{{ plan?.price }} to this UPI ID from any UPI app (PhonePe, Google Pay, Paytm, etc.)
+                Send ₹{{ plan?.price }} to this UPI ID from any UPI app
+                (PhonePe, Google Pay, Paytm, etc.)
               </p>
             </div>
           </div>
 
           <!-- Payment Status -->
-          <div v-if="paymentStatus" class="payment-status" :class="paymentStatus">
+          <div
+            v-if="paymentStatus"
+            class="payment-status"
+            :class="paymentStatus"
+          >
             <div v-if="paymentStatus === 'pending'" class="status-message">
               <Clock :size="20" />
               <span>Waiting for payment confirmation...</span>
@@ -91,23 +104,22 @@
           <!-- Manual Verification (if needed) -->
           <div class="manual-verification">
             <p class="verification-note">
-              After making the payment, click "I've Paid" to verify and activate your subscription.
+              After making the payment, click "I've Paid" to verify and activate
+              your subscription.
             </p>
-            <button 
+            <button
               class="verify-payment-btn"
               @click="verifyPayment"
               :disabled="processing"
             >
               <CheckCircle :size="18" />
-              <span>{{ processing ? 'Verifying...' : "I've Paid" }}</span>
+              <span>{{ processing ? "Verifying..." : "I've Paid" }}</span>
             </button>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button class="cancel-button" @click="$emit('close')">
-            Cancel
-          </button>
+          <button class="cancel-button" @click="$emit('close')">Cancel</button>
         </div>
 
         <div v-if="error" class="error-message">
@@ -119,10 +131,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { X, CreditCard, QrCode, Copy, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-vue-next';
-import { useSubscription } from '../composables/useSubscription';
-import { subscriptionApi } from '../api/subscription';
+import { ref, computed, onMounted } from "vue";
+import {
+  X,
+  CreditCard,
+  QrCode,
+  Copy,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Loader2,
+} from "lucide-vue-next";
+import { useSubscription } from "../composables/useSubscription";
+import { subscriptionApi } from "../api/subscription";
 
 const props = defineProps({
   plan: {
@@ -135,48 +156,56 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['close', 'success']);
+const emit = defineEmits(["close", "success"]);
 
 const { checkPremiumStatus } = useSubscription();
 
 const loadingQR = ref(false);
-const qrCodeUrl = ref('');
-const upiId = ref('your-upi-id@paytm'); // Will be updated from API response
+const qrCodeUrl = ref("");
+const upiId = ref("your-upi-id@paytm"); // Will be updated from API response
 const orderId = ref(null);
 const paymentStatus = ref(null);
 const processing = ref(false);
-const error = ref('');
+const error = ref("");
 
 // Generate UPI QR Code
 async function generateQRCode() {
   loadingQR.value = true;
-  error.value = '';
+  error.value = "";
 
   try {
     // Create payment order
     const orderResponse = await subscriptionApi.createUPIOrder({
       planId: props.plan.id,
       amount: props.plan.price,
-      type: props.plan.id === 'lifetime' ? 'lifetime' : props.plan.id === 'yearly' ? 'yearly' : 'monthly',
+      type:
+        props.plan.id === "lifetime"
+          ? "lifetime"
+          : props.plan.id === "yearly"
+          ? "yearly"
+          : "monthly",
     });
 
     if (orderResponse.qrCodeUrl) {
       qrCodeUrl.value = orderResponse.qrCodeUrl;
       orderId.value = orderResponse.orderId;
-      paymentStatus.value = 'pending';
+      paymentStatus.value = "pending";
     } else if (orderResponse.upiLink) {
       // If Razorpay returns UPI link, convert to QR code
-      qrCodeUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(orderResponse.upiLink)}`;
+      qrCodeUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+        orderResponse.upiLink
+      )}`;
       orderId.value = orderResponse.orderId;
-      paymentStatus.value = 'pending';
+      paymentStatus.value = "pending";
     }
-    
+
     if (orderResponse.upiId) {
       upiId.value = orderResponse.upiId;
     }
   } catch (err) {
-    error.value = err.message || 'Failed to generate QR code. Please try again.';
-    console.error('Error generating QR code:', err);
+    error.value =
+      err.message || "Failed to generate QR code. Please try again.";
+    console.error("Error generating QR code:", err);
   } finally {
     loadingQR.value = false;
   }
@@ -187,41 +216,74 @@ async function copyUPIId() {
   try {
     await navigator.clipboard.writeText(upiId.value);
     // Show toast notification (you can add a toast library)
-    alert('UPI ID copied to clipboard!');
+    alert("UPI ID copied to clipboard!");
   } catch (err) {
-    console.error('Failed to copy UPI ID:', err);
+    console.error("Failed to copy UPI ID:", err);
   }
 }
 
 // Verify payment manually
 async function verifyPayment() {
   processing.value = true;
-  error.value = '';
-  paymentStatus.value = 'pending';
+  error.value = "";
+  paymentStatus.value = "pending";
 
   try {
-    // Verify payment with backend
+    console.log("Verifying payment...", {
+      planId: props.plan.id,
+      amount: props.plan.price,
+    });
+
+    // Verify payment with backend - this saves to DB
     const verifyResponse = await subscriptionApi.verifyUPIPayment({
       planId: props.plan.id,
-      type: props.plan.id === 'lifetime' ? 'lifetime' : props.plan.id === 'yearly' ? 'yearly' : 'monthly',
+      type:
+        props.plan.id === "lifetime"
+          ? "lifetime"
+          : props.plan.id === "yearly"
+          ? "yearly"
+          : "monthly",
       amount: props.plan.price,
       orderId: orderId.value,
     });
 
-    if (verifyResponse.success) {
-      paymentStatus.value = 'success';
-      // Refresh premium status
+    console.log("Payment verification response:", verifyResponse);
+
+    if (verifyResponse.success && verifyResponse.subscription) {
+      // Payment verified and subscription saved to DB
+      paymentStatus.value = "success";
+      console.log(
+        "Payment verified, subscription saved:",
+        verifyResponse.subscription
+      );
+
+      // Refresh premium status from DB
       await checkPremiumStatus();
+
+      // Wait a moment to show success message
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Emit success event and close modal
+      emit("success", verifyResponse.subscription);
+
+      // Close modal after a short delay
       setTimeout(() => {
-        emit('success');
-      }, 1500);
+        emit("close");
+      }, 500);
     } else {
-      paymentStatus.value = 'failed';
-      error.value = verifyResponse.error || 'Payment verification failed. Please contact support.';
+      paymentStatus.value = "failed";
+      error.value =
+        verifyResponse.error ||
+        "Payment verification failed. Please contact support.";
+      console.error("Payment verification failed:", verifyResponse);
     }
   } catch (err) {
-    paymentStatus.value = 'failed';
-    error.value = err.message || 'Payment verification failed. Please try again.';
+    paymentStatus.value = "failed";
+    error.value =
+      err.response?.data?.error ||
+      err.message ||
+      "Payment verification failed. Please try again.";
+    console.error("Payment verification error:", err);
   } finally {
     processing.value = false;
   }
@@ -345,7 +407,7 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 600;
   color: var(--primary);
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .copy-btn {
@@ -453,4 +515,3 @@ onMounted(async () => {
   animation: spin 1s linear infinite;
 }
 </style>
-

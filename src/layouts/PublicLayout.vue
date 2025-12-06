@@ -140,6 +140,107 @@
           </div>
 
           <div class="navbar-right">
+            <!-- User Menu (if logged in) -->
+            <div v-if="isAuthenticated" class="user-menu-wrapper">
+              <button
+                class="user-menu-btn"
+                @click="toggleUserMenu"
+                title="Account"
+                :class="{ active: userMenuOpen }"
+              >
+                <div class="user-avatar-circle">
+                  <img 
+                    v-if="user?.avatar" 
+                    :src="user.avatar" 
+                    :alt="user?.name || 'User'"
+                    class="user-avatar-img"
+                  />
+                  <User v-else :size="18" class="user-avatar-icon" />
+                </div>
+                <span class="user-name">{{ user?.name?.split(' ')[0] || 'User' }}</span>
+                <ChevronDown :size="16" class="chevron-icon" :class="{ rotated: userMenuOpen }" />
+              </button>
+              <Transition name="dropdown">
+                <div v-if="userMenuOpen" class="user-menu-dropdown" @click.stop>
+                  <div class="user-menu-header">
+                    <div class="user-menu-avatar">
+                      <img 
+                        v-if="user?.avatar" 
+                        :src="user.avatar" 
+                        :alt="user?.name || 'User'"
+                        class="user-menu-avatar-img"
+                      />
+                      <div v-else class="user-menu-avatar-placeholder">
+                        <User :size="32" />
+                      </div>
+                    </div>
+                    <div class="user-menu-info">
+                      <span class="user-menu-name">{{ user?.name || 'User' }}</span>
+                      <span class="user-menu-email">{{ user?.email }}</span>
+                    </div>
+                  </div>
+                  <div class="user-menu-divider"></div>
+                  <router-link
+                    to="/dashboard"
+                    class="user-menu-item"
+                    @click="closeUserMenu"
+                  >
+                    <Layout :size="18" />
+                    <span>Dashboard</span>
+                  </router-link>
+                  <router-link
+                    to="/dashboard?tab=profile"
+                    class="user-menu-item"
+                    @click="closeUserMenu"
+                  >
+                    <User :size="18" />
+                    <span>My Profile</span>
+                  </router-link>
+                  <router-link
+                    to="/dashboard?tab=settings"
+                    class="user-menu-item"
+                    @click="closeUserMenu"
+                  >
+                    <Settings :size="18" />
+                    <span>Settings</span>
+                  </router-link>
+                  <router-link
+                    to="/dashboard?tab=subscription"
+                    class="user-menu-item"
+                    @click="closeUserMenu"
+                  >
+                    <Crown :size="18" />
+                    <span>Subscription</span>
+                  </router-link>
+                  <router-link
+                    to="/premium"
+                    class="user-menu-item"
+                    @click="closeUserMenu"
+                  >
+                    <Crown :size="18" />
+                    <span>Premium</span>
+                  </router-link>
+                  <div class="user-menu-divider"></div>
+                  <button
+                    class="user-menu-item logout-item"
+                    @click="handleLogout"
+                  >
+                    <LogOut :size="18" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </Transition>
+            </div>
+            <!-- Login Button (if not logged in and not admin) -->
+            <router-link
+              v-if="!isAuthenticated && !isAdminLoggedIn"
+              to="/login"
+              class="navbar-btn login-btn"
+              title="Sign In"
+            >
+              <LogIn :size="18" />
+              <span>Sign In</span>
+            </router-link>
             <!-- Watch Later Badge -->
             <!-- <router-link
               to="/"
@@ -465,7 +566,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, inject } from "vue";
+import { ref, onMounted, onUnmounted, computed, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useMovies } from "../composables/useMovies";
 import { useEporner } from "../composables/useEporner";
@@ -493,6 +594,9 @@ import {
   Clock,
   ListMusic,
   Crown,
+  LogIn,
+  Layout,
+  ChevronDown,
 } from "lucide-vue-next";
 import PreferencesModal from "../components/PreferencesModal.vue";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";
@@ -501,6 +605,7 @@ import BadgeCount from "../components/BadgeCount.vue";
 import { useAccessibility } from "../composables/useAccessibility";
 import { useBadgeCounts } from "../composables/useBadgeCounts";
 import { usePushNotifications } from "../composables/usePushNotifications";
+import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
 const route = useRoute();
@@ -520,6 +625,28 @@ const isAdminLoggedIn = ref(false);
 const adminId = ref("");
 const showPreferences = ref(false);
 const showAccessibility = ref(false);
+
+// User authentication
+const { user, isAuthenticated, logout: authLogout, checkAuth } = useAuth();
+const userMenuOpen = ref(false);
+
+function toggleUserMenu() {
+  userMenuOpen.value = !userMenuOpen.value;
+  if (userMenuOpen.value) {
+    adminMenuOpen.value = false;
+  }
+}
+
+function closeUserMenu() {
+  userMenuOpen.value = false;
+}
+
+async function handleLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    await authLogout();
+    closeUserMenu();
+  }
+}
 const { skipToMain } = useAccessibility();
 const { watchLaterCount, followedStarsCount } = useBadgeCounts();
 const {
@@ -695,16 +822,27 @@ const isAdminRoute = computed(() => {
   return route.path.startsWith("/admin");
 });
 
+// Watch for auth state changes to update UI immediately
+watch(isAuthenticated, async (newValue) => {
+  if (newValue) {
+    // User just logged in, refresh auth state
+    await checkAuth();
+  }
+}, { immediate: true });
+
 onMounted(async () => {
   checkAdminStatus();
   // Check admin status periodically
   const interval = setInterval(checkAdminStatus, 1000);
   window._adminStatusInterval = interval;
 
+  // Check auth status on mount to ensure UI updates
+  await checkAuth();
+
   // Initialize push notifications if supported and logged in
   if (
     pushSupported.value &&
-    (localStorage.getItem("token") || localStorage.getItem("adminToken"))
+    (localStorage.getItem("cineflix_auth_token") || localStorage.getItem("adminToken"))
   ) {
     const hasPermission = await requestPermission();
     if (hasPermission) {
@@ -712,10 +850,13 @@ onMounted(async () => {
     }
   }
 
-  // Close admin menu when clicking outside
+  // Close admin menu and user menu when clicking outside
   const handleClickOutside = (event) => {
     if (!event.target.closest(".profile-menu-wrapper")) {
       adminMenuOpen.value = false;
+    }
+    if (!event.target.closest(".user-menu-wrapper")) {
+      userMenuOpen.value = false;
     }
   };
   document.addEventListener("click", handleClickOutside);

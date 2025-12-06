@@ -33,9 +33,39 @@ const routes = [
     path: '/premium',
     name: 'Premium',
     component: () => import('../pages/Premium.vue'),
-    meta: { 
+    meta: {
       preload: false,
       title: 'Premium'
+    }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../pages/Login.vue'),
+    meta: {
+      preload: false,
+      title: 'Sign In',
+      requiresGuest: true
+    }
+  },
+  {
+    path: '/signup',
+    name: 'Signup',
+    component: () => import('../pages/Signup.vue'),
+    meta: {
+      preload: false,
+      title: 'Sign Up',
+      requiresGuest: true
+    }
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('../pages/Dashboard.vue'),
+    meta: {
+      requiresAuth: true,
+      preload: false,
+      title: 'Dashboard'
     }
   },
   {
@@ -214,17 +244,34 @@ router.beforeEach((to, from, next) => {
     }
   }
   
-  // Check admin auth
-  if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('adminToken')
+  // Check user authentication (for dashboard, account pages)
+  if (to.meta.requiresAuth && !to.path.startsWith('/admin')) {
+    const token = localStorage.getItem('cineflix_auth_token');
     if (!token) {
-      next('/admin/login')
-    } else {
-      next()
+      next({ name: 'Login', query: { redirect: to.fullPath } });
+      return;
     }
-  } else {
-    next()
   }
+  
+  // Check guest routes (login, signup - redirect if already logged in)
+  if (to.meta.requiresGuest) {
+    const token = localStorage.getItem('cineflix_auth_token');
+    if (token) {
+      next({ name: 'Dashboard' });
+      return;
+    }
+  }
+  
+  // Check admin auth (for admin panel)
+  if (to.meta.requiresAuth && to.path.startsWith('/admin')) {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      next('/admin/login');
+      return;
+    }
+  }
+  
+  next();
 })
 
 // Update document title on route change

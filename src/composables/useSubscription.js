@@ -42,21 +42,50 @@ export function useSubscription() {
       // Check with backend API
       try {
         const response = await subscriptionApi.getStatus();
-        if (response && response.isPremium) {
-          isPremium.value = true;
-          subscription.value = response.subscription;
-          localStorage.setItem(PREMIUM_KEY, 'true');
-          localStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(response.subscription));
+        console.log('Subscription status response:', response);
+        
+        // Check if subscription exists (even if isPremium is false, subscription might exist)
+        if (response && response.success) {
+          if (response.subscription && response.subscription.status === 'active') {
+            // Active subscription found
+            isPremium.value = true;
+            subscription.value = response.subscription;
+            localStorage.setItem(PREMIUM_KEY, 'true');
+            localStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(response.subscription));
+            console.log('✅ Premium status updated:', { isPremium: isPremium.value, subscription: subscription.value });
+          } else if (response.isPremium && response.subscription) {
+            // Fallback: if isPremium is true and subscription exists
+            isPremium.value = true;
+            subscription.value = response.subscription;
+            localStorage.setItem(PREMIUM_KEY, 'true');
+            localStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(response.subscription));
+            console.log('✅ Premium status updated (fallback):', { isPremium: isPremium.value, subscription: subscription.value });
+          } else {
+            // No active subscription
+            isPremium.value = false;
+            subscription.value = null;
+            localStorage.setItem(PREMIUM_KEY, 'false');
+            localStorage.removeItem(SUBSCRIPTION_KEY);
+            console.log('❌ No active subscription found');
+          }
         } else {
           isPremium.value = false;
           subscription.value = null;
           localStorage.setItem(PREMIUM_KEY, 'false');
           localStorage.removeItem(SUBSCRIPTION_KEY);
+          console.log('❌ Invalid response format');
         }
       } catch (error) {
         // If API fails, use localStorage as fallback
         console.warn('Failed to check premium status from API:', error);
         isPremium.value = storedStatus === 'true';
+        if (storedSubscription) {
+          try {
+            subscription.value = JSON.parse(storedSubscription);
+          } catch (e) {
+            subscription.value = null;
+          }
+        }
       }
     } catch (error) {
       console.error('Error checking premium status:', error);

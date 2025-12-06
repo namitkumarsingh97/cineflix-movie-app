@@ -2,8 +2,13 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import './style.css'
+import { useAuth } from './composables/useAuth'
 
 const app = createApp(App).use(router)
+
+// Initialize authentication
+const { init } = useAuth()
+init()
 
 // Setup service worker message handler for background sync
 if ('serviceWorker' in navigator) {

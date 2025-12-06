@@ -119,6 +119,17 @@
           <ManageStories />
         </div>
 
+        <!-- Payment Verifications Section -->
+        <div v-if="activeSection === 'payment-verifications'" class="admin-section">
+          <div class="section-header">
+            <h2>
+              <CreditCard :size="24" />
+              <span>Payment Verifications</span>
+            </h2>
+          </div>
+          <PaymentVerificationReview />
+        </div>
+
         <!-- Dashboard Section -->
         <div v-if="activeSection === 'dashboard'" class="admin-section">
           <div class="section-header">
@@ -217,12 +228,14 @@ import {
   ChevronDown,
   Home,
   FileText,
+  CreditCard,
 } from 'lucide-vue-next';
 import AddMovieForm from '../components/AddMovieForm.vue';
 import ManageMovies from '../components/ManageMovies.vue';
 import CategoryManagement from '../components/CategoryManagement.vue';
 import ManageStories from '../components/ManageStories.vue';
 import AnalyticsChart from '../components/AnalyticsChart.vue';
+import PaymentVerificationReview from '../components/PaymentVerificationReview.vue';
 import apiClient from '../plugins/axios';
 
 const router = useRouter();
@@ -280,6 +293,7 @@ const navItems = [
   { id: 'manage-movies', label: 'Manage Movies', icon: Film },
   { id: 'categories', label: 'Categories', icon: FolderOpen },
   { id: 'stories', label: 'Stories', icon: FileText },
+  { id: 'payment-verifications', label: 'Payment Verifications', icon: CreditCard },
 ];
 
 onMounted(async () => {

@@ -22,9 +22,16 @@
           v-for="plan in subscriptionPlans" 
           :key="plan.id"
           class="plan-card"
-          :class="{ featured: plan.featured }"
+          :class="{ 
+            featured: plan.featured,
+            subscribed: isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id)
+          }"
         >
           <div v-if="plan.featured" class="plan-badge">Most Popular</div>
+          <div v-if="isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id)" class="subscribed-badge">
+            <CheckCircle :size="18" />
+            <span>Subscribed</span>
+          </div>
           <h3 class="plan-name">{{ plan.name }}</h3>
           <div class="plan-price">
             <span class="price-amount">₹{{ plan.price }}</span>
@@ -40,11 +47,21 @@
             class="plan-button"
             :class="{ 
               'featured-button': plan.featured,
-              'current-plan-button': isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id)
+              'subscribed-button': isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id)
             }"
             @click="selectPlan(plan)"
+            :disabled="isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id)"
           >
-            {{ isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id) ? 'Current Plan' : isPremium ? 'View Details' : 'Subscribe Now' }}
+            <template v-if="isPremium && (subscription?.planId === plan.id || subscription?.type === plan.id)">
+              <CheckCircle :size="18" />
+              <span>Subscribed</span>
+            </template>
+            <template v-else-if="isPremium">
+              View Details
+            </template>
+            <template v-else>
+              Subscribe Now
+            </template>
           </button>
         </div>
       </div>
@@ -97,6 +114,25 @@
       @close="showPaymentModal = false"
       @success="handlePaymentSuccess"
     />
+
+    <!-- Payment Success Modal -->
+    <div v-if="showPaymentSuccess" class="modal-overlay" @click.self="showPaymentSuccess = false">
+      <div class="payment-success-modal">
+        <div class="success-icon">
+          <CheckCircle :size="64" />
+        </div>
+        <h2 class="success-title">Payment Successful!</h2>
+        <p class="success-message">Your premium subscription has been activated.</p>
+        <div class="success-actions">
+          <button class="success-btn" @click="goToDashboard">
+            Go to Dashboard
+          </button>
+          <button class="success-btn secondary" @click="showPaymentSuccess = false">
+            Continue Browsing
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Subscription Details Modal -->
     <div v-if="showSubscriptionDetails" class="modal-overlay" @click.self="showSubscriptionDetails = false">
@@ -174,6 +210,7 @@ import {
   Star,
   Play,
   X,
+  CheckCircle,
 } from 'lucide-vue-next';
 
 const router = useRouter();
@@ -183,6 +220,7 @@ const { videos: epornerVideos, loading, searchVideos } = useEporner();
 const premiumVideos = ref([]);
 const showPaymentModal = ref(false);
 const showSubscriptionDetails = ref(false);
+const showPaymentSuccess = ref(false);
 const selectedPlan = ref(null);
 
 const subscriptionPlans = [
@@ -306,10 +344,67 @@ function handleVideoClick(video) {
   router.push(`/watch/${video.id}`);
 }
 
-async function handlePaymentSuccess() {
+async function handlePaymentSuccess(subscriptionData) {
+  console.log('🎉 Payment success handler called with subscription:', subscriptionData);
+  
+  // Close payment modal immediately
   showPaymentModal.value = false;
-  await checkPremiumStatus();
+  
+  // Refresh premium status from backend (with retry logic)
+  let retries = 3;
+  let subscriptionFound = false;
+  
+  while (retries > 0 && !subscriptionFound) {
+    await checkPremiumStatus();
+    
+    if (isPremium.value && subscription.value) {
+      subscriptionFound = true;
+      console.log('✅ Subscription found in DB:', subscription.value);
+      break;
+    }
+    
+    // Wait a bit before retrying
+    if (retries > 1) {
+      console.log(`⏳ Subscription not found yet, retrying... (${retries - 1} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+    retries--;
+  }
+  
+  // Reload premium content
   await loadPremiumContent();
+  
+  // Dispatch custom event to notify other components (like Dashboard)
+  window.dispatchEvent(new CustomEvent('subscription-updated', {
+    detail: { 
+      subscription: subscription.value || subscriptionData, 
+      isPremium: isPremium.value 
+    }
+  }));
+  
+  // Check if subscription is now active
+  if (isPremium.value && subscription.value) {
+    // Success - show success modal
+    console.log('✅ Showing success modal');
+    showPaymentSuccess.value = true;
+  } else {
+    // Fallback: Even if status check failed, show success if we have subscription data
+    if (subscriptionData) {
+      console.log('✅ Using subscription data from payment response');
+      showPaymentSuccess.value = true;
+    } else {
+      // Payment might still be processing
+      alert('✅ Payment received! Your subscription is being activated. Redirecting to dashboard to check status...');
+      setTimeout(() => {
+        router.push('/dashboard?tab=subscription');
+      }, 1500);
+    }
+  }
+}
+
+function goToDashboard() {
+  showPaymentSuccess.value = false;
+  router.push('/dashboard?tab=subscription');
 }
 
 function formatDate(dateString) {
@@ -441,6 +536,29 @@ async function handleCancelSubscription() {
   border-color: var(--primary);
   background: linear-gradient(135deg, var(--dark-lighter), var(--dark-light));
   transform: scale(1.05);
+}
+
+.plan-card.subscribed {
+  border-color: #4caf50;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), var(--dark-lighter));
+}
+
+.subscribed-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .plan-badge {
@@ -657,16 +775,27 @@ async function handleCancelSubscription() {
   }
 }
 
-.current-plan-button {
-  background: rgba(76, 175, 80, 0.2);
+.subscribed-button {
+  background: linear-gradient(135deg, #4caf50, #45a049);
   border-color: #4caf50;
-  color: #4caf50;
-  cursor: pointer;
+  color: white;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
 }
 
-.current-plan-button:hover {
-  background: rgba(76, 175, 80, 0.3);
-  transform: translateY(-2px);
+.subscribed-button:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: none;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.subscribed-button:disabled {
+  opacity: 1;
+  cursor: default;
 }
 
 .modal-overlay {
@@ -821,11 +950,106 @@ async function handleCancelSubscription() {
   transform: translateY(-2px);
 }
 
+.payment-success-modal {
+  background: var(--dark-lighter);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.success-icon {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: white;
+  animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.success-message {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+}
+
+.success-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.success-btn {
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.success-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
+}
+
+.success-btn.secondary {
+  background: var(--dark-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.success-btn.secondary:hover {
+  background: var(--dark);
+  transform: translateY(-2px);
+}
+
 @media (max-width: 768px) {
   .subscription-details-modal {
     max-width: 100%;
     margin: 0;
     padding: 30px 20px;
+  }
+
+  .payment-success-modal {
+    padding: 30px 20px;
+  }
+
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .success-btn {
+    width: 100%;
   }
 }
 </style>
