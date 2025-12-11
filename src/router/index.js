@@ -4,6 +4,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
+    redirect: { name: 'Videos' }
+  },
+  {
+    path: '/home',
     name: 'Home',
     component: () => import('../pages/Home.vue'),
     meta: { 

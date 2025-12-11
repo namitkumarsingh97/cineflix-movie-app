@@ -18,7 +18,7 @@
               <X v-else :size="20" />
             </button>
             <div class="navbar-logo">
-              <router-link to="/" @click="closeMobileMenu">
+              <router-link to="/home" @click="closeMobileMenu">
                 <Film :size="24" class="navbar-logo-icon" />
                 <span class="navbar-logo-text">MovieHub</span>
               </router-link>
@@ -26,7 +26,7 @@
             <ul class="navbar-nav">
               <li class="navbar-nav-item">
                 <router-link
-                  to="/"
+                  to="/home"
                   class="navbar-link"
                   active-class="active"
                   @click="closeMobileMenu"
@@ -243,7 +243,7 @@
             </router-link>
             <!-- Watch Later Badge -->
             <!-- <router-link
-              to="/"
+              to="/home"
               class="navbar-btn badge-wrapper"
               title="Watch Later"
               aria-label="Watch Later"
@@ -363,7 +363,7 @@
         </div>
         <nav class="mobile-menu-nav">
           <router-link
-            to="/"
+            to="/home"
             class="mobile-menu-link"
             active-class="active"
             @click="closeMobileMenu"
@@ -481,7 +481,7 @@
             <h3 class="footer-title">Quick Links</h3>
             <ul class="footer-links">
               <li>
-                <router-link to="/" class="footer-link">Home</router-link>
+                <router-link to="/home" class="footer-link">Home</router-link>
               </li>
               <li>
                 <router-link to="/videos" class="footer-link"
