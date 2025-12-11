@@ -104,7 +104,6 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FolderOpen } from 'lucide-vue-next';
 import { videosApi } from '../api/videos';
-import { moviesApi } from '../api/movies';
 import Loader from '../components/Loader.vue';
 
 const router = useRouter();
@@ -125,79 +124,34 @@ async function loadCategories(page = 1) {
   currentPage.value = page;
 
   try {
-    const combined = new Map();
+    // Fetch video categories (paginated) - only API categories
+    const { data } = await videosApi.getCategories({
+      page,
+      limit: pageSize.value,
+    });
 
-    // Fetch video categories (paginated)
-    try {
-      const { data } = await videosApi.getCategories({
-        page,
-        limit: pageSize.value,
-      });
+    const categoryData = data?.data || data?.categories || [];
 
-      const categoryData = data?.data || data?.categories || [];
-      categoryData.forEach((cat) => {
-        if (!cat?.name && !cat?.category) return;
+    categories.value = categoryData
+      .map((cat) => {
         const name = cat.name || cat.category;
-        if (!name) return;
-
-        combined.set(name, {
+        if (!name) return null;
+        const videoCount = cat.count || cat.videoCount || 0;
+        return {
           name,
           movieCount: 0,
-          videoCount: cat.count || cat.videoCount || 0,
+          videoCount,
+          count: videoCount,
           thumbnail: cat.thumbnail || null,
-        });
-      });
-
-      // Update pagination if API returns meta
-      totalPages.value = data?.meta?.totalPages || data?.totalPages || 1;
-      totalCount.value = data?.meta?.total || data?.total || categoryData.length;
-    } catch (error) {
-      console.error('Failed to load video categories:', error);
-    }
-
-    // Fetch movie categories (non-paginated, usually small)
-    try {
-      const { data } = await moviesApi.getCategories();
-      if (data?.success) {
-        (data.data || []).forEach((cat) => {
-          if (!cat.category) return;
-          const existing = combined.get(cat.category) || {
-            name: cat.category,
-            movieCount: 0,
-            videoCount: 0,
-            thumbnail: cat.thumbnail || null,
-          };
-          existing.movieCount = cat.count || 0;
-          if (!existing.thumbnail && cat.thumbnail) {
-            existing.thumbnail = cat.thumbnail;
-          }
-          combined.set(cat.category, existing);
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load movie categories:', error);
-    }
-
-    // Build final list
-    categories.value = Array.from(combined.values())
-      .map((cat) => ({
-        name: cat.name,
-        movieCount: cat.movieCount || 0,
-        videoCount: cat.videoCount || 0,
-        count: (cat.movieCount || 0) + (cat.videoCount || 0),
-        thumbnail: cat.thumbnail || null,
-      }))
+        };
+      })
+      .filter(Boolean)
       .filter((cat) => cat.count > 0)
       .sort((a, b) => b.count - a.count);
 
-    // If API didn't provide totals, derive from list
-    if (!totalCount.value) {
-      totalCount.value = categories.value.length;
-      totalPages.value = Math.max(
-        1,
-        Math.ceil(totalCount.value / pageSize.value)
-      );
-    }
+    // Update pagination if API returns meta; fallback to derived
+    totalPages.value = data?.meta?.totalPages || data?.totalPages || Math.max(1, Math.ceil((data?.total || categories.value.length) / pageSize.value));
+    totalCount.value = data?.meta?.total || data?.total || categories.value.length;
   } catch (error) {
     console.error('Failed to load categories:', error);
   } finally {

@@ -11,26 +11,16 @@
         </div>
         <div>
           <h1 class="category-title">{{ categoryName || 'Uncategorized' }}</h1>
-          <p class="category-meta">
-            {{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }} in this category
-            <span v-if="movieTotal > 0 && videoTotal > 0">
-              ({{ movieTotal }} {{ movieTotal === 1 ? 'movie' : 'movies' }}, 
-              {{ videoTotal }} {{ videoTotal === 1 ? 'video' : 'videos' }})
-            </span>
-            <span v-else-if="movieTotal > 0">
-              ({{ movieTotal }} {{ movieTotal === 1 ? 'movie' : 'movies' }})
-            </span>
-            <span v-else-if="videoTotal > 0">
-              ({{ videoTotal }} {{ videoTotal === 1 ? 'video' : 'videos' }})
-            </span>
-          </p>
+      <p class="category-meta">
+        {{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }} in this category
+      </p>
         </div>
       </div>
     </div>
 
     <div class="controls-row">
       <div class="count-pill">
-        {{ movieTotal + videoTotal }} total items • {{ movieTotal }} movies • {{ videoTotal }} videos
+        {{ videoTotal }} total videos
       </div>
       <div class="controls">
         <label class="control-label" for="sort">Sort by</label>
@@ -47,55 +37,14 @@
     <Loader v-if="loading" message="Loading content..." />
 
     <div v-else-if="totalItems > 0" class="content-grid">
-      <!-- Movies -->
-      <MovieCard
-        v-for="movie in movies"
-        :key="movie._id"
-        :movie="movie"
-        @click="navigateToMovie(movie._id)"
-      />
-      <!-- Videos -->
       <VideoCard
         v-for="video in videos"
-        :key="video.id"
+        :key="video.id || video._id"
         :video="video"
         @click="navigateToVideo(video)"
       />
     </div>
 
-    <!-- Movies pagination -->
-    <div v-if="movieTotalPages > 1" class="pagination-wrapper">
-      <div class="pagination-info">
-        Movies: Page {{ moviePage }} of {{ movieTotalPages }}
-      </div>
-      <div class="pagination">
-        <button
-          class="pagination-btn"
-          :disabled="moviePage === 1 || loading"
-          @click="changeMoviePage(moviePage - 1)"
-        >
-          Previous
-        </button>
-        <button
-          v-for="page in movieTotalPages"
-          :key="`m-${page}`"
-          :class="['page-number', { active: page === moviePage }]"
-          @click="changeMoviePage(page)"
-          :disabled="loading"
-        >
-          {{ page }}
-        </button>
-        <button
-          class="pagination-btn"
-          :disabled="moviePage === movieTotalPages || loading"
-          @click="changeMoviePage(moviePage + 1)"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-
-    <!-- Videos pagination -->
     <div v-if="videoTotalPages > 1" class="pagination-wrapper">
       <div class="pagination-info">
         Videos: Page {{ videoPage }} of {{ videoTotalPages }}
@@ -142,25 +91,20 @@ import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeft, FolderOpen, Film } from 'lucide-vue-next';
 import { moviesApi } from '../api/movies';
 import { videosApi } from '../api/videos';
-import MovieCard from '../components/MovieCard.vue';
 import VideoCard from '../components/VideoCard.vue';
 import Loader from '../components/Loader.vue';
 
 const route = useRoute();
 const router = useRouter();
 
-const movies = ref([]);
 const videos = ref([]);
 const loading = ref(true);
 const sortOrder = ref('latest');
 
-const moviePage = ref(1);
 const videoPage = ref(1);
 const pageSize = ref(20);
 
-const movieTotal = ref(0);
 const videoTotal = ref(0);
-const movieTotalPages = ref(1);
 const videoTotalPages = ref(1);
 
 const categoryName = computed(() => {
@@ -168,36 +112,12 @@ const categoryName = computed(() => {
 });
 
 const totalItems = computed(() => {
-  return movieTotal.value + videoTotal.value;
+  return videoTotal.value;
 });
 
 onMounted(async () => {
-  await Promise.all([loadMovies(), loadVideos()]);
+  await loadVideos();
 });
-
-async function loadMovies(page = moviePage.value) {
-  try {
-    moviePage.value = page;
-    const { data } = await moviesApi.getAll({
-      params: {
-        category: categoryName.value === 'Uncategorized' ? '' : categoryName.value,
-        page: moviePage.value,
-        limit: pageSize.value,
-        sort: sortOrder.value,
-      },
-    });
-
-    const items = data?.data || data || [];
-    movies.value = items;
-    movieTotal.value = data?.meta?.total || data?.total || items.length;
-    movieTotalPages.value =
-      data?.meta?.totalPages ||
-      data?.totalPages ||
-      Math.max(1, Math.ceil(movieTotal.value / pageSize.value));
-  } catch (error) {
-    console.error('Failed to load movies:', error);
-  }
-}
 
 async function loadVideos(page = videoPage.value) {
   try {
@@ -223,8 +143,7 @@ async function loadVideos(page = videoPage.value) {
 }
 
 function navigateToMovie(movieId) {
-  const id = movieId || movieId?._id;
-  router.push(`/watch/${id}`);
+  // Movies not shown on category page per request
 }
 
 function navigateToVideo(video) {
@@ -234,7 +153,6 @@ function navigateToVideo(video) {
 
 function changeSort(order) {
   sortOrder.value = order;
-  loadMovies(1);
   loadVideos(1);
 }
 
@@ -243,10 +161,6 @@ function changeVideoPage(page) {
   loadVideos(page);
 }
 
-function changeMoviePage(page) {
-  if (page < 1 || page > movieTotalPages.value) return;
-  loadMovies(page);
-}
 
 function goBack() {
   router.push('/categories');
