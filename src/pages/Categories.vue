@@ -124,13 +124,56 @@ async function loadCategories(page = 1) {
   currentPage.value = page;
 
   try {
-    // Fetch video categories (paginated) - only API categories
-    const { data } = await videosApi.getCategories({
-      page,
-      limit: pageSize.value,
-    });
+    let categoryData = [];
+    let metaTotal = 0;
+    let metaTotalPages = 1;
 
-    const categoryData = data?.data || data?.categories || [];
+    try {
+      // Primary: use dedicated categories endpoint
+      const { data } = await videosApi.getCategories({
+        page,
+        limit: pageSize.value,
+      });
+      categoryData = data?.data || data?.categories || [];
+      metaTotal = data?.meta?.total || data?.total || categoryData.length;
+      metaTotalPages =
+        data?.meta?.totalPages ||
+        data?.totalPages ||
+        Math.max(1, Math.ceil(metaTotal / pageSize.value));
+    } catch (err) {
+      console.warn('videos/categories endpoint failed, falling back to videos list', err);
+      // Fallback: derive categories from paginated videos list
+      const { data } = await videosApi.getAll({
+        params: {
+          page,
+          limit: pageSize.value,
+        },
+      });
+      const videos = data?.data || data?.videos || data || [];
+      const counts = new Map();
+      videos.forEach((video) => {
+        (video.categories || []).forEach((cat) => {
+          if (!cat || !cat.trim()) return;
+          const name = cat.trim();
+          const current = counts.get(name) || {
+            name,
+            videoCount: 0,
+            thumbnail: video.thumbnail || null,
+          };
+          current.videoCount += 1;
+          if (!current.thumbnail && video.thumbnail) {
+            current.thumbnail = video.thumbnail;
+          }
+          counts.set(name, current);
+        });
+      });
+      categoryData = Array.from(counts.values());
+      metaTotal = data?.meta?.total || data?.total || categoryData.length;
+      metaTotalPages =
+        data?.meta?.totalPages ||
+        data?.totalPages ||
+        Math.max(1, Math.ceil(metaTotal / pageSize.value));
+    }
 
     categories.value = categoryData
       .map((cat) => {
@@ -149,9 +192,8 @@ async function loadCategories(page = 1) {
       .filter((cat) => cat.count > 0)
       .sort((a, b) => b.count - a.count);
 
-    // Update pagination if API returns meta; fallback to derived
-    totalPages.value = data?.meta?.totalPages || data?.totalPages || Math.max(1, Math.ceil((data?.total || categories.value.length) / pageSize.value));
-    totalCount.value = data?.meta?.total || data?.total || categories.value.length;
+    totalPages.value = metaTotalPages;
+    totalCount.value = metaTotal || categories.value.length;
   } catch (error) {
     console.error('Failed to load categories:', error);
   } finally {
