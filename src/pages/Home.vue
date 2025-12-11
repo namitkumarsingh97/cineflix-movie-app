@@ -1,5 +1,13 @@
 <template>
-  <div>
+  <div class="home-page-container">
+    <!-- Category Sidebar -->
+    <CategorySidebar 
+      :is-open="sidebarOpen" 
+      @filter-change="handleFilterChange"
+    />
+    
+    <!-- Main Content (with sidebar offset) -->
+    <div class="home-content">
     <!-- Layout Customizer Button -->
     <div class="layout-customizer-btn-container">
       <button 
@@ -497,7 +505,8 @@
       :show="showLayoutCustomizer" 
       @close="showLayoutCustomizer = false" 
     />
-  </div>
+    </div> <!-- End home-content -->
+  </div> <!-- End home-page-container -->
 </template>
 
 <script setup>
@@ -512,6 +521,7 @@ import SkeletonSection from "../components/SkeletonSection.vue";
 import MovieCard from "../components/MovieCard.vue";
 import AdvancedSearch from "../components/AdvancedSearch.vue";
 import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
+import CategorySidebar from "../components/CategorySidebar.vue";
 import { useHomeLayout } from "../composables/useHomeLayout";
 import { useWatchLater } from "../composables/useWatchLater";
 import { useStarFollows } from "../composables/useStarFollows";
@@ -593,6 +603,12 @@ const blurredPreviewVideos = ref([]);
 const { isPremium, checkPremiumStatus } = useSubscription();
 
 const showLayoutCustomizer = ref(false);
+const sidebarOpen = ref(true);
+
+function handleFilterChange(filter) {
+  console.log('Filter changed:', filter);
+  // Handle filter changes if needed
+}
 const lastNotifiedAtKey = 'cineflix_last_content_notified';
 
 // Local state
@@ -1114,6 +1130,25 @@ function scrollToSection(section) {
 
 .view-all-link:hover svg {
   transform: translateX(2px);
+}
+
+/* Home Page Container with Sidebar */
+.home-page-container {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.home-content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .home-content {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 768px) {

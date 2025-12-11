@@ -1014,6 +1014,125 @@ body {
     color: var(--primary);
     opacity: 1;
   }
+
+  /* Mobile category sections */
+  .mobile-menu-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 16px 20px;
+  }
+
+  .mobile-menu-section {
+    padding: 0;
+    margin-bottom: 16px;
+  }
+
+  .mobile-menu-section-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 16px 20px 12px;
+    padding: 0 4px;
+  }
+
+  .mobile-menu-button {
+    width: 100%;
+    justify-content: space-between;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .mobile-menu-count {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .mobile-featured-item {
+    font-weight: 600;
+  }
+
+  .mobile-featured-item:hover {
+    background: var(--dark-lighter);
+  }
+
+  .mobile-featured-item.active {
+    background: rgba(255, 69, 0, 0.15);
+    border-left: 3px solid rgba(255, 69, 0, 0.3);
+    color: #ff4500;
+  }
+
+  .mobile-featured-item.active:hover {
+    background: rgba(255, 69, 0, 0.2);
+    border-left-color: rgba(255, 69, 0, 0.5);
+  }
+
+  .mobile-featured-item-divider {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 4px;
+    padding-bottom: 10px;
+  }
+
+  .mobile-categories-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .mobile-categories-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .mobile-categories-list::-webkit-scrollbar-track {
+    background: var(--dark);
+  }
+
+  .mobile-categories-list::-webkit-scrollbar-thumb {
+    background: var(--dark-lighter);
+    border-radius: 2px;
+  }
+
+  .mobile-category-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 20px;
+    margin-top: 8px;
+  }
+
+  .mobile-pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--dark-lighter);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-pagination-btn:hover:not(:disabled) {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+  }
+
+  .mobile-pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .mobile-page-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    min-width: 50px;
+    text-align: center;
+  }
 }
 
 /* Large screens (L and 4K) */

@@ -37,9 +37,36 @@ const routes = [
     path: '/indian',
     name: 'Indian',
     component: () => import('../pages/Indian.vue'),
-    meta: { 
+    meta: {
       preload: false,
       title: 'Indian'
+    }
+  },
+  {
+    path: '/double-penetration',
+    name: 'DoublePenetration',
+    component: () => import('../pages/DoublePenetration.vue'),
+    meta: {
+      preload: false,
+      title: 'Double Penetration'
+    }
+  },
+  {
+    path: '/amateur',
+    name: 'Amateur',
+    component: () => import('../pages/Amateur.vue'),
+    meta: {
+      preload: false,
+      title: 'Amateur'
+    }
+  },
+  {
+    path: '/anal',
+    name: 'Anal',
+    component: () => import('../pages/Anal.vue'),
+    meta: {
+      preload: false,
+      title: 'Anal'
     }
   },
   {

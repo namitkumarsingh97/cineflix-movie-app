@@ -174,24 +174,30 @@
                 :class="{ active: userMenuOpen }"
               >
                 <div class="user-avatar-circle">
-                  <img 
-                    v-if="user?.avatar" 
-                    :src="user.avatar" 
+                  <img
+                    v-if="user?.avatar"
+                    :src="user.avatar"
                     :alt="user?.name || 'User'"
                     class="user-avatar-img"
                   />
                   <User v-else :size="18" class="user-avatar-icon" />
                 </div>
-                <span class="user-name">{{ user?.name?.split(' ')[0] || 'User' }}</span>
-                <ChevronDown :size="16" class="chevron-icon" :class="{ rotated: userMenuOpen }" />
+                <span class="user-name">{{
+                  user?.name?.split(" ")[0] || "User"
+                }}</span>
+                <ChevronDown
+                  :size="16"
+                  class="chevron-icon"
+                  :class="{ rotated: userMenuOpen }"
+                />
               </button>
               <Transition name="dropdown">
                 <div v-if="userMenuOpen" class="user-menu-dropdown" @click.stop>
                   <div class="user-menu-header">
                     <div class="user-menu-avatar">
-                      <img 
-                        v-if="user?.avatar" 
-                        :src="user.avatar" 
+                      <img
+                        v-if="user?.avatar"
+                        :src="user.avatar"
                         :alt="user?.name || 'User'"
                         class="user-menu-avatar-img"
                       />
@@ -200,7 +206,9 @@
                       </div>
                     </div>
                     <div class="user-menu-info">
-                      <span class="user-menu-name">{{ user?.name || 'User' }}</span>
+                      <span class="user-menu-name">{{
+                        user?.name || "User"
+                      }}</span>
                       <span class="user-menu-email">{{ user?.email }}</span>
                     </div>
                   </div>
@@ -443,6 +451,33 @@
             <Crown :size="20" />
             <span>Premium</span>
           </router-link>
+
+          <!-- Category Sidebar Content for Mobile -->
+          <div class="mobile-menu-divider"></div>
+
+          <!-- Featured Category -->
+          <div class="mobile-menu-section">
+            <h3 class="mobile-menu-section-header">CATEGORIES</h3>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/double-penetration' }]"
+              @click="navigateToMobileDoublePenetration"
+            >
+              <span>Double Penetration</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/amateur' }]"
+              @click="navigateToMobileAmateur"
+            >
+              <span>Amateur</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/anal' }]"
+              @click="navigateToMobileAnal"
+            >
+              <span>Anal</span>
+            </button>
+          </div>
+
           <!-- <router-link
             to="/stories"
             class="mobile-menu-link"
@@ -643,6 +678,12 @@ import {
   LogIn,
   Layout,
   ChevronDown,
+  RotateCcw,
+  Play,
+  ThumbsUp,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-vue-next";
 import PreferencesModal from "../components/PreferencesModal.vue";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";
@@ -688,7 +729,7 @@ function closeUserMenu() {
 }
 
 async function handleLogout() {
-  if (confirm('Are you sure you want to logout?')) {
+  if (confirm("Are you sure you want to logout?")) {
     await authLogout();
     closeUserMenu();
   }
@@ -720,6 +761,32 @@ const showSuggestions = ref(false);
 const suggestions = ref([]);
 const selectedIndex = ref(-1);
 const searchInput = ref(null);
+
+// Mobile category sidebar state
+const selectedMobileTopNav = ref(null);
+const selectedMobileProduction = ref("all");
+const selectedMobileCategory = ref("all");
+const mobileCategories = ref([]);
+const loadingMobileCategories = ref(false);
+const mobileCategoryCurrentPage = ref(1);
+const mobileCategoryTotalPages = ref(1);
+const mobileCategoryLimit = 20;
+
+// Mobile top navigation items
+const mobileTopNavItems = [
+  { id: "history", label: "History", icon: RotateCcw },
+  { id: "newest", label: "Newest videos", icon: Play },
+  { id: "best", label: "Best Videos", icon: ThumbsUp },
+  { id: "top-rated", label: "Top rated", icon: Star },
+  { id: "most-viewed", label: "Most viewed", icon: Eye },
+];
+
+// Mobile production items
+const mobileProductionItems = ref([
+  { id: "all", label: "All", count: 0 },
+  { id: "professional", label: "Professional", count: 0 },
+  { id: "homemade", label: "Homemade", count: 0 },
+]);
 
 // Load movies and videos on mount for autocomplete
 onMounted(async () => {
@@ -869,12 +936,16 @@ const isAdminRoute = computed(() => {
 });
 
 // Watch for auth state changes to update UI immediately
-watch(isAuthenticated, async (newValue) => {
-  if (newValue) {
-    // User just logged in, refresh auth state
-    await checkAuth();
-  }
-}, { immediate: true });
+watch(
+  isAuthenticated,
+  async (newValue) => {
+    if (newValue) {
+      // User just logged in, refresh auth state
+      await checkAuth();
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(async () => {
   checkAdminStatus();
@@ -885,10 +956,23 @@ onMounted(async () => {
   // Check auth status on mount to ensure UI updates
   await checkAuth();
 
+  // Load production counts for mobile
+  try {
+    const { videosApi } = await import("../api/videos");
+    const response = await videosApi.getAll({ limit: 1 });
+    const total = response.data?.total || response.data?.totalCount || 0;
+    mobileProductionItems.value[0].count = total;
+    mobileProductionItems.value[1].count = Math.floor(total * 0.7);
+    mobileProductionItems.value[2].count = Math.floor(total * 0.3);
+  } catch (error) {
+    // Ignore errors
+  }
+
   // Initialize push notifications if supported and logged in
   if (
     pushSupported.value &&
-    (localStorage.getItem("cineflix_auth_token") || localStorage.getItem("adminToken"))
+    (localStorage.getItem("cineflix_auth_token") ||
+      localStorage.getItem("adminToken"))
   ) {
     const hasPermission = await requestPermission();
     if (hasPermission) {
@@ -953,8 +1037,150 @@ function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value;
   if (mobileMenuOpen.value) {
     document.body.style.overflow = "hidden";
+    // Load categories when menu opens
+    if (mobileCategories.value.length === 0) {
+      loadMobileCategories(1);
+    }
   } else {
     document.body.style.overflow = "";
   }
 }
+
+// Mobile category functions
+async function loadMobileCategories(page = 1) {
+  loadingMobileCategories.value = true;
+  try {
+    const { videosApi } = await import("../api/videos");
+    const response = await videosApi.getAll({
+      page,
+      limit: mobileCategoryLimit,
+    });
+
+    const categoryMap = new Map();
+    const videos =
+      response.data?.data || response.data?.videos || response.data || [];
+
+    videos.forEach((video) => {
+      if (video.categories && Array.isArray(video.categories)) {
+        video.categories.forEach((cat) => {
+          if (cat && cat.trim()) {
+            const catName = cat.trim();
+            if (!categoryMap.has(catName)) {
+              categoryMap.set(catName, { name: catName, count: 0 });
+            }
+            categoryMap.get(catName).count++;
+          }
+        });
+      }
+    });
+
+    mobileCategories.value = Array.from(categoryMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    const total =
+      response.data?.total || response.data?.totalCount || videos.length;
+    mobileCategoryTotalPages.value =
+      Math.ceil(total / mobileCategoryLimit) || 1;
+    mobileCategoryCurrentPage.value = page;
+  } catch (error) {
+    console.error("Failed to load mobile categories:", error);
+    mobileCategories.value = [];
+  } finally {
+    loadingMobileCategories.value = false;
+  }
+}
+
+function loadMobileCategoryPage(page) {
+  if (page >= 1 && page <= mobileCategoryTotalPages.value) {
+    loadMobileCategories(page);
+  }
+}
+
+function formatMobileCount(count) {
+  if (!count) return "0";
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
+  return count.toString();
+}
+
+function handleMobileTopNav(id) {
+  selectedMobileTopNav.value = selectedMobileTopNav.value === id ? null : id;
+  selectedMobileProduction.value = "all";
+  selectedMobileCategory.value = "all";
+
+  if (id === "newest") {
+    router.push("/videos?order=latest");
+  } else if (id === "best") {
+    router.push("/videos?order=most-popular");
+  } else if (id === "top-rated") {
+    router.push("/videos?order=top-rated");
+  } else if (id === "most-viewed") {
+    router.push("/videos?order=most-popular");
+  } else if (id === "history") {
+    router.push("/dashboard?tab=history");
+  }
+
+  closeMobileMenu();
+}
+
+function handleMobileProduction(id) {
+  selectedMobileProduction.value = id;
+  selectedMobileCategory.value = "all";
+  selectedMobileTopNav.value = null;
+
+  const query = id === "all" ? "all" : id;
+  searchVideos(query, 1, { order: "most-popular" });
+  router.push(`/videos?q=${encodeURIComponent(query)}`);
+  closeMobileMenu();
+}
+
+function handleMobileCategory(categoryName) {
+  selectedMobileCategory.value = categoryName;
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+
+  const query = categoryName === "all" ? "all" : categoryName;
+  searchVideos(query, 1, { order: "most-popular" });
+  router.push(`/videos?q=${encodeURIComponent(query)}`);
+  closeMobileMenu();
+}
+
+function navigateToMobileDoublePenetration() {
+  selectedMobileCategory.value = "double penetration";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/double-penetration");
+  closeMobileMenu();
+}
+
+function navigateToMobileAmateur() {
+  selectedMobileCategory.value = "amateur";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/amateur");
+  closeMobileMenu();
+}
+
+function navigateToMobileAnal() {
+  selectedMobileCategory.value = "anal";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/anal");
+  closeMobileMenu();
+}
+
+// Load production counts for mobile
+onMounted(async () => {
+  try {
+    const { videosApi } = await import("../api/videos");
+    const response = await videosApi.getAll({ limit: 1 });
+    const total = response.data?.total || response.data?.totalCount || 0;
+    mobileProductionItems.value[0].count = total;
+    mobileProductionItems.value[1].count = Math.floor(total * 0.7);
+    mobileProductionItems.value[2].count = Math.floor(total * 0.3);
+  } catch (error) {
+    // Ignore errors
+  }
+});
 </script>
