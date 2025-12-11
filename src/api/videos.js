@@ -2,10 +2,23 @@ import apiClient from '../plugins/axios';
 
 export const videosApi = {
   // Get all videos
-  getAll: () => apiClient.get('/videos'),
+  getAll: (params = {}) => apiClient.get('/videos', { params }),
   
   // Get video by ID
   getById: (id) => apiClient.get(`/videos/${id}`),
+
+  // Get videos by category with pagination/sorting
+  getByCategory: (category, params = {}) =>
+    apiClient.get('/videos', {
+      params: {
+        category,
+        ...params,
+      },
+    }),
+
+  // Get paginated categories with counts/thumbnails
+  getCategories: (params = {}) =>
+    apiClient.get('/videos/categories', { params }),
   
   // Create video
   create: (data) => apiClient.post('/videos', data),

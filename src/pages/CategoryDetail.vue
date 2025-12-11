@@ -13,18 +13,34 @@
           <h1 class="category-title">{{ categoryName || 'Uncategorized' }}</h1>
           <p class="category-meta">
             {{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }} in this category
-            <span v-if="movies.length > 0 && videos.length > 0">
-              ({{ movies.length }} {{ movies.length === 1 ? 'movie' : 'movies' }}, 
-              {{ videos.length }} {{ videos.length === 1 ? 'video' : 'videos' }})
+            <span v-if="movieTotal > 0 && videoTotal > 0">
+              ({{ movieTotal }} {{ movieTotal === 1 ? 'movie' : 'movies' }}, 
+              {{ videoTotal }} {{ videoTotal === 1 ? 'video' : 'videos' }})
             </span>
-            <span v-else-if="movies.length > 0">
-              ({{ movies.length }} {{ movies.length === 1 ? 'movie' : 'movies' }})
+            <span v-else-if="movieTotal > 0">
+              ({{ movieTotal }} {{ movieTotal === 1 ? 'movie' : 'movies' }})
             </span>
-            <span v-else-if="videos.length > 0">
-              ({{ videos.length }} {{ videos.length === 1 ? 'video' : 'videos' }})
+            <span v-else-if="videoTotal > 0">
+              ({{ videoTotal }} {{ videoTotal === 1 ? 'video' : 'videos' }})
             </span>
           </p>
         </div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="count-pill">
+        {{ movieTotal + videoTotal }} total items • {{ movieTotal }} movies • {{ videoTotal }} videos
+      </div>
+      <div class="controls">
+        <label class="control-label" for="sort">Sort by</label>
+        <select id="sort" v-model="sortOrder" @change="changeSort(sortOrder)" class="sort-select">
+          <option value="latest">Latest</option>
+          <option value="most-popular">Most Popular</option>
+          <option value="top-weekly">Top Weekly</option>
+          <option value="top-monthly">Top Monthly</option>
+          <option value="top-rated">Top Rated</option>
+        </select>
       </div>
     </div>
 
@@ -47,6 +63,70 @@
       />
     </div>
 
+    <!-- Movies pagination -->
+    <div v-if="movieTotalPages > 1" class="pagination-wrapper">
+      <div class="pagination-info">
+        Movies: Page {{ moviePage }} of {{ movieTotalPages }}
+      </div>
+      <div class="pagination">
+        <button
+          class="pagination-btn"
+          :disabled="moviePage === 1 || loading"
+          @click="changeMoviePage(moviePage - 1)"
+        >
+          Previous
+        </button>
+        <button
+          v-for="page in movieTotalPages"
+          :key="`m-${page}`"
+          :class="['page-number', { active: page === moviePage }]"
+          @click="changeMoviePage(page)"
+          :disabled="loading"
+        >
+          {{ page }}
+        </button>
+        <button
+          class="pagination-btn"
+          :disabled="moviePage === movieTotalPages || loading"
+          @click="changeMoviePage(moviePage + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- Videos pagination -->
+    <div v-if="videoTotalPages > 1" class="pagination-wrapper">
+      <div class="pagination-info">
+        Videos: Page {{ videoPage }} of {{ videoTotalPages }}
+      </div>
+      <div class="pagination">
+        <button
+          class="pagination-btn"
+          :disabled="videoPage === 1 || loading"
+          @click="changeVideoPage(videoPage - 1)"
+        >
+          Previous
+        </button>
+        <button
+          v-for="page in videoTotalPages"
+          :key="`v-${page}`"
+          :class="['page-number', { active: page === videoPage }]"
+          @click="changeVideoPage(page)"
+          :disabled="loading"
+        >
+          {{ page }}
+        </button>
+        <button
+          class="pagination-btn"
+          :disabled="videoPage === videoTotalPages || loading"
+          @click="changeVideoPage(videoPage + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
     <div v-else class="empty-state">
       <Film :size="64" />
       <h3>No content found</h3>
@@ -60,93 +140,81 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeft, FolderOpen, Film } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
-import { useEporner } from '../composables/useEporner';
+import { moviesApi } from '../api/movies';
+import { videosApi } from '../api/videos';
 import MovieCard from '../components/MovieCard.vue';
 import VideoCard from '../components/VideoCard.vue';
 import Loader from '../components/Loader.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { videos: epornerVideos, searchVideos } = useEporner();
 
 const movies = ref([]);
 const videos = ref([]);
 const loading = ref(true);
+const sortOrder = ref('latest');
+
+const moviePage = ref(1);
+const videoPage = ref(1);
+const pageSize = ref(20);
+
+const movieTotal = ref(0);
+const videoTotal = ref(0);
+const movieTotalPages = ref(1);
+const videoTotalPages = ref(1);
 
 const categoryName = computed(() => {
   return decodeURIComponent(route.params.category || 'Uncategorized');
 });
 
 const totalItems = computed(() => {
-  return movies.value.length + videos.value.length;
+  return movieTotal.value + videoTotal.value;
 });
 
 onMounted(async () => {
   await Promise.all([loadMovies(), loadVideos()]);
 });
 
-async function loadMovies() {
+async function loadMovies(page = moviePage.value) {
   try {
-    const response = await apiClient.get('/movies', {
+    moviePage.value = page;
+    const { data } = await moviesApi.getAll({
       params: {
         category: categoryName.value === 'Uncategorized' ? '' : categoryName.value,
+        page: moviePage.value,
+        limit: pageSize.value,
+        sort: sortOrder.value,
       },
     });
-    
-    if (response.data.success) {
-      // Filter movies by category
-      const allMovies = response.data.data || [];
-      if (categoryName.value === 'Uncategorized') {
-        movies.value = allMovies.filter(m => !m.category || m.category.trim() === '');
-      } else {
-        movies.value = allMovies.filter(m => m.category === categoryName.value);
-      }
-    }
+
+    const items = data?.data || data || [];
+    movies.value = items;
+    movieTotal.value = data?.meta?.total || data?.total || items.length;
+    movieTotalPages.value =
+      data?.meta?.totalPages ||
+      data?.totalPages ||
+      Math.max(1, Math.ceil(movieTotal.value / pageSize.value));
   } catch (error) {
     console.error('Failed to load movies:', error);
   }
 }
 
-async function loadVideos() {
+async function loadVideos(page = videoPage.value) {
   try {
-    // Search for videos with this category name
-    // The search API will return videos matching the category name
-    const allVideos = [];
-    const seenIds = new Set();
-    
-    // Fetch first 5 pages (150 videos max)
-    for (let page = 1; page <= 5; page++) {
-      await searchVideos(categoryName.value, page, { perPage: 30, order: 'most-popular' });
-      
-      // Filter videos that have this category as their FIRST category only
-      // This ensures videos don't appear in multiple categories
-      epornerVideos.value.forEach(video => {
-        if (!seenIds.has(video.id)) {
-          if (video.categories && Array.isArray(video.categories) && video.categories.length > 0) {
-            // Sort categories alphabetically and check if this is the first category
-            const sortedCategories = video.categories
-              .map(cat => cat && cat.trim() ? cat.trim() : null)
-              .filter(cat => cat !== null)
-              .sort();
-            
-            if (sortedCategories.length > 0) {
-              const firstCategory = sortedCategories[0];
-              // Only include video if this category is its first category
-              if (firstCategory.toLowerCase() === categoryName.value.toLowerCase()) {
-                seenIds.add(video.id);
-                allVideos.push(video);
-              }
-            }
-          }
-        }
-      });
-      
-      // Stop if we got less than per_page (last page)
-      if (epornerVideos.value.length < 30) break;
-    }
-    
-    videos.value = allVideos;
+    videoPage.value = page;
+    const { data } = await videosApi.getByCategory(categoryName.value, {
+      page: videoPage.value,
+      limit: pageSize.value,
+      sort: sortOrder.value,
+    });
+
+    const items = data?.data || data?.videos || data || [];
+    videos.value = items;
+    videoTotal.value = data?.meta?.total || data?.total || items.length;
+    videoTotalPages.value =
+      data?.meta?.totalPages ||
+      data?.totalPages ||
+      Math.max(1, Math.ceil(videoTotal.value / pageSize.value));
   } catch (error) {
     console.error('Failed to load videos:', error);
   } finally {
@@ -155,11 +223,29 @@ async function loadVideos() {
 }
 
 function navigateToMovie(movieId) {
-  router.push(`/watch/${movieId}`);
+  const id = movieId || movieId?._id;
+  router.push(`/watch/${id}`);
 }
 
 function navigateToVideo(video) {
-  router.push(`/watch/${video.id}?source=eporner`);
+  const id = video._id || video.id;
+  router.push(`/watch/${id}`);
+}
+
+function changeSort(order) {
+  sortOrder.value = order;
+  loadMovies(1);
+  loadVideos(1);
+}
+
+function changeVideoPage(page) {
+  if (page < 1 || page > videoTotalPages.value) return;
+  loadVideos(page);
+}
+
+function changeMoviePage(page) {
+  if (page < 1 || page > movieTotalPages.value) return;
+  loadMovies(page);
 }
 
 function goBack() {
@@ -256,6 +342,44 @@ function goBack() {
   gap: 24px;
 }
 
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0 24px;
+  flex-wrap: wrap;
+}
+
+.count-pill {
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.sort-select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--dark-lighter);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
 /* Small tablets - 2 columns */
 @media (min-width: 640px) {
   .content-grid {
@@ -345,6 +469,56 @@ function goBack() {
   font-size: 24px;
   color: var(--text-primary);
   margin-bottom: 12px;
+}
+
+.pagination-wrapper {
+  margin: 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-btn,
+.page-number {
+  padding: 10px 16px;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 44px;
+}
+
+.pagination-btn:hover:not(:disabled),
+.page-number:hover:not(:disabled) {
+  background: var(--dark-light);
+  border-color: var(--primary);
+}
+
+.page-number.active {
+  background: var(--gradient-primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.pagination-btn:disabled,
+.page-number:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-primary {

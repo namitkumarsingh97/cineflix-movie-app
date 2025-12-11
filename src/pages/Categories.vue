@@ -56,6 +56,39 @@
           </div>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="pagination-wrapper">
+        <div class="pagination-info">
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <span class="pagination-total">• {{ totalCount }} categories</span>
+        </div>
+        <div class="pagination">
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === 1 || loading"
+            @click="handlePageChange(currentPage - 1)"
+          >
+            Previous
+          </button>
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            :class="['page-number', { active: page === currentPage }]"
+            @click="handlePageChange(page)"
+            :disabled="loading"
+          >
+            {{ page }}
+          </button>
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === totalPages || loading"
+            @click="handlePageChange(currentPage + 1)"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-else class="empty-state">
@@ -67,133 +100,104 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { FolderOpen, ChevronRight } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
-import { useEporner } from '../composables/useEporner';
+import { FolderOpen } from 'lucide-vue-next';
+import { videosApi } from '../api/videos';
+import { moviesApi } from '../api/movies';
 import Loader from '../components/Loader.vue';
 
 const router = useRouter();
-const { videos: epornerVideos, searchVideos } = useEporner();
 
 const categories = ref([]);
 const loading = ref(true);
+const currentPage = ref(1);
+const pageSize = ref(20);
+const totalPages = ref(1);
+const totalCount = ref(0);
 
 onMounted(async () => {
   await loadCategories();
 });
 
-async function loadCategories() {
+async function loadCategories(page = 1) {
   loading.value = true;
+  currentPage.value = page;
+
   try {
-    // Load movie categories
-    const movieCategories = [];
+    const combined = new Map();
+
+    // Fetch video categories (paginated)
     try {
-      const response = await apiClient.get('/movies/categories');
-      if (response.data.success) {
-        const categoryData = response.data.data || [];
-        categoryData.forEach(cat => {
-          if (cat.category && cat.count > 0) {
-            movieCategories.push({
-              name: cat.category,
-              movieCount: cat.count || 0,
-              videoCount: 0,
-              thumbnail: cat.thumbnail || null,
-              source: 'movie'
-            });
+      const { data } = await videosApi.getCategories({
+        page,
+        limit: pageSize.value,
+      });
+
+      const categoryData = data?.data || data?.categories || [];
+      categoryData.forEach((cat) => {
+        if (!cat?.name && !cat?.category) return;
+        const name = cat.name || cat.category;
+        if (!name) return;
+
+        combined.set(name, {
+          name,
+          movieCount: 0,
+          videoCount: cat.count || cat.videoCount || 0,
+          thumbnail: cat.thumbnail || null,
+        });
+      });
+
+      // Update pagination if API returns meta
+      totalPages.value = data?.meta?.totalPages || data?.totalPages || 1;
+      totalCount.value = data?.meta?.total || data?.total || categoryData.length;
+    } catch (error) {
+      console.error('Failed to load video categories:', error);
+    }
+
+    // Fetch movie categories (non-paginated, usually small)
+    try {
+      const { data } = await moviesApi.getCategories();
+      if (data?.success) {
+        (data.data || []).forEach((cat) => {
+          if (!cat.category) return;
+          const existing = combined.get(cat.category) || {
+            name: cat.category,
+            movieCount: 0,
+            videoCount: 0,
+            thumbnail: cat.thumbnail || null,
+          };
+          existing.movieCount = cat.count || 0;
+          if (!existing.thumbnail && cat.thumbnail) {
+            existing.thumbnail = cat.thumbnail;
           }
+          combined.set(cat.category, existing);
         });
       }
     } catch (error) {
       console.error('Failed to load movie categories:', error);
     }
 
-    // Load video categories from Eporner
-    const videoCategoriesMap = new Map();
-    const assignedVideoIds = new Set(); // Track videos already assigned to a category
-    try {
-      // Fetch first 3 pages to get a good sample of categories (90 videos)
-      for (let page = 1; page <= 3; page++) {
-        await searchVideos('all', page, { perPage: 30, order: 'most-popular' });
-        
-        epornerVideos.value.forEach(video => {
-          // Skip if video already assigned to a category
-          if (assignedVideoIds.has(video.id)) {
-            return;
-          }
-          
-          if (video.categories && Array.isArray(video.categories) && video.categories.length > 0) {
-            // Sort categories alphabetically and assign video to first category only
-            const sortedCategories = video.categories
-              .map(cat => cat && cat.trim() ? cat.trim() : null)
-              .filter(cat => cat !== null)
-              .sort();
-            
-            if (sortedCategories.length > 0) {
-              const firstCategory = sortedCategories[0];
-              
-              // Initialize category if it doesn't exist
-              if (!videoCategoriesMap.has(firstCategory)) {
-                videoCategoriesMap.set(firstCategory, {
-                  name: firstCategory,
-                  movieCount: 0,
-                  videoCount: 0,
-                  thumbnail: video.thumbnail || null,
-                  source: 'video'
-                });
-              }
-              
-              // Assign video to this category only
-              videoCategoriesMap.get(firstCategory).videoCount++;
-              assignedVideoIds.add(video.id);
-              
-              // Use video thumbnail if category doesn't have one yet
-              if (!videoCategoriesMap.get(firstCategory).thumbnail && video.thumbnail) {
-                videoCategoriesMap.get(firstCategory).thumbnail = video.thumbnail;
-              }
-            }
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load video categories:', error);
+    // Build final list
+    categories.value = Array.from(combined.values())
+      .map((cat) => ({
+        name: cat.name,
+        movieCount: cat.movieCount || 0,
+        videoCount: cat.videoCount || 0,
+        count: (cat.movieCount || 0) + (cat.videoCount || 0),
+        thumbnail: cat.thumbnail || null,
+      }))
+      .filter((cat) => cat.count > 0)
+      .sort((a, b) => b.count - a.count);
+
+    // If API didn't provide totals, derive from list
+    if (!totalCount.value) {
+      totalCount.value = categories.value.length;
+      totalPages.value = Math.max(
+        1,
+        Math.ceil(totalCount.value / pageSize.value)
+      );
     }
-
-    // Combine categories
-    const combinedCategories = new Map();
-    
-    // Add movie categories
-    movieCategories.forEach(cat => {
-      combinedCategories.set(cat.name, { ...cat });
-    });
-
-    // Add or merge video categories
-    videoCategoriesMap.forEach((videoCat, name) => {
-      if (combinedCategories.has(name)) {
-        // Merge: add video count to existing category
-        combinedCategories.get(name).videoCount = videoCat.videoCount;
-        // Use video thumbnail if movie doesn't have one
-        if (!combinedCategories.get(name).thumbnail && videoCat.thumbnail) {
-          combinedCategories.get(name).thumbnail = videoCat.thumbnail;
-        }
-      } else {
-        // New category from videos
-        combinedCategories.set(name, { ...videoCat });
-      }
-    });
-
-    // Convert to array and calculate total count
-    categories.value = Array.from(combinedCategories.values()).map(cat => ({
-      name: cat.name,
-      count: cat.movieCount + cat.videoCount,
-      movieCount: cat.movieCount,
-      videoCount: cat.videoCount,
-      thumbnail: cat.thumbnail,
-    })).filter(cat => cat.count > 0); // Only show categories with content
-    
-    // Sort by total count (descending)
-    categories.value.sort((a, b) => b.count - a.count);
   } catch (error) {
     console.error('Failed to load categories:', error);
   } finally {
@@ -203,6 +207,11 @@ async function loadCategories() {
 
 function navigateToCategory(categoryName) {
   router.push(`/category/${encodeURIComponent(categoryName)}`);
+}
+
+function handlePageChange(page) {
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return;
+  loadCategories(page);
 }
 
 function handleThumbnailError(event) {
@@ -437,6 +446,59 @@ function handleThumbnailError(event) {
   font-size: 24px;
   color: var(--text-primary);
   margin-bottom: 12px;
+}
+
+.pagination-wrapper {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-btn,
+.page-number {
+  padding: 10px 16px;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 44px;
+}
+
+.pagination-btn:hover:not(:disabled),
+.page-number:hover:not(:disabled) {
+  background: var(--dark-light);
+  border-color: var(--primary);
+}
+
+.page-number.active {
+  background: var(--gradient-primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.pagination-btn:disabled,
+.page-number:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Responsive adjustments for padding and header */

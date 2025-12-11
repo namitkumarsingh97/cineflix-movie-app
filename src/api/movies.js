@@ -2,7 +2,7 @@ import apiClient from '../plugins/axios';
 
 export const moviesApi = {
   // Get all movies
-  getAll: () => apiClient.get('/movies'),
+  getAll: (config = {}) => apiClient.get('/movies', config),
   
   // Get movie by ID
   getById: (id) => apiClient.get(`/movies/${id}`),
