@@ -25,6 +25,24 @@ const routes = [
     }
   },
   {
+    path: '/japanese',
+    name: 'Japanese',
+    component: () => import('../pages/Japanese.vue'),
+    meta: { 
+      preload: false,
+      title: 'Japanese'
+    }
+  },
+  {
+    path: '/indian',
+    name: 'Indian',
+    component: () => import('../pages/Indian.vue'),
+    meta: { 
+      preload: false,
+      title: 'Indian'
+    }
+  },
+  {
     path: '/watch/:id',
     name: 'Watch',
     component: () => import('../pages/Watch.vue'),

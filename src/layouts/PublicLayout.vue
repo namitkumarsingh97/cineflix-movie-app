@@ -48,6 +48,30 @@
               </li>
               <li class="navbar-nav-item">
                 <router-link
+                  to="/japanese"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
+                  <Languages :size="16" />
+                  <span>Japanese</span>
+                </router-link>
+              </li>
+              <li class="navbar-nav-item">
+                <router-link
+                  to="/indian"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
+                  <Languages :size="16" />
+                  <span>Indian</span>
+                </router-link>
+              </li>
+              <!-- Categories temporarily hidden -->
+              <!--
+              <li class="navbar-nav-item">
+                <router-link
                   to="/categories"
                   class="navbar-link"
                   active-class="active"
@@ -57,6 +81,7 @@
                   <span>Categories</span>
                 </router-link>
               </li>
+              -->
               <!-- <li class="navbar-nav-item">
                 <router-link
                   to="/stories"
@@ -381,6 +406,25 @@
             <span>Videos</span>
           </router-link>
           <router-link
+            to="/japanese"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
+            <Languages :size="20" />
+            <span>Japanese</span>
+          </router-link>
+          <router-link
+            to="/indian"
+            class="mobile-menu-link"
+            active-class="active"
+            @click="closeMobileMenu"
+          >
+            <Languages :size="20" />
+            <span>Indian</span>
+          </router-link>
+          <!-- Categories temporarily hidden
+          <router-link
             to="/categories"
             class="mobile-menu-link"
             active-class="active"
@@ -389,6 +433,7 @@
             <FolderOpen :size="20" />
             <span>Categories</span>
           </router-link>
+          -->
           <router-link
             to="/premium"
             class="mobile-menu-link premium-nav-link"
@@ -576,6 +621,7 @@ import {
   RefreshCw,
   Home,
   TrendingUp,
+  Languages,
   Image,
   FolderOpen,
   Star,
