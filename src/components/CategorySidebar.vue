@@ -40,6 +40,90 @@
         >
           <span class="item-label">Big Ass</span>
         </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/big-dick' }]"
+          @click="navigateToBigDick"
+        >
+          <span class="item-label">Big Dick</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/big-tits' }]"
+          @click="navigateToBigTits"
+        >
+          <span class="item-label">Big Tits</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/bisexual' }]"
+          @click="navigateToBisexual"
+        >
+          <span class="item-label">Bisexual</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/blonde' }]"
+          @click="navigateToBlonde"
+        >
+          <span class="item-label">Blonde</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/blowjob' }]"
+          @click="navigateToBlowjob"
+        >
+          <span class="item-label">Blowjob</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/brunette' }]"
+          @click="navigateToBrunette"
+        >
+          <span class="item-label">Brunette</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/bukkake' }]"
+          @click="navigateToBukkake"
+        >
+          <span class="item-label">Bukkake</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/creampie' }]"
+          @click="navigateToCreampie"
+        >
+          <span class="item-label">Creampie</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/cumshot' }]"
+          @click="navigateToCumshot"
+        >
+          <span class="item-label">Cumshot</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/ebony' }]"
+          @click="navigateToEbony"
+        >
+          <span class="item-label">Ebony</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/for-women' }]"
+          @click="navigateToForWomen"
+        >
+          <span class="item-label">For Women</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/group-sex' }]"
+          @click="navigateToGroupSex"
+        >
+          <span class="item-label">Group Sex</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/handjob' }]"
+          @click="navigateToHandjob"
+        >
+          <span class="item-label">Handjob</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/hardcore' }]"
+          @click="navigateToHardcore"
+        >
+          <span class="item-label">Hardcore</span>
+        </button>
       </div>
     </div>
   </aside>
@@ -252,6 +336,118 @@ function navigateToBigAss() {
   selectedTopNav.value = null;
   router.push("/big-ass");
   emit("filter-change", { type: "category", value: "big ass" });
+}
+
+function navigateToBigDick() {
+  selectedCategory.value = "big dick";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/big-dick");
+  emit("filter-change", { type: "category", value: "big dick" });
+}
+
+function navigateToBigTits() {
+  selectedCategory.value = "big tits";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/big-tits");
+  emit("filter-change", { type: "category", value: "big tits" });
+}
+
+function navigateToBisexual() {
+  selectedCategory.value = "bisexual";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/bisexual");
+  emit("filter-change", { type: "category", value: "bisexual" });
+}
+
+function navigateToBlonde() {
+  selectedCategory.value = "blonde";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/blonde");
+  emit("filter-change", { type: "category", value: "blonde" });
+}
+
+function navigateToBlowjob() {
+  selectedCategory.value = "blowjob";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/blowjob");
+  emit("filter-change", { type: "category", value: "blowjob" });
+}
+
+function navigateToBrunette() {
+  selectedCategory.value = "brunette";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/brunette");
+  emit("filter-change", { type: "category", value: "brunette" });
+}
+
+function navigateToBukkake() {
+  selectedCategory.value = "bukkake";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/bukkake");
+  emit("filter-change", { type: "category", value: "bukkake" });
+}
+
+function navigateToCreampie() {
+  selectedCategory.value = "creampie";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/creampie");
+  emit("filter-change", { type: "category", value: "creampie" });
+}
+
+function navigateToCumshot() {
+  selectedCategory.value = "cumshot";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/cumshot");
+  emit("filter-change", { type: "category", value: "cumshot" });
+}
+
+function navigateToEbony() {
+  selectedCategory.value = "ebony";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/ebony");
+  emit("filter-change", { type: "category", value: "ebony" });
+}
+
+function navigateToForWomen() {
+  selectedCategory.value = "for women";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/for-women");
+  emit("filter-change", { type: "category", value: "for women" });
+}
+
+function navigateToGroupSex() {
+  selectedCategory.value = "group sex";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/group-sex");
+  emit("filter-change", { type: "category", value: "group sex" });
+}
+
+function navigateToHandjob() {
+  selectedCategory.value = "handjob";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/handjob");
+  emit("filter-change", { type: "category", value: "handjob" });
+}
+
+function navigateToHardcore() {
+  selectedCategory.value = "hardcore";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/hardcore");
+  emit("filter-change", { type: "category", value: "hardcore" });
 }
 
 // Load initial categories

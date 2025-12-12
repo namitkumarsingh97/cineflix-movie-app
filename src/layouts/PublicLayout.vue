@@ -494,6 +494,90 @@
             >
               <span>Big Ass</span>
             </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-dick' }]"
+              @click="navigateToMobileBigDick"
+            >
+              <span>Big Dick</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-tits' }]"
+              @click="navigateToMobileBigTits"
+            >
+              <span>Big Tits</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bisexual' }]"
+              @click="navigateToMobileBisexual"
+            >
+              <span>Bisexual</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/blonde' }]"
+              @click="navigateToMobileBlonde"
+            >
+              <span>Blonde</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/blowjob' }]"
+              @click="navigateToMobileBlowjob"
+            >
+              <span>Blowjob</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/brunette' }]"
+              @click="navigateToMobileBrunette"
+            >
+              <span>Brunette</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bukkake' }]"
+              @click="navigateToMobileBukkake"
+            >
+              <span>Bukkake</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/creampie' }]"
+              @click="navigateToMobileCreampie"
+            >
+              <span>Creampie</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/cumshot' }]"
+              @click="navigateToMobileCumshot"
+            >
+              <span>Cumshot</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/ebony' }]"
+              @click="navigateToMobileEbony"
+            >
+              <span>Ebony</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/for-women' }]"
+              @click="navigateToMobileForWomen"
+            >
+              <span>For Women</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/group-sex' }]"
+              @click="navigateToMobileGroupSex"
+            >
+              <span>Group Sex</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/handjob' }]"
+              @click="navigateToMobileHandjob"
+            >
+              <span>Handjob</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hardcore' }]"
+              @click="navigateToMobileHardcore"
+            >
+              <span>Hardcore</span>
+            </button>
           </div>
 
           <!-- <router-link
@@ -1209,6 +1293,118 @@ function navigateToMobileBigAss() {
   selectedMobileProduction.value = "all";
   selectedMobileTopNav.value = null;
   router.push("/big-ass");
+  closeMobileMenu();
+}
+
+function navigateToMobileBigDick() {
+  selectedMobileCategory.value = "big dick";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/big-dick");
+  closeMobileMenu();
+}
+
+function navigateToMobileBigTits() {
+  selectedMobileCategory.value = "big tits";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/big-tits");
+  closeMobileMenu();
+}
+
+function navigateToMobileBisexual() {
+  selectedMobileCategory.value = "bisexual";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/bisexual");
+  closeMobileMenu();
+}
+
+function navigateToMobileBlonde() {
+  selectedMobileCategory.value = "blonde";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/blonde");
+  closeMobileMenu();
+}
+
+function navigateToMobileBlowjob() {
+  selectedMobileCategory.value = "blowjob";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/blowjob");
+  closeMobileMenu();
+}
+
+function navigateToMobileBrunette() {
+  selectedMobileCategory.value = "brunette";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/brunette");
+  closeMobileMenu();
+}
+
+function navigateToMobileBukkake() {
+  selectedMobileCategory.value = "bukkake";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/bukkake");
+  closeMobileMenu();
+}
+
+function navigateToMobileCreampie() {
+  selectedMobileCategory.value = "creampie";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/creampie");
+  closeMobileMenu();
+}
+
+function navigateToMobileCumshot() {
+  selectedMobileCategory.value = "cumshot";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/cumshot");
+  closeMobileMenu();
+}
+
+function navigateToMobileEbony() {
+  selectedMobileCategory.value = "ebony";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/ebony");
+  closeMobileMenu();
+}
+
+function navigateToMobileForWomen() {
+  selectedMobileCategory.value = "for women";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/for-women");
+  closeMobileMenu();
+}
+
+function navigateToMobileGroupSex() {
+  selectedMobileCategory.value = "group sex";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/group-sex");
+  closeMobileMenu();
+}
+
+function navigateToMobileHandjob() {
+  selectedMobileCategory.value = "handjob";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/handjob");
+  closeMobileMenu();
+}
+
+function navigateToMobileHardcore() {
+  selectedMobileCategory.value = "hardcore";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hardcore");
   closeMobileMenu();
 }
 

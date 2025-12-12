@@ -97,6 +97,258 @@ const routes = [
     }
   },
   {
+    path: '/big-dick',
+    name: 'BigDick',
+    component: () => import('../pages/BigDick.vue'),
+    meta: {
+      preload: false,
+      title: 'Big Dick'
+    }
+  },
+  {
+    path: '/big-tits',
+    name: 'BigTits',
+    component: () => import('../pages/BigTits.vue'),
+    meta: {
+      preload: false,
+      title: 'Big Tits'
+    }
+  },
+  {
+    path: '/bisexual',
+    name: 'Bisexual',
+    component: () => import('../pages/Bisexual.vue'),
+    meta: {
+      preload: false,
+      title: 'Bisexual'
+    }
+  },
+  {
+    path: '/blonde',
+    name: 'Blonde',
+    component: () => import('../pages/Blonde.vue'),
+    meta: {
+      preload: false,
+      title: 'Blonde'
+    }
+  },
+  {
+    path: '/blowjob',
+    name: 'Blowjob',
+    component: () => import('../pages/Blowjob.vue'),
+    meta: {
+      preload: false,
+      title: 'Blowjob'
+    }
+  },
+  {
+    path: '/brunette',
+    name: 'Brunette',
+    component: () => import('../pages/Brunette.vue'),
+    meta: {
+      preload: false,
+      title: 'Brunette'
+    }
+  },
+  {
+    path: '/bukkake',
+    name: 'Bukkake',
+    component: () => import('../pages/Bukkake.vue'),
+    meta: {
+      preload: false,
+      title: 'Bukkake'
+    }
+  },
+  {
+    path: '/creampie',
+    name: 'Creampie',
+    component: () => import('../pages/Creampie.vue'),
+    meta: {
+      preload: false,
+      title: 'Creampie'
+    }
+  },
+  {
+    path: '/cumshot',
+    name: 'Cumshot',
+    component: () => import('../pages/Cumshot.vue'),
+    meta: {
+      preload: false,
+      title: 'Cumshot'
+    }
+  },
+  {
+    path: '/ebony',
+    name: 'Ebony',
+    component: () => import('../pages/Ebony.vue'),
+    meta: {
+      preload: false,
+      title: 'Ebony'
+    }
+  },
+  {
+    path: '/for-women',
+    name: 'ForWomen',
+    component: () => import('../pages/ForWomen.vue'),
+    meta: {
+      preload: false,
+      title: 'For Women'
+    }
+  },
+  {
+    path: '/group-sex',
+    name: 'GroupSex',
+    component: () => import('../pages/GroupSex.vue'),
+    meta: {
+      preload: false,
+      title: 'Group Sex'
+    }
+  },
+  {
+    path: '/handjob',
+    name: 'Handjob',
+    component: () => import('../pages/Handjob.vue'),
+    meta: {
+      preload: false,
+      title: 'Handjob'
+    }
+  },
+  {
+    path: '/hardcore',
+    name: 'Hardcore',
+    component: () => import('../pages/Hardcore.vue'),
+    meta: {
+      preload: false,
+      title: 'Hardcore'
+    }
+  },
+  {
+    path: '/big-dick',
+    name: 'BigDick',
+    component: () => import('../pages/BigDick.vue'),
+    meta: {
+      preload: false,
+      title: 'Big Dick'
+    }
+  },
+  {
+    path: '/big-tits',
+    name: 'BigTits',
+    component: () => import('../pages/BigTits.vue'),
+    meta: {
+      preload: false,
+      title: 'Big Tits'
+    }
+  },
+  {
+    path: '/bisexual',
+    name: 'Bisexual',
+    component: () => import('../pages/Bisexual.vue'),
+    meta: {
+      preload: false,
+      title: 'Bisexual'
+    }
+  },
+  {
+    path: '/blonde',
+    name: 'Blonde',
+    component: () => import('../pages/Blonde.vue'),
+    meta: {
+      preload: false,
+      title: 'Blonde'
+    }
+  },
+  {
+    path: '/blowjob',
+    name: 'Blowjob',
+    component: () => import('../pages/Blowjob.vue'),
+    meta: {
+      preload: false,
+      title: 'Blowjob'
+    }
+  },
+  {
+    path: '/brunette',
+    name: 'Brunette',
+    component: () => import('../pages/Brunette.vue'),
+    meta: {
+      preload: false,
+      title: 'Brunette'
+    }
+  },
+  {
+    path: '/bukkake',
+    name: 'Bukkake',
+    component: () => import('../pages/Bukkake.vue'),
+    meta: {
+      preload: false,
+      title: 'Bukkake'
+    }
+  },
+  {
+    path: '/creampie',
+    name: 'Creampie',
+    component: () => import('../pages/Creampie.vue'),
+    meta: {
+      preload: false,
+      title: 'Creampie'
+    }
+  },
+  {
+    path: '/cumshot',
+    name: 'Cumshot',
+    component: () => import('../pages/Cumshot.vue'),
+    meta: {
+      preload: false,
+      title: 'Cumshot'
+    }
+  },
+  {
+    path: '/ebony',
+    name: 'Ebony',
+    component: () => import('../pages/Ebony.vue'),
+    meta: {
+      preload: false,
+      title: 'Ebony'
+    }
+  },
+  {
+    path: '/for-women',
+    name: 'ForWomen',
+    component: () => import('../pages/ForWomen.vue'),
+    meta: {
+      preload: false,
+      title: 'For Women'
+    }
+  },
+  {
+    path: '/group-sex',
+    name: 'GroupSex',
+    component: () => import('../pages/GroupSex.vue'),
+    meta: {
+      preload: false,
+      title: 'Group Sex'
+    }
+  },
+  {
+    path: '/handjob',
+    name: 'Handjob',
+    component: () => import('../pages/Handjob.vue'),
+    meta: {
+      preload: false,
+      title: 'Handjob'
+    }
+  },
+  {
+    path: '/hardcore',
+    name: 'Hardcore',
+    component: () => import('../pages/Hardcore.vue'),
+    meta: {
+      preload: false,
+      title: 'Hardcore'
+    }
+  },
+  {
     path: '/watch/:id',
     name: 'Watch',
     component: () => import('../pages/Watch.vue'),
