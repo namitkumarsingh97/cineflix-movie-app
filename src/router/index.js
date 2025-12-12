@@ -586,6 +586,24 @@ const routes = [
     }
   },
   {
+    path: '/creator-studio',
+    name: 'CreatorStudio',
+    component: () => import('../pages/CreatorStudio.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Creator Studio'
+    }
+  },
+  {
+    path: '/watch-party/:roomId?',
+    name: 'WatchParty',
+    component: () => import('../pages/Watch.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Watch Party'
+    }
+  },
+  {
     path: '/stories',
     name: 'Stories',
     component: () => import('../pages/Stories.vue'),

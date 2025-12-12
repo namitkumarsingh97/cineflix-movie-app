@@ -270,6 +270,26 @@
       @item-click="navigateToVideo"
     />
   </div>
+
+  <!-- Interactive Choice Overlay -->
+  <InteractiveChoiceOverlay
+    v-if="isInteractive && currentChoicePoint"
+    :choice-point="currentChoicePoint"
+    :choices="currentChoicePoint.choices"
+    :selected-choices="selectedChoices"
+    @choice="handleInteractiveChoice"
+    @skip="handleSkipChoice"
+  />
+
+  <!-- Watch Party Sidebar -->
+  <div v-if="roomId" class="watch-party-overlay">
+    <div class="watch-party-container">
+      <WatchPartyRoom
+        :room-id="roomId"
+        @leave="handleLeaveParty"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -290,6 +310,9 @@ import { useNetworkQuality } from '../composables/useNetworkQuality';
 import { useRecommendations } from '../composables/useRecommendations';
 import { useScenes } from '../composables/useScenes';
 import { useSceneDetection } from '../composables/useSceneDetection';
+import { useInteractiveVideo } from '../composables/useInteractiveVideo';
+import { useSocialWatchParty } from '../composables/useSocialWatchParty';
+import { useVRIntegration } from '../composables/useVRIntegration';
 import { useCreators } from '../composables/useCreators';
 import { useSubscription } from '../composables/useSubscription';
 import VideoCard from '../components/VideoCard.vue';
@@ -298,6 +321,8 @@ import SceneNavigation from '../components/SceneNavigation.vue';
 import BecauseYouWatched from '../components/BecauseYouWatched.vue';
 import Loader from '../components/Loader.vue';
 import ModernVideoPlayer from '../components/ModernVideoPlayer.vue';
+import InteractiveChoiceOverlay from '../components/InteractiveChoiceOverlay.vue';
+import WatchPartyRoom from '../components/WatchPartyRoom.vue';
 import {
   ThumbsUp,
   ThumbsDown,
@@ -307,6 +332,7 @@ import {
   Heart,
   Clock,
   Star,
+  Users,
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -350,6 +376,37 @@ const {
   scenePreferences,
   setPreferences: setScenePreferences 
 } = useSceneDetection();
+const {
+  isInteractive,
+  currentSegment,
+  choicePoints,
+  selectedChoices,
+  initializeInteractiveVideo,
+  getCurrentSegmentUrl,
+  getChoicesAtTime,
+  makeChoice,
+} = useInteractiveVideo();
+const {
+  isHost,
+  roomId,
+  participants,
+  isConnected: isPartyConnected,
+  chatMessages,
+  createRoom,
+  joinRoom,
+  broadcastState,
+  synchronizePlayback,
+  sendMessage: sendPartyMessage,
+  leaveRoom,
+} = useSocialWatchParty();
+const {
+  isVRSupported,
+  isVRActive,
+  enterVRPreview,
+  enterFullVR,
+  exitVR,
+  hasVRContent,
+} = useVRIntegration();
 const { extractCreator, followCreator, unfollowCreator, isCreatorFollowed: checkCreatorFollowed } = useCreators();
 const { isPremium, checkPremiumStatus } = useSubscription();
 
@@ -1187,6 +1244,19 @@ function handleTimeUpdate(time) {
       if (sceneAtTime && (!currentScene.value || sceneAtTime.id !== currentScene.value.id)) {
         currentScene.value = sceneAtTime;
       }
+
+      // Check for interactive video choices
+      if (isInteractive.value) {
+        const choices = getChoicesAtTime(currentTimeValue);
+        if (choices.length > 0 && !currentChoicePoint.value) {
+          currentChoicePoint.value = choices[0];
+        }
+      }
+
+      // Synchronize playback for watch party
+      if (roomId.value && videoPlayer.value) {
+        synchronizePlayback(videoPlayer.value);
+      }
     }
   }
 }
@@ -1219,6 +1289,9 @@ async function handlePlay() {
 
 function handlePause() {
   // Video paused
+  if (roomId.value && isHost.value) {
+    broadcastState({ isPlaying: false });
+  }
 }
 
 function handleFavorite() {

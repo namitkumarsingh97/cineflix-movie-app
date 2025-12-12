@@ -31,6 +31,14 @@
       <div class="controls-overlay" :class="{ 'controls-visible': controlsVisible || !isPlaying }">
         <!-- Top Controls Bar -->
         <div class="controls-top">
+          <button 
+            v-if="isVRSupported" 
+            class="control-btn vr-btn" 
+            @click="$emit('vr-click')" 
+            :title="isVRActive ? 'Exit VR' : 'Enter VR'"
+          >
+            <span class="vr-icon">🥽</span>
+          </button>
           <button class="control-btn pip-btn" @click="togglePictureInPicture" :title="isPictureInPicture ? 'Exit Picture-in-Picture' : 'Picture-in-Picture'">
             <PictureInPicture :size="20" />
           </button>
