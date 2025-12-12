@@ -260,42 +260,59 @@ function handleThumbnailError(event) {
   }
 }
 
-// Fetch actor's most viewed video thumbnail
-async function loadActorThumbnail(actorName) {
-  try {
-    // Search for actor videos, sorted by most popular (most views)
-    // Get just 1 video to get the most viewed one for thumbnail
-    await searchVideos(actorName.toLowerCase(), 1, { 
-      perPage: 1, 
-      order: 'most-popular' 
-    });
-    
-    // Get the first (most viewed) video
-    if (epornerVideos.value && epornerVideos.value.length > 0) {
-      const mostViewedVideo = epornerVideos.value[0];
-      const actor = allActors.value.find(a => a.name === actorName);
-      if (actor) {
-        // Get total count if available
-        if (epornerTotalCount.value) {
-          actor.videoCount = epornerTotalCount.value;
-          // If video count is less than 100, remove the actor
-          if (epornerTotalCount.value < 100) {
-            console.log(`Removing ${actorName} - only ${epornerTotalCount.value} videos (< 100)`);
-            const index = allActors.value.findIndex(a => a.name === actorName);
-            if (index > -1) {
-              allActors.value.splice(index, 1);
+// Fetch actor's most viewed video thumbnail with retry logic
+async function loadActorThumbnail(actorName, retries = 3) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      // Search for actor videos, sorted by most popular (most views)
+      // Get just 1 video to get the most viewed one for thumbnail
+      await searchVideos(actorName.toLowerCase(), 1, { 
+        perPage: 1, 
+        order: 'most-popular' 
+      });
+      
+      // Get the first (most viewed) video
+      if (epornerVideos.value && epornerVideos.value.length > 0) {
+        const mostViewedVideo = epornerVideos.value[0];
+        const actor = allActors.value.find(a => a.name === actorName);
+        if (actor) {
+          // Get total count if available
+          if (epornerTotalCount.value) {
+            actor.videoCount = epornerTotalCount.value;
+            // If video count is less than 100, remove the actor
+            if (epornerTotalCount.value < 100) {
+              const index = allActors.value.findIndex(a => a.name === actorName);
+              if (index > -1) {
+                allActors.value.splice(index, 1);
+              }
+              return; // Don't set thumbnail for removed actor
             }
-            return; // Don't set thumbnail for removed actor
+          }
+          // Only set thumbnail if actor still exists (wasn't removed)
+          if (mostViewedVideo.thumbnail && allActors.value.find(a => a.name === actorName)) {
+            actor.thumbnail = mostViewedVideo.thumbnail;
           }
         }
-        // Only set thumbnail if actor still exists (wasn't removed)
-        if (mostViewedVideo.thumbnail && allActors.value.find(a => a.name === actorName)) {
-          actor.thumbnail = mostViewedVideo.thumbnail;
-        }
+      }
+      return; // Success, exit retry loop
+    } catch (error) {
+      // Suppress console errors for expected failures (CORS, rate limiting, network issues)
+      const isExpectedError = error?.message?.includes('Failed to fetch') || 
+                              error?.message?.includes('CORS') ||
+                              error?.message?.includes('503') ||
+                              error?.message?.includes('NetworkError');
+      
+      if (!isExpectedError && attempt === retries - 1) {
+        // Only log unexpected errors on final attempt
+        console.warn(`Failed to load thumbnail for ${actorName} after ${retries} attempts`);
+      }
+      
+      // If not the last attempt, wait before retrying with exponential backoff
+      if (attempt < retries - 1) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000); // Max 5 seconds
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-  } catch (error) {
-    console.error(`Error loading ${actorName} thumbnail:`, error);
   }
 }
 
@@ -318,24 +335,35 @@ onMounted(async () => {
   // Load thumbnails in the background
   loading.value = true;
   try {
-    // Load thumbnails for all actors (in batches to avoid overwhelming the API)
+    // Load thumbnails for all actors (in smaller batches with delays to avoid rate limiting)
     const allActorNames = allActors.value.map(a => a.name);
-    // Load first 10 thumbnails immediately, then load the rest in batches
-    const firstBatch = allActorNames.slice(0, 10);
-    await Promise.all(firstBatch.map(name => loadActorThumbnail(name).catch(err => {
-      console.error(`Error loading thumbnail for ${name}:`, err);
-      return null; // Continue even if one fails
-    })));
     
-    // Load remaining thumbnails in batches of 10
-    for (let i = 10; i < allActorNames.length; i += 10) {
-      const batch = allActorNames.slice(i, i + 10);
-      await Promise.all(batch.map(name => loadActorThumbnail(name).catch(err => {
-        console.error(`Error loading thumbnail for ${name}:`, err);
-        return null; // Continue even if one fails
-      })));
-      // Small delay between batches to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
+    // Process actors sequentially in small batches to avoid overwhelming the API
+    const BATCH_SIZE = 3; // Reduced from 10 to 3
+    const DELAY_BETWEEN_REQUESTS = 800; // Delay between individual requests (ms)
+    const DELAY_BETWEEN_BATCHES = 2000; // Delay between batches (ms)
+    
+    for (let i = 0; i < allActorNames.length; i += BATCH_SIZE) {
+      const batch = allActorNames.slice(i, i + BATCH_SIZE);
+      
+      // Process batch sequentially (not in parallel) to reduce concurrent requests
+      for (let j = 0; j < batch.length; j++) {
+        const name = batch[j];
+        await loadActorThumbnail(name).catch(() => {
+          // Errors are already handled in loadActorThumbnail with retry logic
+          return null; // Continue even if one fails
+        });
+        
+        // Delay between individual requests within a batch (except for the last one)
+        if (j < batch.length - 1 || i + BATCH_SIZE < allActorNames.length) {
+          await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_REQUESTS));
+        }
+      }
+      
+      // Delay between batches to avoid rate limiting
+      if (i + BATCH_SIZE < allActorNames.length) {
+        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
+      }
     }
     
     // Filter out actors with less than 100 videos
@@ -343,13 +371,18 @@ onMounted(async () => {
       // If videoCount is null/undefined, keep the actor (count not loaded yet)
       // If videoCount exists and is < 100, remove the actor
       if (actor.videoCount !== null && actor.videoCount !== undefined && actor.videoCount < 100) {
-        console.log(`Removing ${actor.name} - only ${actor.videoCount} videos`);
         return false;
       }
       return true;
     });
   } catch (error) {
-    console.error('Error loading actor thumbnails:', error);
+    // Suppress expected errors - they're already handled in loadActorThumbnail
+    // Only log unexpected errors
+    if (!error?.message?.includes('Failed to fetch') && 
+        !error?.message?.includes('CORS') &&
+        !error?.message?.includes('503')) {
+      console.warn('Error loading actor thumbnails:', error);
+    }
     // Continue even if thumbnail fails - actor cards will show with avatars
   } finally {
     loading.value = false;

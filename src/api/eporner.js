@@ -51,7 +51,17 @@ export const epornerApi = {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Eporner API search error:', error);
+      // Suppress console errors for expected failures (CORS, rate limiting, network issues)
+      const isExpectedError = error?.message?.includes('Failed to fetch') || 
+                              error?.message?.includes('CORS') ||
+                              error?.message?.includes('503') ||
+                              error?.message?.includes('NetworkError') ||
+                              error?.message?.includes('Service Unavailable') ||
+                              error?.name === 'TypeError';
+      
+      if (!isExpectedError) {
+        console.error('Eporner API search error:', error);
+      }
       throw error;
     }
   },
@@ -103,7 +113,17 @@ export const epornerApi = {
       
       return null;
     } catch (error) {
-      console.error('Eporner API getById error:', error);
+      // Suppress console errors for expected failures (CORS, rate limiting, network issues)
+      const isExpectedError = error?.message?.includes('Failed to fetch') || 
+                              error?.message?.includes('CORS') ||
+                              error?.message?.includes('503') ||
+                              error?.message?.includes('NetworkError') ||
+                              error?.message?.includes('Service Unavailable') ||
+                              error?.name === 'TypeError';
+      
+      if (!isExpectedError) {
+        console.error('Eporner API getById error:', error);
+      }
       throw error;
     }
   },

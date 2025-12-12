@@ -216,7 +216,16 @@ export function useEporner() {
         totalCount.value = 0;
       }
     } catch (err) {
-      console.error('Error searching Eporner videos:', err);
+      // Suppress console errors for expected failures (CORS, rate limiting, network issues)
+      const isExpectedError = err?.message?.includes('Failed to fetch') || 
+                              err?.message?.includes('CORS') ||
+                              err?.message?.includes('503') ||
+                              err?.message?.includes('NetworkError') ||
+                              err?.message?.includes('Service Unavailable');
+      
+      if (!isExpectedError) {
+        console.error('Error searching Eporner videos:', err);
+      }
       error.value = err.message || 'Failed to fetch videos';
       videos.value = [];
     } finally {
@@ -251,7 +260,17 @@ export function useEporner() {
       console.warn('useEporner.getVideoById: video is null');
       return null;
     } catch (err) {
-      console.error('Error fetching video by ID:', err);
+      // Suppress console errors for expected failures (CORS, rate limiting, network issues)
+      const isExpectedError = err?.message?.includes('Failed to fetch') || 
+                              err?.message?.includes('CORS') ||
+                              err?.message?.includes('503') ||
+                              err?.message?.includes('NetworkError') ||
+                              err?.message?.includes('Service Unavailable') ||
+                              err?.name === 'TypeError';
+      
+      if (!isExpectedError) {
+        console.error('Error fetching video by ID:', err);
+      }
       error.value = err.message || 'Failed to fetch video';
       return null;
     } finally {
