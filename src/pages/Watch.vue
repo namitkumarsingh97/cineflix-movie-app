@@ -289,6 +289,7 @@ import { useStarFollows } from '../composables/useStarFollows';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
 import { useRecommendations } from '../composables/useRecommendations';
 import { useScenes } from '../composables/useScenes';
+import { useSceneDetection } from '../composables/useSceneDetection';
 import { useCreators } from '../composables/useCreators';
 import { useSubscription } from '../composables/useSubscription';
 import VideoCard from '../components/VideoCard.vue';
@@ -342,6 +343,13 @@ const { follow, unfollow, isFollowed } = useStarFollows();
 const { shouldAutoplay, playerBitrate, videoQuality, shouldDeferRecommendations } = useNetworkQuality();
 const { getBecauseYouWatched, updateSession } = useRecommendations();
 const { scenes, currentScene, generateScenes, jumpToScene, getSceneAtTime } = useScenes();
+const { 
+  detectedScenes, 
+  detectScenes: detectScenesAI, 
+  getRecommendedSkipTime, 
+  scenePreferences,
+  setPreferences: setScenePreferences 
+} = useSceneDetection();
 const { extractCreator, followCreator, unfollowCreator, isCreatorFollowed: checkCreatorFollowed } = useCreators();
 const { isPremium, checkPremiumStatus } = useSubscription();
 
@@ -763,6 +771,12 @@ async function loadVideo() {
           } catch (e) {
             console.log('View increment not available for videos');
           }
+          // Detect scenes using AI
+          if (video.value) {
+            detectScenesAI(video.value, { useAI: true });
+            generateScenes(video.value);
+          }
+          
           await nextTick();
           await setupStreaming();
           return;
@@ -809,6 +823,12 @@ async function loadVideo() {
           } catch (e) {
             console.error('Error incrementing view:', e);
           }
+          // Detect scenes using AI
+          if (video.value) {
+            detectScenesAI(video.value, { useAI: true });
+            generateScenes(video.value);
+          }
+          
           // Load comments
           await loadComments();
           await nextTick();
@@ -1183,6 +1203,17 @@ async function handlePlay() {
     
     // Initialize smart queue to predict and pre-load next videos
     await initializeSmartQueue(video.value, allVideos);
+    
+    // Auto-skip based on preferences
+    const skipTime = getRecommendedSkipTime(video.value);
+    if (skipTime && videoPlayer.value) {
+      // Small delay to ensure player is ready
+      setTimeout(() => {
+        if (videoPlayer.value && typeof videoPlayer.value.currentTime !== 'undefined') {
+          videoPlayer.value.currentTime = skipTime;
+        }
+      }, 500);
+    }
   }
 }
 
