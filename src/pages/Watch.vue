@@ -42,9 +42,11 @@
                 frameborder="0"
                 allowfullscreen
                 allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                class="watch-iframe-player"
+                class="watch-iframe-player eporner-iframe"
                 loading="lazy"
               ></iframe>
+              <!-- Overlay to hide Eporner banner -->
+              <div class="eporner-banner-overlay"></div>
             </div>
             <!-- Modern Video Player for direct video URLs (S3 videos, etc.) -->
             <ModernVideoPlayer
@@ -1456,6 +1458,38 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Overlay to hide Eporner banner at top */
+.eporner-banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px; /* Adjust based on banner height - covers the yellow text banner */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 50%, rgba(0, 0, 0, 0) 100%);
+  z-index: 10;
+  pointer-events: none; /* Don't block video interactions */
+  border-radius: 12px 12px 0 0;
+}
+
+/* Overlay to hide Eporner banner at top */
+.eporner-banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90px; /* Covers the banner with download icon and yellow text */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.98) 30%, rgba(0, 0, 0, 0.95) 60%, rgba(0, 0, 0, 0) 100%);
+  z-index: 100; /* Above the iframe */
+  pointer-events: auto; /* Block clicks on the banner area */
+  border-radius: 12px 12px 0 0;
+}
+
+/* Ensure iframe is below overlay */
+.eporner-iframe {
+  position: relative;
+  z-index: 1;
 }
 
 .watch-iframe-player {
