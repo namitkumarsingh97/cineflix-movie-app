@@ -141,10 +141,18 @@ onMounted(() => {
   
   // Prevent right-click and other shortcuts when not verified
   if (!isVerified.value) {
-    // Lock body scroll
+    // Lock body scroll and hide all content
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    // Hide app content
+    const appContent = document.querySelector('.app-content');
+    if (appContent) {
+      appContent.style.display = 'none';
+      appContent.style.visibility = 'hidden';
+    }
     
     document.addEventListener('contextmenu', preventDefault);
     document.addEventListener('keydown', preventShortcuts);
@@ -155,6 +163,14 @@ onMounted(() => {
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.width = '';
+    document.body.style.height = '';
+    
+    // Show app content
+    const appContent = document.querySelector('.app-content');
+    if (appContent) {
+      appContent.style.display = '';
+      appContent.style.visibility = '';
+    }
   }
 });
 
@@ -165,6 +181,14 @@ watch(isVerified, (verified) => {
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.width = '';
+    document.body.style.height = '';
+    
+    // Show app content
+    const appContent = document.querySelector('.app-content');
+    if (appContent) {
+      appContent.style.display = '';
+      appContent.style.visibility = '';
+    }
     
     // Remove event listeners
     document.removeEventListener('contextmenu', preventDefault);
@@ -176,6 +200,14 @@ watch(isVerified, (verified) => {
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    // Hide app content
+    const appContent = document.querySelector('.app-content');
+    if (appContent) {
+      appContent.style.display = 'none';
+      appContent.style.visibility = 'hidden';
+    }
     
     // Add event listeners
     document.addEventListener('contextmenu', preventDefault);
@@ -188,30 +220,30 @@ watch(isVerified, (verified) => {
 
 <style scoped>
 .age-verification-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #000000;
-  z-index: 999999;
-  display: flex;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #000000 !important;
+  z-index: 999999 !important;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   padding: 20px;
   animation: fadeIn 0.3s ease;
   overflow-y: auto;
+  overflow-x: hidden;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   isolation: isolate;
   pointer-events: auto;
-}
-
-/* Hide all content behind the overlay */
-.age-verification-overlay ~ * {
-  visibility: hidden;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 @keyframes fadeIn {

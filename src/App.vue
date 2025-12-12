@@ -1,7 +1,7 @@
 <template>
   <div>
     <AgeVerification />
-    <div v-if="isAgeVerified" class="app-content">
+    <div v-show="isAgeVerified" class="app-content" :style="{ display: isAgeVerified ? 'block' : 'none' }">
       <PublicLayout
         v-model="searchQuery"
         @refresh="handleRefresh"
@@ -48,6 +48,7 @@ watch(() => localStorage.getItem('ageVerified'), () => {
   checkAgeVerification();
 });
 
+// Listen for custom age verification event
 onMounted(() => {
   checkAgeVerification();
   
@@ -55,6 +56,26 @@ onMounted(() => {
   window.addEventListener('storage', () => {
     checkAgeVerification();
   });
+  
+  // Listen for custom age verified event
+  window.addEventListener('ageVerified', () => {
+    checkAgeVerification();
+  });
+  
+  // Also poll for changes (fallback)
+  const interval = setInterval(() => {
+    const currentVerified = localStorage.getItem('ageVerified') === 'true';
+    if (currentVerified !== isAgeVerified.value) {
+      checkAgeVerification();
+    }
+  }, 100);
+  
+  // Cleanup on unmount
+  return () => {
+    clearInterval(interval);
+    window.removeEventListener('storage', checkAgeVerification);
+    window.removeEventListener('ageVerified', checkAgeVerification);
+  };
 });
 
 // Provide search query and refresh trigger to child components

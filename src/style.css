@@ -47,6 +47,14 @@ body {
 #app {
   width: 100vw;
   height: 100vh;
+  position: relative;
+}
+
+/* Hide app content when age verification is showing */
+#app:has(.age-verification-overlay) .app-content {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 .app-container {
