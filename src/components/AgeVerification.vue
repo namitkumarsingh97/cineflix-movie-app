@@ -1,6 +1,6 @@
 <template>
   <div v-if="!isVerified" class="age-verification-overlay">
-    <div class="age-verification-modal">
+    <div>
       <div class="modal-content">
         <div class="content-wrapper">
           <div class="main-content">
@@ -255,26 +255,6 @@ watch(isVerified, (verified) => {
   }
 }
 
-.age-verification-modal {
-  background: #2a2a2a;
-  border: 3px solid #ff4500;
-  border-left: 8px solid #ff4500;
-  border-radius: 12px;
-  max-width: 900px;
-  width: 100%;
-  max-height: 90vh;
-  box-shadow: 
-    0 0 0 1px rgba(255, 69, 0, 0.3),
-    0 0 30px rgba(255, 69, 0, 0.5),
-    0 20px 60px rgba(0, 0, 0, 1),
-    inset -10px 0 20px rgba(255, 69, 0, 0.2);
-  animation: slideUp 0.4s ease;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
-}
 
 @keyframes slideUp {
   from {
