@@ -211,6 +211,11 @@
           </div>
         </div>
 
+        <!-- Analytics Tab -->
+        <div v-show="activeTab === 'analytics'" class="tab-content">
+          <WatchAnalytics @close="activeTab = 'overview'" />
+        </div>
+
         <!-- Settings Tab -->
         <div v-show="activeTab === 'settings'" class="tab-content">
           <div class="dashboard-card">
@@ -352,11 +357,13 @@ import {
   Loader2,
   Layout,
   Calendar,
+  BarChart3,
 } from "lucide-vue-next";
 import { useAuth } from "../composables/useAuth";
 import { useSubscription } from "../composables/useSubscription";
 import AccountSettings from "../components/AccountSettings.vue";
 import PaymentScreenshotUpload from "../components/PaymentScreenshotUpload.vue";
+import WatchAnalytics from "../components/WatchAnalytics.vue";
 import { formatDate } from "../utils/date";
 
 const router = useRouter();
@@ -374,6 +381,7 @@ const activeTab = ref("overview");
 
 const tabs = [
   { id: "overview", label: "Overview", icon: Layout },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "profile", label: "Profile", icon: User },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "subscription", label: "Subscription", icon: Crown },

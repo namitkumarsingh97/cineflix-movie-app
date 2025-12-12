@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import { useGuestSession } from './useGuestSession';
 
 const WATCH_HISTORY_KEY = 'watchHistory';
 const FAVORITES_KEY = 'favorites';
@@ -6,8 +7,16 @@ const MAX_HISTORY_ITEMS = 50;
 
 // Watch History Functions
 export function useWatchHistory() {
+  const { getGuestSessionId, updateLastActivity, isGuest } = useGuestSession();
+  
   const getWatchHistory = () => {
     try {
+      // Ensure guest session exists
+      if (isGuest()) {
+        getGuestSessionId();
+        updateLastActivity();
+      }
+      
       const history = localStorage.getItem(WATCH_HISTORY_KEY);
       return history ? JSON.parse(history) : [];
     } catch (error) {
@@ -18,6 +27,12 @@ export function useWatchHistory() {
 
   const addToHistory = (item) => {
     try {
+      // Ensure guest session exists and update activity
+      if (isGuest()) {
+        getGuestSessionId();
+        updateLastActivity();
+      }
+      
       const history = getWatchHistory();
       const { id, title, thumbnail, type, category } = item;
       
@@ -33,7 +48,8 @@ export function useWatchHistory() {
         category,
         watchedAt: new Date().toISOString(),
         progress: 0, // 0-100 percentage
-        duration: item.duration || 0
+        duration: item.duration || 0,
+        sessionId: isGuest() ? getGuestSessionId() : null, // Track which session added this
       };
       
       filtered.unshift(newItem);
@@ -104,8 +120,16 @@ export function useWatchHistory() {
 
 // Favorites Functions
 export function useFavorites() {
+  const { getGuestSessionId, updateLastActivity, isGuest } = useGuestSession();
+  
   const getFavorites = () => {
     try {
+      // Ensure guest session exists
+      if (isGuest()) {
+        getGuestSessionId();
+        updateLastActivity();
+      }
+      
       const favorites = localStorage.getItem(FAVORITES_KEY);
       return favorites ? JSON.parse(favorites) : [];
     } catch (error) {
@@ -116,6 +140,12 @@ export function useFavorites() {
 
   const addToFavorites = (item) => {
     try {
+      // Ensure guest session exists and update activity
+      if (isGuest()) {
+        getGuestSessionId();
+        updateLastActivity();
+      }
+      
       const favorites = getFavorites();
       const { id, title, thumbnail, type, category } = item;
       
@@ -130,7 +160,8 @@ export function useFavorites() {
         thumbnail,
         type,
         category,
-        favoritedAt: new Date().toISOString()
+        favoritedAt: new Date().toISOString(),
+        sessionId: isGuest() ? getGuestSessionId() : null, // Track which session added this
       };
       
       favorites.unshift(newItem);

@@ -577,6 +577,15 @@ const routes = [
     }
   },
   {
+    path: '/analytics',
+    name: 'Analytics',
+    component: () => import('../pages/Analytics.vue'),
+    meta: {
+      requiresAuth: false, // Accessible to guests
+      title: 'Watch Analytics'
+    }
+  },
+  {
     path: '/stories',
     name: 'Stories',
     component: () => import('../pages/Stories.vue'),

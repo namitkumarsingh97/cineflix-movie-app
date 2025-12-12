@@ -282,6 +282,7 @@ import { useEporner } from '../composables/useEporner';
 import { useVideos } from '../composables/useVideos';
 import { useMovies } from '../composables/useMovies';
 import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
+import { useSmartQueue } from '../composables/useSmartQueue';
 import { useDownloads } from '../composables/useDownloads';
 import { useWatchLater } from '../composables/useWatchLater';
 import { useStarFollows } from '../composables/useStarFollows';
@@ -314,6 +315,8 @@ const loading = ref(true);
 const { videos, loadVideos } = useVideos();
 const { movies, loadMovies } = useMovies();
 const { getVideoById, videos: epornerVideos, searchVideos } = useEporner();
+const { initializeSmartQueue, predictedVideos, isPreloading } = useSmartQueue();
+const { initializeSmartQueue, predictedVideos, isPreloading } = useSmartQueue();
 
 const videoId = computed(() => route.params.id);
 const isMovie = ref(false);
@@ -1169,8 +1172,19 @@ function handleTimeUpdate(time) {
   }
 }
 
-function handlePlay() {
-  // Video started playing
+async function handlePlay() {
+  // Video started playing - initialize smart queue
+  if (video.value) {
+    // Get all available videos for prediction
+    const allVideos = [
+      ...epornerVideos.value,
+      ...videos.value,
+      ...movies.value
+    ];
+    
+    // Initialize smart queue to predict and pre-load next videos
+    await initializeSmartQueue(video.value, allVideos);
+  }
 }
 
 function handlePause() {

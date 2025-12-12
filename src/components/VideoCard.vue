@@ -2,7 +2,7 @@
   <div class="youtube-video-card" @click="handleClick">
     <div class="video-thumbnail-wrapper">
       <OptimizedImage
-        :src="video.thumbnail || getDefaultThumbnail()"
+        :src="personalizedThumbnail"
         :alt="video.title"
         :loading="shouldPreloadThumbnails ? 'eager' : 'lazy'"
         :fetchpriority="shouldPreloadThumbnails ? 'high' : 'auto'"
@@ -44,12 +44,28 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { formatDuration } from '../utils/date';
 import { Star } from 'lucide-vue-next';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
+import { useAIThumbnails } from '../composables/useAIThumbnails';
 import OptimizedImage from './OptimizedImage.vue';
 
 const { shouldPreloadThumbnails } = useNetworkQuality();
+const { getOptimizedThumbnail } = useAIThumbnails();
+
+// Get network quality for thumbnail optimization
+const networkQuality = computed(() => {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  return connection?.effectiveType || '4g';
+});
+
+// Get personalized thumbnail
+const personalizedThumbnail = computed(() => {
+  const defaultThumb = props.video.thumbnail || getDefaultThumbnail();
+  const optimized = getOptimizedThumbnail(props.video, defaultThumb, networkQuality.value);
+  return optimized.url;
+});
 
 const props = defineProps({
   video: {
