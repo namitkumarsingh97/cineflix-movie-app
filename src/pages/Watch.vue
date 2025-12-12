@@ -180,6 +180,29 @@
               @scene-click="handleSceneJump"
             />
 
+            <!-- Related Videos Section -->
+            <div v-if="recommendations.length > 0" class="related-videos-section">
+              <h2 class="related-videos-title">Related Videos</h2>
+              <div class="related-videos-grid">
+                <template v-if="isEporner || (!isMovie && !isEporner)">
+                  <VideoCard
+                    v-for="recVideo in recommendations"
+                    :key="recVideo.id || recVideo._id"
+                    :video="recVideo"
+                    @click="navigateToVideo(recVideo)"
+                  />
+                </template>
+                <template v-else-if="isMovie">
+                  <MovieCard
+                    v-for="recMovie in recommendations"
+                    :key="recMovie._id"
+                    :movie="recMovie"
+                    @click="navigateToVideo(recMovie)"
+                  />
+                </template>
+              </div>
+            </div>
+
             <!-- Related Content Section -->
             <div v-if="relatedContent.length > 0" class="related-section">
               <h2 class="related-title">Related Content</h2>
@@ -251,30 +274,6 @@
         </div>
       </div>
 
-      <!-- Sidebar with Recommendations -->
-      <div class="watch-sidebar">
-        <div class="recommendations-header">
-          <h3>Up next</h3>
-        </div>
-        <div class="recommendations-list">
-          <template v-if="isEporner || (!isMovie && !isEporner)">
-            <VideoCard
-              v-for="recVideo in recommendations"
-              :key="recVideo.id || recVideo._id"
-              :video="recVideo"
-              @click="navigateToVideo(recVideo)"
-            />
-          </template>
-          <template v-else-if="isMovie">
-            <MovieCard
-              v-for="recMovie in recommendations"
-              :key="recMovie._id"
-              :movie="recMovie"
-              @click="navigateToVideo(recMovie)"
-            />
-          </template>
-        </div>
-      </div>
     </div>
     
     <!-- Because You Watched Section - Outside container for full width -->
@@ -1216,6 +1215,7 @@ onBeforeUnmount(() => {
   max-width: 1600px;
   margin: 0 auto;
   display: flex;
+  flex-direction: column;
   gap: 24px;
   width: 100%;
   box-sizing: border-box;
@@ -1238,8 +1238,7 @@ onBeforeUnmount(() => {
 }
 
 .watch-main {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -1289,23 +1288,11 @@ onBeforeUnmount(() => {
     min-height: 350px;
     max-height: calc(100vh - 180px);
   }
-
-  .watch-sidebar {
-    width: 300px;
-  }
 }
 
 @media (max-width: 900px) {
   .watch-page {
     padding: 16px 16px 16px 0;
-  }
-
-  .watch-sidebar {
-    width: 280px;
-  }
-
-  .recommendations-list {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }
 
@@ -1593,70 +1580,64 @@ onBeforeUnmount(() => {
   white-space: pre-wrap;
 }
 
-.watch-sidebar {
-  width: 402px;
-  flex-shrink: 0;
-  max-width: 100%;
-  box-sizing: border-box;
+/* Related Videos Section */
+.related-videos-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Large screens (L screens and above) */
-@media (min-width: 1920px) {
-  .watch-sidebar {
-    width: 450px;
-  }
-}
-
-/* 4K screens */
-@media (min-width: 2560px) {
-  .watch-sidebar {
-    width: 500px;
-  }
-}
-
-.recommendations-header {
-  margin-bottom: 16px;
-}
-
-.recommendations-header h3 {
-  font-size: 16px;
+.related-videos-title {
+  font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0;
+  margin: 0 0 20px 0;
 }
 
-.recommendations-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Responsive breakpoints */
-@media (max-width: 1400px) {
-  .watch-sidebar {
-    width: 360px;
-  }
+.related-videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
 }
 
 @media (max-width: 1200px) {
-  .watch-sidebar {
-    width: 320px;
+  .related-videos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
   }
 }
 
-@media (max-width: 1024px) {
-  .watch-container {
-    flex-direction: column;
+@media (max-width: 768px) {
+  .related-videos-section {
+    margin-top: 24px;
+    padding-top: 20px;
   }
-  
-  .watch-sidebar {
-    width: 100%;
+
+  .related-videos-title {
+    font-size: 18px;
+    margin-bottom: 16px;
   }
-  
-  .recommendations-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+
+  .related-videos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .related-videos-section {
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+
+  .related-videos-title {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .related-videos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
   }
 }
 
@@ -2094,14 +2075,6 @@ onBeforeUnmount(() => {
     font-size: 13px;
   }
 
-  .recommendations-header h3 {
-    font-size: 15px;
-  }
-
-  .recommendations-list {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 12px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -2307,14 +2280,6 @@ onBeforeUnmount(() => {
     font-size: 12px;
   }
 
-  .recommendations-header h3 {
-    font-size: 14px;
-  }
-
-  .recommendations-list {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-  }
 }
 
 /* Touch device optimizations */
