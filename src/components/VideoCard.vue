@@ -51,22 +51,6 @@ import { useNetworkQuality } from '../composables/useNetworkQuality';
 import { useAIThumbnails } from '../composables/useAIThumbnails';
 import OptimizedImage from './OptimizedImage.vue';
 
-const { shouldPreloadThumbnails } = useNetworkQuality();
-const { getOptimizedThumbnail } = useAIThumbnails();
-
-// Get network quality for thumbnail optimization
-const networkQuality = computed(() => {
-  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  return connection?.effectiveType || '4g';
-});
-
-// Get personalized thumbnail
-const personalizedThumbnail = computed(() => {
-  const defaultThumb = props.video.thumbnail || getDefaultThumbnail();
-  const optimized = getOptimizedThumbnail(props.video, defaultThumb, networkQuality.value);
-  return optimized.url;
-});
-
 const props = defineProps({
   video: {
     type: Object,
@@ -80,12 +64,37 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 
-function handleClick() {
-  emit('click', props.video);
-}
+const { shouldPreloadThumbnails } = useNetworkQuality();
+const { getOptimizedThumbnail } = useAIThumbnails();
 
 function getDefaultThumbnail() {
   return 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video';
+}
+
+// Get network quality for thumbnail optimization
+const networkQuality = computed(() => {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  return connection?.effectiveType || '4g';
+});
+
+// Get personalized thumbnail
+const personalizedThumbnail = computed(() => {
+  if (!props.video) {
+    return getDefaultThumbnail();
+  }
+  
+  try {
+    const defaultThumb = props.video.thumbnail || getDefaultThumbnail();
+    const optimized = getOptimizedThumbnail(props.video, defaultThumb, networkQuality.value);
+    return optimized?.url || defaultThumb;
+  } catch (error) {
+    console.error('Error getting personalized thumbnail:', error);
+    return props.video.thumbnail || getDefaultThumbnail();
+  }
+});
+
+function handleClick() {
+  emit('click', props.video);
 }
 
 function handleThumbnailError(event) {
