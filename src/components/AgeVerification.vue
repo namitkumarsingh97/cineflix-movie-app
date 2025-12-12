@@ -2,61 +2,68 @@
   <div v-if="!isVerified" class="age-verification-overlay">
     <div class="age-verification-modal">
       <div class="modal-content">
-        <h1 class="verification-title">
-          YOU MUST BE OVER 18 AND AGREE TO THE TERMS BELOW BEFORE CONTINUING:
-        </h1>
+        <div class="content-wrapper">
+          <div class="main-content">
+            <h1 class="verification-title">
+              YOU MUST BE OVER 18 AND AGREE TO THE TERMS BELOW BEFORE CONTINUING:
+            </h1>
 
-        <div class="terms-content">
-          <p class="terms-text">
-            This website contains information, links, images and videos of sexually explicit material (collectively, the "Sexually Explicit Material"). Do NOT continue if: (i) you are not at least 18 years of age or the age of majority in each and every jurisdiction in which you will or may view the Sexually Explicit Material, whichever is higher (the "Age of Majority"), (ii) such material offends you, or (iii) viewing the Sexually Explicit Material is not legal in each and every community where you choose to view it.
-          </p>
+            <div class="terms-content">
+              <p class="terms-text">
+                This website contains information, links, images and videos of sexually explicit material (collectively, the "Sexually Explicit Material"). Do NOT continue if: (i) you are not at least 18 years of age or the age of majority in each and every jurisdiction in which you will or may view the Sexually Explicit Material, whichever is higher (the "Age of Majority"), (ii) such material offends you, or (iii) viewing the Sexually Explicit Material is not legal in each and every community where you choose to view it.
+              </p>
 
-          <p class="terms-text">
-            By choosing to enter this website you are affirming under oath and penalties of perjury pursuant to Title 28 U.S.C. § 1746 and other applicable statutes and laws that all of the following statements are true and correct:
-          </p>
+              <p class="terms-text">
+                By choosing to enter this website you are affirming under oath and penalties of perjury pursuant to Title 28 U.S.C. § 1746 and other applicable statutes and laws that all of the following statements are true and correct:
+              </p>
 
-          <ul class="terms-list">
-            <li>I have attained the Age of Majority in my jurisdiction;</li>
-            <li>The sexually explicit material I am viewing is for my own personal use and I will not expose any minors to the material;</li>
-            <li>I desire to receive/view sexually explicit material;</li>
-            <li>I believe that as an adult it is my inalienable constitutional right to receive/view sexually explicit material;</li>
-          </ul>
+              <ul class="terms-list">
+                <li>I have attained the Age of Majority in my jurisdiction;</li>
+                <li>The sexually explicit material I am viewing is for my own personal use and I will not expose any minors to the material;</li>
+                <li>I desire to receive/view sexually explicit material;</li>
+                <li>I believe that as an adult it is my inalienable constitutional right to receive/view sexually explicit material;</li>
+              </ul>
 
-          <p class="warning-text">
-            THIS SITE ACTIVELY COOPERATES WITH LAW ENFORCEMENT IN ALL INSTANCES OF SUSPECTED ILLEGAL USE OF THE SERVICE, ESPECIALLY IN THE CASE OF UNDERAGE USAGE OF THE SERVICE.
-          </p>
-        </div>
+              <p class="warning-text">
+                THIS SITE ACTIVELY COOPERATES WITH LAW ENFORCEMENT IN ALL INSTANCES OF SUSPECTED ILLEGAL USE OF THE SERVICE, ESPECIALLY IN THE CASE OF UNDERAGE USAGE OF THE SERVICE.
+              </p>
+            </div>
 
-        <div class="modal-actions">
-          <button class="exit-btn" @click="exitSite">
-            Exit
-          </button>
-          <button class="agree-btn" @click="agreeAndEnter">
-            I AGREE
-          </button>
-        </div>
+            <div class="modal-actions">
+              <button class="exit-btn" @click="exitSite">
+                Exit
+              </button>
+              <button class="agree-btn" @click="agreeAndEnter">
+                I AGREE
+              </button>
+            </div>
 
-        <div class="compliance-badges">
-          <div class="badge-item">
-            <div class="badge-checkbox"></div>
-            <div class="badge-text">
-              <span class="badge-title">SafeLabeling</span>
-              <span class="badge-subtitle">COMPLIANT</span>
+            <div class="compliance-badges">
+              <div class="badge-item">
+                <div class="badge-checkbox"></div>
+                <div class="badge-text">
+                  <span class="badge-title">SafeLabeling</span>
+                  <span class="badge-subtitle">COMPLIANT</span>
+                </div>
+              </div>
+              <div class="badge-item">
+                <div class="badge-logo rta-logo">RTA®</div>
+                <div class="badge-text">
+                  <span class="badge-subtitle">VERIFIED</span>
+                </div>
+              </div>
+              <div class="badge-item">
+                <div class="badge-logo asacp-logo">ASACP</div>
+                <div class="badge-checkbox checked"></div>
+                <div class="badge-text">
+                  <span class="badge-subtitle">APPROVED MEMBER</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="badge-item">
-            <div class="badge-logo rta-logo">RTA®</div>
-            <div class="badge-text">
-              <span class="badge-subtitle">VERIFIED</span>
-            </div>
-          </div>
-          <div class="badge-item">
-            <div class="badge-logo asacp-logo">ASACP</div>
-            <div class="badge-text">
-              <div class="badge-checkbox checked"></div>
-              <span class="badge-subtitle">APPROVED MEMBER</span>
-            </div>
-          </div>
+          
+          <!-- Vertical bar with orange gradient -->
+          <div class="vertical-bar"></div>
         </div>
       </div>
     </div>
@@ -189,7 +196,7 @@ watch(isVerified, (verified) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 0.98);
   backdrop-filter: blur(10px);
   z-index: 99999;
   display: flex;
@@ -214,12 +221,13 @@ watch(isVerified, (verified) => {
 }
 
 .age-verification-modal {
-  background: white;
+  background: #2a2a2a;
+  border: 2px solid #ff4500;
   border-radius: 12px;
-  max-width: 800px;
+  max-width: 900px;
   width: 100%;
   max-height: 90vh;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   animation: slideUp 0.4s ease;
   overflow: hidden;
   display: flex;
@@ -238,18 +246,34 @@ watch(isVerified, (verified) => {
 }
 
 .modal-content {
+  padding: 0;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.content-wrapper {
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
   padding: 40px;
   overflow-y: auto;
-  flex: 1;
+  padding-right: 60px;
 }
 
 .verification-title {
   font-size: 18px;
   font-weight: 700;
-  color: #000;
+  color: #d0d0d0;
   margin: 0 0 24px 0;
   text-transform: uppercase;
   line-height: 1.4;
+  letter-spacing: 0.5px;
 }
 
 .terms-content {
@@ -258,8 +282,8 @@ watch(isVerified, (verified) => {
 
 .terms-text {
   font-size: 13px;
-  color: #333;
-  line-height: 1.6;
+  color: #b0b0b0;
+  line-height: 1.7;
   margin-bottom: 16px;
 }
 
@@ -271,21 +295,24 @@ watch(isVerified, (verified) => {
 
 .terms-list li {
   font-size: 13px;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 8px;
+  color: #b0b0b0;
+  line-height: 1.7;
+  margin-bottom: 10px;
 }
 
 .warning-text {
   font-size: 13px;
   font-weight: 700;
-  color: #d32f2f;
+  color: #ff4444;
   text-transform: uppercase;
-  margin-top: 20px;
+  margin-top: 24px;
   padding: 12px;
-  background: rgba(211, 47, 47, 0.1);
-  border-left: 4px solid #d32f2f;
-  line-height: 1.5;
+  background: rgba(255, 68, 68, 0.1);
+  border-left: 4px solid #ff4444;
+  line-height: 1.6;
+  text-decoration: underline;
+  text-decoration-color: #ff4444;
+  letter-spacing: 0.5px;
 }
 
 .modal-actions {
@@ -293,16 +320,16 @@ watch(isVerified, (verified) => {
   gap: 16px;
   margin-bottom: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .exit-btn {
   flex: 1;
-  padding: 12px 24px;
-  background: white;
-  border: 1px solid #000;
+  padding: 14px 24px;
+  background: transparent;
+  border: 1px solid #666;
   border-radius: 6px;
-  color: #000;
+  color: #d0d0d0;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -310,12 +337,13 @@ watch(isVerified, (verified) => {
 }
 
 .exit-btn:hover {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #888;
 }
 
 .agree-btn {
   flex: 1;
-  padding: 12px 24px;
+  padding: 14px 24px;
   background: #ff4500;
   border: none;
   border-radius: 6px;
@@ -331,7 +359,7 @@ watch(isVerified, (verified) => {
 .agree-btn:hover {
   background: #ff6b35;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
 }
 
 .compliance-badges {
@@ -340,7 +368,7 @@ watch(isVerified, (verified) => {
   align-items: center;
   gap: 32px;
   padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
 }
 
@@ -353,13 +381,15 @@ watch(isVerified, (verified) => {
 .badge-checkbox {
   width: 16px;
   height: 16px;
-  border: 2px solid #000;
+  border: 2px solid #d0d0d0;
   border-radius: 2px;
   flex-shrink: 0;
+  background: transparent;
 }
 
 .badge-checkbox.checked {
-  background: #000;
+  background: #ff4500;
+  border-color: #ff4500;
   position: relative;
 }
 
@@ -377,7 +407,7 @@ watch(isVerified, (verified) => {
 .badge-logo {
   font-size: 18px;
   font-weight: 700;
-  color: #000;
+  color: #d0d0d0;
   flex-shrink: 0;
 }
 
@@ -400,21 +430,38 @@ watch(isVerified, (verified) => {
 .badge-title {
   font-size: 11px;
   font-weight: 600;
-  color: #000;
+  color: #d0d0d0;
 }
 
 .badge-subtitle {
   font-size: 10px;
   font-weight: 600;
-  color: #666;
+  color: #b0b0b0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
+/* Vertical bar with orange gradient */
+.vertical-bar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: white;
+  background: linear-gradient(to right, rgba(255, 69, 0, 0.3) 0%, rgba(255, 255, 255, 0.9) 100%);
+  z-index: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .modal-content {
+  .main-content {
     padding: 24px 20px;
+    padding-right: 20px;
+  }
+
+  .vertical-bar {
+    display: none;
   }
 
   .verification-title {
@@ -446,7 +493,7 @@ watch(isVerified, (verified) => {
 }
 
 @media (max-width: 480px) {
-  .modal-content {
+  .main-content {
     padding: 20px 16px;
   }
 
