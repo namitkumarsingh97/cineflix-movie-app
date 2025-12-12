@@ -1473,17 +1473,16 @@ onBeforeUnmount(() => {
   border-radius: 12px 12px 0 0;
 }
 
-/* Overlay to hide Eporner banner at top */
+/* Overlay to block clicks on Eporner banner (transparent, no color) */
 .eporner-banner-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 90px; /* Covers the banner with download icon and yellow text */
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.98) 30%, rgba(0, 0, 0, 0.95) 60%, rgba(0, 0, 0, 0) 100%);
+  background: transparent; /* No color, completely transparent */
   z-index: 100; /* Above the iframe */
-  pointer-events: auto; /* Block clicks on the banner area */
-  border-radius: 12px 12px 0 0;
+  pointer-events: auto; /* Block clicks on the banner area to prevent redirects */
 }
 
 /* Ensure iframe is below overlay */
