@@ -316,7 +316,6 @@ const { videos, loadVideos } = useVideos();
 const { movies, loadMovies } = useMovies();
 const { getVideoById, videos: epornerVideos, searchVideos } = useEporner();
 const { initializeSmartQueue, predictedVideos, isPreloading } = useSmartQueue();
-const { initializeSmartQueue, predictedVideos, isPreloading } = useSmartQueue();
 
 const videoId = computed(() => route.params.id);
 const isMovie = ref(false);
