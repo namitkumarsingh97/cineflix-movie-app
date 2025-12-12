@@ -44,42 +44,24 @@
                 loading="lazy"
               ></iframe>
             </div>
-            <!-- Video tag for S3 videos -->
-            <video
+            <!-- Modern Video Player for S3 videos -->
+            <ModernVideoPlayer
               v-else-if="video && video.url && !isEporner && (!video.isPremium || isPremium)"
-              ref="videoPlayer"
-              :src="isHlsSource ? '' : video.url"
-              controls
+              :src="video.url"
+              :poster="video.thumbnail"
               :autoplay="shouldAutoplay"
-              :preload="shouldAutoplay ? 'auto' : 'metadata'"
-              playsinline
-              class="watch-video-player"
-              @loadedmetadata="handleVideoLoaded"
-              @timeupdate="handleTimeUpdate"
+              :muted="false"
+              :is-hls="isHlsSource"
               @play="handlePlay"
               @pause="handlePause"
-            >
-              Your browser does not support the video tag.
-            </video>
+              @ended="handleEnded"
+              @timeupdate="handleTimeUpdate"
+              @volumechange="handleVolumeChange"
+              @fullscreenchange="handleFullscreenChange"
+            />
             
             <!-- Loading State -->
             <Loader v-if="loading" message="Loading video..." />
-            
-            <!-- Playback Speed Control -->
-            <div v-else-if="video && video.url && videoPlayer" class="playback-controls">
-              <div class="speed-control">
-                <label>Speed:</label>
-                <select v-model="playbackSpeed" @change="changePlaybackSpeed" class="speed-select">
-                  <option value="0.5">0.5x</option>
-                  <option value="0.75">0.75x</option>
-                  <option value="1">1x</option>
-                  <option value="1.25">1.25x</option>
-                  <option value="1.5">1.5x</option>
-                  <option value="1.75">1.75x</option>
-                  <option value="2">2x</option>
-                </select>
-              </div>
-            </div>
           </div>
 
           <!-- Video Info -->
@@ -309,6 +291,7 @@ import MovieCard from '../components/MovieCard.vue';
 import SceneNavigation from '../components/SceneNavigation.vue';
 import BecauseYouWatched from '../components/BecauseYouWatched.vue';
 import Loader from '../components/Loader.vue';
+import ModernVideoPlayer from '../components/ModernVideoPlayer.vue';
 import {
   ThumbsUp,
   ThumbsDown,
@@ -1133,16 +1116,18 @@ function changePlaybackSpeed() {
   }
 }
 
-function handleTimeUpdate() {
-  if (videoPlayer.value && video.value) {
-    const currentTime = videoPlayer.value.currentTime;
-    const duration = videoPlayer.value.duration;
-    if (duration > 0) {
-      const progress = Math.round((currentTime / duration) * 100);
-      updateProgress(video.value._id || video.value.id, progress, duration);
+function handleTimeUpdate(time) {
+  if (video.value) {
+    // Time can come from ModernVideoPlayer event or from videoPlayer ref
+    const currentTimeValue = time !== undefined ? time : (videoPlayer.value?.currentTime || 0);
+    const durationValue = videoPlayer.value?.duration || 0;
+    
+    if (durationValue > 0) {
+      const progress = Math.round((currentTimeValue / durationValue) * 100);
+      updateProgress(video.value._id || video.value.id, progress, durationValue);
       
       // Update current scene
-      const sceneAtTime = getSceneAtTime(currentTime);
+      const sceneAtTime = getSceneAtTime(currentTimeValue);
       if (sceneAtTime && (!currentScene.value || sceneAtTime.id !== currentScene.value.id)) {
         currentScene.value = sceneAtTime;
       }
