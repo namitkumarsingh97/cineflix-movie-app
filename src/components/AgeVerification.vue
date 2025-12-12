@@ -61,9 +61,6 @@
               </div>
             </div>
           </div>
-          
-          <!-- Vertical bar with orange gradient -->
-          <div class="vertical-bar"></div>
         </div>
       </div>
     </div>
@@ -196,9 +193,8 @@ watch(isVerified, (verified) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.98);
-  backdrop-filter: blur(10px);
-  z-index: 99999;
+  background: #000000;
+  z-index: 999999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,6 +205,13 @@ watch(isVerified, (verified) => {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  isolation: isolate;
+  pointer-events: auto;
+}
+
+/* Hide all content behind the overlay */
+.age-verification-overlay ~ * {
+  visibility: hidden;
 }
 
 @keyframes fadeIn {
@@ -222,16 +225,23 @@ watch(isVerified, (verified) => {
 
 .age-verification-modal {
   background: #2a2a2a;
-  border: 2px solid #ff4500;
+  border: 3px solid #ff4500;
+  border-left: 8px solid #ff4500;
   border-radius: 12px;
   max-width: 900px;
   width: 100%;
   max-height: 90vh;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  box-shadow: 
+    0 0 0 1px rgba(255, 69, 0, 0.3),
+    0 0 30px rgba(255, 69, 0, 0.5),
+    0 20px 60px rgba(0, 0, 0, 1),
+    inset -10px 0 20px rgba(255, 69, 0, 0.2);
   animation: slideUp 0.4s ease;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes slideUp {
@@ -441,16 +451,28 @@ watch(isVerified, (verified) => {
   letter-spacing: 0.5px;
 }
 
-/* Vertical bar with orange gradient */
+/* Vertical bar with orange gradient - 3D spine effect */
 .vertical-bar {
   position: absolute;
-  right: 0;
+  left: -8px;
   top: 0;
   bottom: 0;
-  width: 40px;
-  background: white;
-  background: linear-gradient(to right, rgba(255, 69, 0, 0.3) 0%, rgba(255, 255, 255, 0.9) 100%);
-  z-index: 1;
+  width: 12px;
+  background: linear-gradient(
+    to right,
+    rgba(255, 200, 100, 0.9) 0%,
+    rgba(255, 150, 50, 0.8) 20%,
+    rgba(255, 100, 0, 0.9) 50%,
+    rgba(200, 80, 0, 0.8) 80%,
+    rgba(150, 60, 0, 0.7) 100%
+  );
+  border-left: 2px solid #ff4500;
+  border-right: 2px solid rgba(255, 69, 0, 0.5);
+  box-shadow: 
+    inset -2px 0 10px rgba(255, 200, 100, 0.5),
+    2px 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  border-radius: 4px 0 0 4px;
 }
 
 /* Responsive */
