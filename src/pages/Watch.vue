@@ -107,16 +107,6 @@
                   <Clock :size="20" />
                   <span>{{ isWatchLater ? 'Saved' : 'Watch Later' }}</span>
                 </button>
-                <button
-                  v-if="followTarget"
-                  class="action-btn"
-                  :class="{ active: isFollowingStar }"
-                  @click="toggleFollowStar"
-                  title="Follow star or creator"
-                >
-                  <Star :size="20" />
-                  <span>{{ isFollowingStar ? 'Following' : 'Follow' }}</span>
-                </button>
               </div>
             </div>
 
@@ -185,25 +175,21 @@
             </div>
 
             <div class="channel-info">
-              <div class="channel-header">
-                <div class="channel-avatar-large">
-                  {{ getInitials(video.channel || 'MovieHub') }}
-                </div>
-                <div class="channel-details">
-                  <h3 class="channel-name-main">{{ video.channel || 'MovieHub' }}</h3>
-                  <p class="subscriber-count" v-if="!isMovie">{{ formatViews(video.subscribers || 0) }} subscribers</p>
-                </div>
-                <button 
-                  class="subscribe-btn" 
-                  v-if="!isMovie"
-                  @click="handleFollowCreator"
-                  :class="{ active: isCreatorFollowed }"
-                >
-                  {{ isCreatorFollowed ? 'Following' : 'Follow Creator' }}
-                </button>
-              </div>
               <div class="video-description" v-if="video.description">
                 <p>{{ video.description }}</p>
+              </div>
+              <!-- Tags Section -->
+              <div v-if="videoTags.length > 0" class="video-tags-section">
+                <div class="tags-container">
+                  <span
+                    v-for="(tag, index) in videoTags"
+                    :key="index"
+                    class="tag-item"
+                    @click="navigateToTag(tag)"
+                  >
+                    {{ tag }}
+                  </span>
+                </div>
               </div>
             </div>
             
@@ -475,6 +461,20 @@ const isCreatorFollowed = computed(() => {
   if (!creatorInfo.value) return false;
   return checkCreatorFollowed(creatorInfo.value.id);
 });
+
+// Get video tags/categories for display
+const videoTags = computed(() => {
+  if (!video.value) return [];
+  // Combine categories and tags, remove duplicates
+  const allTags = [
+    ...(video.value.categories || []),
+    ...(video.value.category ? [video.value.category] : []),
+    ...(video.value.tags || [])
+  ];
+  // Remove duplicates and empty values
+  return [...new Set(allTags.filter(tag => tag && tag.trim()))];
+});
+
 const primaryStar = computed(() => {
   if (!video.value) return '';
   if (Array.isArray(video.value.stars) && video.value.stars.length) return video.value.stars[0];
@@ -1414,6 +1414,13 @@ async function submitComment() {
   }
 }
 
+function navigateToTag(tag) {
+  if (!tag) return;
+  // Navigate to tag page with encoded tag name
+  const encodedTag = encodeURIComponent(tag.trim());
+  router.push(`/tag/${encodedTag}`);
+}
+
 function navigateToVideo(video) {
   const source = video._source === 'eporner' ? '?source=eporner' : '';
   router.push(`/watch/${video.id || video._id}${source}`);
@@ -2048,6 +2055,38 @@ onBeforeUnmount(() => {
   font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
+}
+
+.video-tags-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-item {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--dark-lighter, #2a2a3e);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--text-primary, #ffffff);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tag-item:hover {
+  background: var(--primary, #ff4500);
+  border-color: var(--primary, #ff4500);
+  color: white;
+  transform: translateY(-1px);
 }
 
 /* Related Videos Section */

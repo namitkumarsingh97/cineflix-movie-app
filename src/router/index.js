@@ -538,6 +538,15 @@ const routes = [
     }
   },
   {
+    path: '/tag/:tag',
+    name: 'Tag',
+    component: () => import('../pages/Tag.vue'),
+    meta: {
+      preload: false,
+      title: 'Tag Videos'
+    }
+  },
+  {
     path: '/premium',
     name: 'Premium',
     component: () => import('../pages/Premium.vue'),
