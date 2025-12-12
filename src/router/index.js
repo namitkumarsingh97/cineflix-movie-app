@@ -547,6 +547,249 @@ const routes = [
     }
   },
   {
+    path: '/actors',
+    name: 'Actors',
+    component: () => import('../pages/Actors.vue'),
+    meta: {
+      preload: false,
+      title: 'Actors'
+    }
+  },
+  {
+    path: '/abella-danger',
+    name: 'AbellaDanger',
+    component: () => import('../pages/AbellaDanger.vue'),
+    meta: {
+      preload: false,
+      title: 'Abella Danger'
+    }
+  },
+  {
+    path: '/aj-applegate',
+    name: 'AJApplegate',
+    component: () => import('../pages/AJApplegate.vue'),
+    meta: {
+      preload: false,
+      title: 'AJ Applegate'
+    }
+  },
+  {
+    path: '/aaliyah-hadid',
+    name: 'AaliyahHadid',
+    component: () => import('../pages/AaliyahHadid.vue'),
+    meta: {
+      preload: false,
+      title: 'Aaliyah Hadid'
+    }
+  },
+  {
+    path: '/aaliyah-love',
+    name: 'AaliyahLove',
+    component: () => import('../pages/AaliyahLove.vue'),
+    meta: {
+      preload: false,
+      title: 'Aaliyah Love'
+    }
+  },
+  {
+    path: '/abigaile-johnson',
+    name: 'AbigaileJohnson',
+    component: () => import('../pages/AbigaileJohnson.vue'),
+    meta: {
+      preload: false,
+      title: 'Abigaile Johnson'
+    }
+  },
+  {
+    path: '/adira-allure',
+    name: 'AdiraAllure',
+    component: () => import('../pages/AdiraAllure.vue'),
+    meta: {
+      preload: false,
+      title: 'Adira Allure'
+    }
+  },
+  {
+    path: '/adria-rae',
+    name: 'AdriaRae',
+    component: () => import('../pages/AdriaRae.vue'),
+    meta: {
+      preload: false,
+      title: 'Adria Rae'
+    }
+  },
+  {
+    path: '/adriana-chechik',
+    name: 'AdrianaChechik',
+    component: () => import('../pages/AdrianaChechik.vue'),
+    meta: {
+      preload: false,
+      title: 'Adriana Chechik'
+    }
+  },
+  {
+    path: '/aletta-ocean',
+    name: 'AlettaOcean',
+    component: () => import('../pages/AlettaOcean.vue'),
+    meta: {
+      preload: false,
+      title: 'Aletta Ocean'
+    }
+  },
+  {
+    path: '/alex-blake',
+    name: 'AlexBlake',
+    component: () => import('../pages/AlexBlake.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Blake'
+    }
+  },
+  {
+    path: '/alex-chance',
+    name: 'AlexChance',
+    component: () => import('../pages/AlexChance.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Chance'
+    }
+  },
+  {
+    path: '/alex-coal',
+    name: 'AlexCoal',
+    component: () => import('../pages/AlexCoal.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Coal'
+    }
+  },
+  {
+    path: '/alex-de-la-flor',
+    name: 'AlexDeLaFlor',
+    component: () => import('../pages/AlexDeLaFlor.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex De La Flor'
+    }
+  },
+  {
+    path: '/alex-gonz',
+    name: 'AlexGonz',
+    component: () => import('../pages/AlexGonz.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Gonz'
+    }
+  },
+  {
+    path: '/alex-grey',
+    name: 'AlexGrey',
+    component: () => import('../pages/AlexGrey.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Grey'
+    }
+  },
+  {
+    path: '/alex-harper',
+    name: 'AlexHarper',
+    component: () => import('../pages/AlexHarper.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Harper'
+    }
+  },
+  {
+    path: '/alex-jett',
+    name: 'AlexJett',
+    component: () => import('../pages/AlexJett.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Jett'
+    }
+  },
+  {
+    path: '/alex-jones',
+    name: 'AlexJones',
+    component: () => import('../pages/AlexJones.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Jones'
+    }
+  },
+  {
+    path: '/alex-legend',
+    name: 'AlexLegend',
+    component: () => import('../pages/AlexLegend.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Legend'
+    }
+  },
+  {
+    path: '/alex-lynn',
+    name: 'AlexLynn',
+    component: () => import('../pages/AlexLynn.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Lynn'
+    }
+  },
+  {
+    path: '/alex-mack',
+    name: 'AlexMack',
+    component: () => import('../pages/AlexMack.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Mack'
+    }
+  },
+  {
+    path: '/alex-moreno',
+    name: 'AlexMoreno',
+    component: () => import('../pages/AlexMoreno.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Moreno'
+    }
+  },
+  {
+    path: '/alex-tanner',
+    name: 'AlexTanner',
+    component: () => import('../pages/AlexTanner.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Tanner'
+    }
+  },
+  {
+    path: '/alex-victor',
+    name: 'AlexVictor',
+    component: () => import('../pages/AlexVictor.vue'),
+    meta: {
+      preload: false,
+      title: 'Alex Victor'
+    }
+  },
+  {
+    path: '/alexa-flexy',
+    name: 'AlexaFlexy',
+    component: () => import('../pages/AlexaFlexy.vue'),
+    meta: {
+      preload: false,
+      title: 'Alexa Flexy'
+    }
+  },
+  {
+    path: '/alexa-grace',
+    name: 'AlexaGrace',
+    component: () => import('../pages/AlexaGrace.vue'),
+    meta: {
+      preload: false,
+      title: 'Alexa Grace'
+    }
+  },
+  {
     path: '/premium',
     name: 'Premium',
     component: () => import('../pages/Premium.vue'),

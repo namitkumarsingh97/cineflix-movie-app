@@ -99,6 +99,30 @@
       </div>
     </section>
 
+    <!-- Actors Section -->
+    <section 
+      v-if="isSectionEnabled('actors')" 
+      class="movies-section"
+      aria-label="Actors"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Star :size="24" class="title-icon" />
+          <span>Actors</span>
+        </h2>
+      </div>
+      <div class="actors-grid">
+        <div 
+          class="actor-card"
+          @click="navigateToActor('Abella Danger')"
+        >
+          <div class="actor-card-content">
+            <h3 class="actor-name">Abella Danger</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Personalized Stars Section -->
     <section
       id="followed-stars-section"
@@ -877,6 +901,12 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
 }
 
+function navigateToActor(actorName) {
+  if (!actorName) return;
+  const encodedName = encodeURIComponent(actorName.toLowerCase().replace(/\s+/g, '-'));
+  router.push(`/${encodedName}`);
+}
+
 function handlePremiumVideoClick(video, event) {
   // ALWAYS prevent default behavior and stop all propagation
   if (event) {
@@ -1180,6 +1210,66 @@ function scrollToSection(section) {
 
   .layout-customizer-btn span {
     display: none;
+  }
+}
+
+.actors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.actor-card {
+  background: var(--dark-lighter, #2a2a3e);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.actor-card:hover {
+  background: var(--dark-light, #3a3a4e);
+  border-color: var(--primary, #ff4500);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 69, 0, 0.2);
+}
+
+.actor-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.actor-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .actors-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .actor-card {
+    padding: 16px;
+  }
+
+  .actor-name {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .actors-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
   }
 }
 </style>

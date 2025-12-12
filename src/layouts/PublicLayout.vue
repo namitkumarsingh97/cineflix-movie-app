@@ -68,6 +68,17 @@
                   <span>Indian</span>
                 </router-link>
               </li>
+              <li class="navbar-nav-item">
+                <router-link
+                  to="/actors"
+                  class="navbar-link"
+                  active-class="active"
+                  @click="closeMobileMenu"
+                >
+                  <Star :size="16" />
+                  <span>Actors</span>
+                </router-link>
+              </li>
               <!-- Categories temporarily hidden -->
               <!--
               <li class="navbar-nav-item">
@@ -442,6 +453,22 @@
           </router-link>
 
           <!-- Category Sidebar Content for Mobile -->
+          <div class="mobile-menu-divider"></div>
+
+          <!-- Actors Section -->
+          <div class="mobile-menu-section">
+            <h3 class="mobile-menu-section-header">ACTORS</h3>
+            <router-link
+              to="/actors"
+              class="mobile-menu-link"
+              active-class="active"
+              @click="closeMobileMenu"
+            >
+              <Star :size="20" />
+              <span>Actors</span>
+            </router-link>
+          </div>
+
           <div class="mobile-menu-divider"></div>
 
           <!-- Featured Category -->
