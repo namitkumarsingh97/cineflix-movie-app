@@ -15,6 +15,7 @@
         @volumechange="onVolumeChange"
         @waiting="onWaiting"
         @playing="onPlaying"
+        @error="onError"
         @click="togglePlayPause"
       >
         <source v-for="source in sources" :key="source.src" :src="source.src" :type="source.type" />
@@ -217,7 +218,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'fullscreenchange']);
+const emit = defineEmits(['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'fullscreenchange', 'error']);
 
 const videoElement = ref(null);
 const videoContainer = ref(null);
@@ -361,6 +362,19 @@ function onWaiting() {
 
 function onPlaying() {
   isLoading.value = false;
+}
+
+function onError(event) {
+  console.error('Video playback error:', event);
+  isLoading.value = false;
+  if (event && event.target && event.target.error) {
+    const error = event.target.error;
+    console.error('Video error details:', {
+      code: error.code,
+      message: error.message
+    });
+  }
+  emit('error', event);
 }
 
 // Control functions
@@ -620,9 +634,10 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   background: #000;
-  border-radius: 12px;
+  border-radius: inherit;
   overflow: hidden;
   user-select: none;
+  display: block;
 }
 
 .video-container {

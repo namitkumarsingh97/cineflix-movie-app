@@ -35,10 +35,21 @@
             <div v-else-if="video && video.iframe" class="watch-iframe-container">
               <div v-html="video.iframe" class="watch-iframe-player"></div>
             </div>
-            <!-- Modern Video Player for all direct video URLs (including Eporner) -->
+            <!-- Iframe for Eporner videos (they only provide embed URLs, not direct video URLs) -->
+            <div v-else-if="video && (isEporner || video._source === 'eporner') && (video.embedUrl || video.url)" class="watch-iframe-container">
+              <iframe
+                :src="video.embedUrl || video.url"
+                frameborder="0"
+                allowfullscreen
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                class="watch-iframe-player"
+                loading="lazy"
+              ></iframe>
+            </div>
+            <!-- Modern Video Player for direct video URLs (S3 videos, etc.) -->
             <ModernVideoPlayer
-              v-else-if="video && video.url && (!video.isPremium || isPremium)"
-              :src="getDirectVideoUrl(video)"
+              v-else-if="video && hasDirectVideoUrl(video) && (!video.isPremium || isPremium)"
+              :src="video.url"
               :poster="video.thumbnail"
               :autoplay="shouldAutoplay"
               :muted="false"
@@ -1062,19 +1073,34 @@ function goToPremium() {
   router.push('/premium');
 }
 
-// Get direct video URL, avoiding embed URLs that redirect to Eporner
-function getDirectVideoUrl(video) {
-  if (!video) return '';
+// Check if video has a direct video URL (not an embed URL or page URL)
+function hasDirectVideoUrl(video) {
+  if (!video || !video.url) return false;
   
-  // For Eporner videos, use direct URL (not embedUrl which shows Eporner's player)
+  // Don't use ModernVideoPlayer for Eporner videos (they only have embed URLs)
   if (isEporner.value || video._source === 'eporner') {
-    // Use direct video URL from API, not embedUrl
-    // The API returns 'url' as direct MP4 and 'embed' as iframe embed
-    return video.url || '';
+    return false;
   }
   
-  // For other videos, use the URL directly
-  return video.url || '';
+  const url = video.url.toLowerCase();
+  
+  // Check if it's a direct video file URL
+  const isDirectVideo = url.endsWith('.mp4') || 
+                       url.endsWith('.webm') || 
+                       url.endsWith('.m3u8') ||
+                       url.endsWith('.m3u') ||
+                       url.includes('/video/') && !url.includes('/embed/') ||
+                       url.startsWith('blob:') ||
+                       url.startsWith('data:');
+  
+  // Check if it's NOT an embed URL or page URL
+  const isNotEmbed = !url.includes('/embed/') && 
+                    !url.includes('embed') &&
+                    !url.includes('youtube.com') &&
+                    !url.includes('vimeo.com') &&
+                    !url.includes('eporner.com/video/');
+  
+  return isDirectVideo && isNotEmbed;
 }
 
 function formatViews(views) {
@@ -1262,6 +1288,20 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
   max-height: calc(100vh - 200px);
   min-height: 400px;
+}
+
+/* Modern Video Player styling */
+.video-player-wrapper :deep(.modern-video-player) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-player-wrapper :deep(.video-container) {
+  width: 100%;
+  height: 100%;
 }
 
 /* Large screens (L screens and above) */
