@@ -95,17 +95,6 @@
               </li> -->
               <li class="navbar-nav-item">
                 <router-link
-                  to="/playlists"
-                  class="navbar-link"
-                  active-class="active"
-                  @click="closeMobileMenu"
-                >
-                  <ListMusic :size="16" />
-                  <span>Playlists</span>
-                </router-link>
-              </li>
-              <li class="navbar-nav-item">
-                <router-link
                   to="/premium"
                   class="navbar-link premium-nav-link"
                   active-class="active"
@@ -788,16 +777,6 @@
               <li>
                 <router-link to="/videos" class="footer-link"
                   >Videos</router-link
-                >
-              </li>
-              <li>
-                <router-link to="/categories" class="footer-link"
-                  >Categories</router-link
-                >
-              </li>
-              <li>
-                <router-link to="/playlists" class="footer-link"
-                  >Playlists</router-link
                 >
               </li>
             </ul>
