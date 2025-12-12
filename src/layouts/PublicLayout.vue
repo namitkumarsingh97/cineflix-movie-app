@@ -476,6 +476,24 @@
             >
               <span>Anal</span>
             </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/asian' }]"
+              @click="navigateToMobileAsian"
+            >
+              <span>Asian</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bdsm' }]"
+              @click="navigateToMobileBdsm"
+            >
+              <span>BDSM</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-ass' }]"
+              @click="navigateToMobileBigAss"
+            >
+              <span>Big Ass</span>
+            </button>
           </div>
 
           <!-- <router-link
@@ -1167,6 +1185,30 @@ function navigateToMobileAnal() {
   selectedMobileProduction.value = "all";
   selectedMobileTopNav.value = null;
   router.push("/anal");
+  closeMobileMenu();
+}
+
+function navigateToMobileAsian() {
+  selectedMobileCategory.value = "asian";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/asian");
+  closeMobileMenu();
+}
+
+function navigateToMobileBdsm() {
+  selectedMobileCategory.value = "bdsm";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/bdsm");
+  closeMobileMenu();
+}
+
+function navigateToMobileBigAss() {
+  selectedMobileCategory.value = "big ass";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/big-ass");
   closeMobileMenu();
 }
 

@@ -70,6 +70,33 @@ const routes = [
     }
   },
   {
+    path: '/asian',
+    name: 'Asian',
+    component: () => import('../pages/Asian.vue'),
+    meta: {
+      preload: false,
+      title: 'Asian'
+    }
+  },
+  {
+    path: '/bdsm',
+    name: 'Bdsm',
+    component: () => import('../pages/Bdsm.vue'),
+    meta: {
+      preload: false,
+      title: 'BDSM'
+    }
+  },
+  {
+    path: '/big-ass',
+    name: 'BigAss',
+    component: () => import('../pages/BigAss.vue'),
+    meta: {
+      preload: false,
+      title: 'Big Ass'
+    }
+  },
+  {
     path: '/watch/:id',
     name: 'Watch',
     component: () => import('../pages/Watch.vue'),

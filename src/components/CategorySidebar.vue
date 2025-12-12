@@ -17,10 +17,28 @@
           <span class="item-label">Amateur</span>
         </button>
         <button
-          :class="['sidebar-item', 'featured-item', { active: route.path === '/anal' }]"
+          :class="['sidebar-item', 'featured-item', 'featured-item-divider', { active: route.path === '/anal' }]"
           @click="navigateToAnal"
         >
           <span class="item-label">Anal</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/asian' }]"
+          @click="navigateToAsian"
+        >
+          <span class="item-label">Asian</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/bdsm' }]"
+          @click="navigateToBdsm"
+        >
+          <span class="item-label">BDSM</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/big-ass' }]"
+          @click="navigateToBigAss"
+        >
+          <span class="item-label">Big Ass</span>
         </button>
       </div>
     </div>
@@ -210,6 +228,30 @@ function navigateToAnal() {
   selectedTopNav.value = null;
   router.push("/anal");
   emit("filter-change", { type: "category", value: "anal" });
+}
+
+function navigateToAsian() {
+  selectedCategory.value = "asian";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/asian");
+  emit("filter-change", { type: "category", value: "asian" });
+}
+
+function navigateToBdsm() {
+  selectedCategory.value = "bdsm";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/bdsm");
+  emit("filter-change", { type: "category", value: "bdsm" });
+}
+
+function navigateToBigAss() {
+  selectedCategory.value = "big ass";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/big-ass");
+  emit("filter-change", { type: "category", value: "big ass" });
 }
 
 // Load initial categories
