@@ -496,8 +496,85 @@ const shouldShowIframe = computed(() => {
   return result;
 });
 
+// Tag-based recommendations
+const tagBasedRecommendations = ref([]);
+const loadingTagRecommendations = ref(false);
+
+// Load recommendations based on video tags
+async function loadTagBasedRecommendations() {
+  if (!video.value || loadingTagRecommendations.value) return;
+  
+  loadingTagRecommendations.value = true;
+  try {
+    // Get tags/categories from current video
+    const tags = video.value.categories || 
+                 (video.value.category ? [video.value.category] : []) ||
+                 (video.value.tags || []);
+    
+    if (tags.length === 0) {
+      // Fallback to general recommendations if no tags
+      tagBasedRecommendations.value = [];
+      loadingTagRecommendations.value = false;
+      return;
+    }
+    
+    // Use the first tag/category for search
+    const primaryTag = tags[0];
+    const limit = shouldDeferRecommendations.value ? 5 : 10;
+    
+    if (isEporner.value || video.value._source === 'eporner') {
+      // Search Eporner videos by tag
+      await searchVideos(primaryTag, 1, { perPage: limit + 1, order: 'most-popular' });
+      // Filter out current video and limit results
+      tagBasedRecommendations.value = epornerVideos.value
+        .filter(v => v.id !== videoId.value)
+        .slice(0, limit);
+    } else if (isMovie.value) {
+      // For movies, filter by category
+      const related = movies.value.filter(m => 
+        m._id !== videoId.value && 
+        (m.category === primaryTag || (m.tags && m.tags.includes(primaryTag)))
+      );
+      // If not enough, add random movies
+      if (related.length < limit) {
+        const random = movies.value
+          .filter(m => m._id !== videoId.value && m.category !== primaryTag)
+          .slice(0, limit - related.length);
+        tagBasedRecommendations.value = [...related, ...random].slice(0, limit);
+      } else {
+        tagBasedRecommendations.value = related.slice(0, limit);
+      }
+    } else {
+      // For backend videos, filter by category
+      const related = videos.value.filter(v => 
+        v.id !== videoId.value && 
+        (v.category === primaryTag || (v.tags && v.tags.includes(primaryTag)))
+      );
+      // If not enough, add random videos
+      if (related.length < limit) {
+        const random = videos.value
+          .filter(v => v.id !== videoId.value && v.category !== primaryTag)
+          .slice(0, limit - related.length);
+        tagBasedRecommendations.value = [...related, ...random].slice(0, limit);
+      } else {
+        tagBasedRecommendations.value = related.slice(0, limit);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading tag-based recommendations:', error);
+    tagBasedRecommendations.value = [];
+  } finally {
+    loadingTagRecommendations.value = false;
+  }
+}
+
 const recommendations = computed(() => {
-  // Limit recommendations on slow networks
+  // If we have tag-based recommendations, use those
+  if (tagBasedRecommendations.value.length > 0) {
+    return tagBasedRecommendations.value;
+  }
+  
+  // Fallback to general recommendations
   const limit = shouldDeferRecommendations.value ? 5 : 10;
   
   if (isEporner.value) {
@@ -560,6 +637,7 @@ watch(() => route.params.id, () => {
   comments.value = [];
   commentText.value = '';
   commentAuthor.value = '';
+  tagBasedRecommendations.value = []; // Reset tag-based recommendations
 });
 
 // Helper function to check if ID looks like Eporner video ID (11 chars, alphanumeric)
@@ -634,9 +712,16 @@ async function loadVideo() {
             duration: video.value.duration || 0,
           });
           
-          // Load related videos (defer on slow networks)
-          if (!shouldDeferRecommendations.value && video.value.categories && video.value.categories.length > 0) {
-            await searchVideos(video.value.categories[0], 1, { perPage: 10 });
+          // Load tag-based recommendations
+          if (video.value.categories && video.value.categories.length > 0) {
+            if (!shouldDeferRecommendations.value) {
+              await loadTagBasedRecommendations();
+            } else {
+              // Defer loading on slow networks
+              setTimeout(() => {
+                loadTagBasedRecommendations();
+              }, 2000);
+            }
           }
           return;
         } else {
@@ -767,9 +852,16 @@ async function loadVideo() {
             duration: video.value.duration || 0,
           });
           
-          // Load related videos (defer on slow networks)
-          if (!shouldDeferRecommendations.value && video.value.categories && video.value.categories.length > 0) {
-            await searchVideos(video.value.categories[0], 1, { perPage: 10 });
+          // Load tag-based recommendations
+          if (video.value.categories && video.value.categories.length > 0) {
+            if (!shouldDeferRecommendations.value) {
+              await loadTagBasedRecommendations();
+            } else {
+              // Defer loading on slow networks
+              setTimeout(() => {
+                loadTagBasedRecommendations();
+              }, 2000);
+            }
           }
           return;
         }
@@ -1096,12 +1188,10 @@ onMounted(async () => {
   await loadVideo();
   processIframe();
   
-  // Load recommendations after initial load if deferred
+  // Load tag-based recommendations after initial load if deferred
   if (shouldDeferRecommendations.value && video.value) {
-    setTimeout(async () => {
-      if (video.value?.categories && video.value.categories.length > 0) {
-        await searchVideos(video.value.categories[0], 1, { perPage: 5 });
-      }
+    setTimeout(() => {
+      loadTagBasedRecommendations();
     }, 2000); // Delay 2 seconds on slow networks
   }
 });
