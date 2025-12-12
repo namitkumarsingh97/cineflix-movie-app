@@ -629,6 +629,8 @@ const relatedContent = computed(() => {
 
 // Watch for route changes
 watch(() => route.params.id, () => {
+  // Scroll to top when video changes
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   loadVideo();
   // Reset states
   isLiked.value = false;
@@ -681,6 +683,9 @@ async function loadVideo() {
           video.value = epornerVideo;
           isMovie.value = false;
           loading.value = false;
+          
+          // Scroll to top when video loads
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           
           console.log('Video set:', {
             id: video.value.id,
@@ -744,6 +749,8 @@ async function loadVideo() {
           video.value = videoResponse.data.data;
           isMovie.value = false;
           loading.value = false;
+          // Scroll to top when video loads
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           // Add to watch history
           addToHistory({
             id: video.value.id,
@@ -786,6 +793,8 @@ async function loadVideo() {
           video.value = movieResponse.data.data || movieResponse.data;
           isMovie.value = true;
           loading.value = false;
+          // Scroll to top when video loads
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           // Add to watch history
           addToHistory({
             id: video.value._id,
@@ -833,6 +842,8 @@ async function loadVideo() {
           video.value = epornerVideo;
           isMovie.value = false;
           loading.value = false;
+          // Scroll to top when video loads
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           // Add to watch history
           addToHistory({
             id: video.value.id,
@@ -1182,6 +1193,9 @@ watch(() => video.value, () => {
 }, { deep: true });
 
 onMounted(async () => {
+  // Scroll to top on initial mount
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  
   await checkPremiumStatus();
   await Promise.all([loadVideos(), loadMovies()]);
   await loadVideo();
