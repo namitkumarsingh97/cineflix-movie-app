@@ -1,5 +1,9 @@
 <template>
-  <div class="youtube-video-card" @click="handleClick">
+  <router-link 
+    :to="watchUrl" 
+    class="youtube-video-card"
+    @click="handleClick"
+  >
     <div class="video-thumbnail-wrapper">
       <OptimizedImage
         :src="personalizedThumbnail"
@@ -40,7 +44,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script setup>
@@ -66,6 +70,24 @@ const emit = defineEmits(['click']);
 
 const { shouldPreloadThumbnails } = useNetworkQuality();
 const { getOptimizedThumbnail } = useAIThumbnails();
+
+// Generate watch URL for router-link
+const watchUrl = computed(() => {
+  if (!props.video) return '/';
+  // Check if it's an Eporner video (has id but no _id)
+  if (props.video.id && !props.video._id) {
+    return `/watch/${props.video.id}?source=eporner`;
+  }
+  // Regular video from backend
+  if (props.video._id) {
+    return `/watch/${props.video._id}`;
+  }
+  // Fallback to id
+  if (props.video.id) {
+    return `/watch/${props.video.id}`;
+  }
+  return '/';
+});
 
 function getDefaultThumbnail() {
   return 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video';
@@ -93,7 +115,14 @@ const personalizedThumbnail = computed(() => {
   }
 });
 
-function handleClick() {
+function handleClick(event) {
+  // Allow right-click, middle-click, and modifier keys to work normally (open in new tab)
+  // event.button: 0=left, 1=middle, 2=right
+  if (event.button === 2 || event.button === 1 || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return; // Let the browser/router-link handle it naturally
+  }
+  // For regular left-click, emit the event
+  // The router-link will handle navigation automatically
   emit('click', props.video);
 }
 
@@ -151,6 +180,9 @@ function getInitials(name) {
 .youtube-video-card {
   cursor: pointer;
   width: 100%;
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
 .video-thumbnail-wrapper {

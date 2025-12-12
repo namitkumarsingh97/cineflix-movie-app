@@ -1,5 +1,9 @@
 <template>
-  <div class="youtube-video-card" @click="handleClick">
+  <router-link 
+    :to="watchUrl" 
+    class="youtube-video-card"
+    @click="handleClick"
+  >
     <div class="video-thumbnail-wrapper">
       <OptimizedImage
         :src="getThumbnail(movie)"
@@ -22,10 +26,11 @@
         </div>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { getThumbnail } from '../utils/video';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
 import OptimizedImage from './OptimizedImage.vue';
@@ -45,7 +50,20 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 
-function handleClick() {
+// Generate watch URL for router-link
+const watchUrl = computed(() => {
+  if (!props.movie || !props.movie._id) return '/';
+  return `/watch/${props.movie._id}`;
+});
+
+function handleClick(event) {
+  // Allow right-click, middle-click, and modifier keys to work normally (open in new tab)
+  // event.button: 0=left, 1=middle, 2=right
+  if (event.button === 2 || event.button === 1 || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return; // Let the browser/router-link handle it naturally
+  }
+  // For regular left-click, emit the event
+  // The router-link will handle navigation automatically
   emit('click', props.movie);
 }
 
@@ -84,6 +102,9 @@ function getInitials(name) {
 .youtube-video-card {
   cursor: pointer;
   width: 100%;
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
 .video-thumbnail-wrapper {

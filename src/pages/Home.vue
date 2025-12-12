@@ -2,6 +2,7 @@
   <div class="home-page-container">
     <!-- Category Sidebar -->
     <CategorySidebar 
+      v-if="isSidebarEnabled"
       :is-open="sidebarOpen" 
       @filter-change="handleFilterChange"
     />
@@ -46,7 +47,7 @@
     <!-- Watch Later Section -->
     <section
       id="watch-later-section"
-      v-if="watchLaterItems.length > 0"
+      v-if="watchLaterItems.length > 0 && isSectionEnabled('watchLater')"
       class="movies-section"
       aria-label="Watch later"
     >
@@ -101,7 +102,7 @@
     <!-- Personalized Stars Section -->
     <section
       id="followed-stars-section"
-      v-if="personalizedByStars.length > 0"
+      v-if="personalizedByStars.length > 0 && isSectionEnabled('yourStars')"
       class="movies-section"
       aria-label="Your favorite stars"
     >
@@ -605,6 +606,15 @@ const { isPremium, checkPremiumStatus } = useSubscription();
 const showLayoutCustomizer = ref(false);
 const sidebarOpen = ref(true);
 
+// Sidebar visibility preference
+const isSidebarEnabled = ref(true);
+
+// Load sidebar preference
+function loadSidebarPreference() {
+  const sidebarPref = localStorage.getItem('categorySidebarEnabled');
+  isSidebarEnabled.value = sidebarPref !== null ? sidebarPref === 'true' : true;
+}
+
 function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
   // Handle filter changes if needed
@@ -1032,6 +1042,7 @@ async function maybeNotifyNewContent() {
 
 
 onMounted(() => {
+  loadSidebarPreference();
   loadMovies();
   loadBackendVideos();
   loadEpornerSections();
@@ -1043,6 +1054,11 @@ onMounted(() => {
   if (section) {
     scrollToSection(section);
   }
+
+  // Listen for preference changes
+  window.addEventListener('sidebarPreferenceChanged', (e) => {
+    isSidebarEnabled.value = e.detail.enabled;
+  });
 });
 
 watch(

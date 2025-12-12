@@ -2,16 +2,19 @@ import { ref, computed } from 'vue';
 
 const STORAGE_KEY = 'homeLayoutPreferences';
 
-// Available sections
+// Available sections - updated to match current homepage
 export const availableSections = [
-  { id: 'hero', label: 'Hero Section', icon: 'Film', defaultEnabled: true, order: 0 },
-  { id: 'continueWatching', label: 'Continue Watching', icon: 'Clock', defaultEnabled: true, order: 1 },
-  { id: 'trending', label: 'Trending', icon: 'TrendingUp', defaultEnabled: true, order: 2 },
-  { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 3 },
-  { id: 'pov', label: 'Recent POV Videos', icon: 'Film', defaultEnabled: true, order: 4 },
-  { id: 'family', label: 'Recent Family Videos', icon: 'Film', defaultEnabled: true, order: 5 },
-  { id: 'premium', label: 'Premium Content', icon: 'Crown', defaultEnabled: true, order: 6 },
-  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 7 },
+  { id: 'continueWatching', label: 'Continue Watching', icon: 'Clock', defaultEnabled: true, order: 0 },
+  { id: 'watchLater', label: 'Watch Later', icon: 'Clock', defaultEnabled: true, order: 1 },
+  { id: 'trending', label: 'Trending Now', icon: 'TrendingUp', defaultEnabled: true, order: 2 },
+  { id: 'yourStars', label: 'Your Stars', icon: 'Star', defaultEnabled: true, order: 3 },
+  { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 4 },
+  { id: 'pov', label: 'Recent POV Videos', icon: 'Film', defaultEnabled: true, order: 5 },
+  { id: 'family', label: 'Recent Family Videos', icon: 'Film', defaultEnabled: true, order: 6 },
+  { id: 'premium', label: 'Premium Content', icon: 'Crown', defaultEnabled: true, order: 7 },
+  { id: 'trendingVideos', label: 'Trending Videos', icon: 'TrendingUp', defaultEnabled: true, order: 8 },
+  { id: 'recentlyAddedVideos', label: 'Recently Added Videos', icon: 'Calendar', defaultEnabled: true, order: 9 },
+  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 10 },
 ];
 
 // Load preferences from localStorage
