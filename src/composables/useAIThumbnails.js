@@ -6,8 +6,8 @@ import { useWatchHistory, useFavorites } from './useWatchHistory';
  * Generates custom thumbnails showing the most appealing frame for each user
  */
 export function useAIThumbnails() {
-  const { getHistory } = useWatchHistory();
-  const { getFavorites } = useFavorites();
+  // Don't call composables at top level - call them when needed
+  // This avoids issues with browser API access during SSR or initial load
   
   const thumbnailPreferences = ref({
     preferredFrames: [], // Types of frames user clicks on most
@@ -20,8 +20,13 @@ export function useAIThumbnails() {
    * Analyze user click patterns to determine thumbnail preferences
    */
   function analyzeThumbnailPreferences() {
-    const history = getHistory();
-    const favorites = getFavorites();
+    try {
+      // Call composables only when needed, not at top level
+      const { getWatchHistory } = useWatchHistory();
+      const { getFavorites: getFavs } = useFavorites();
+      
+      const history = getWatchHistory();
+      const favorites = getFavs();
     
     // Analyze which videos user clicked on vs skipped
     // This would ideally come from click tracking, but we'll use watch history as proxy
@@ -60,6 +65,10 @@ export function useAIThumbnails() {
       colorPreferences: [], // Would need image analysis
       compositionPreferences: [], // Would need image analysis
     };
+    } catch (error) {
+      console.error('Error analyzing thumbnail preferences:', error);
+      // Return empty preferences on error
+    }
   }
 
   /**
@@ -125,32 +134,52 @@ export function useAIThumbnails() {
    * @returns {Object} Thumbnail configuration
    */
   function getOptimizedThumbnail(video, defaultThumbnail, networkQuality = '4g') {
-    const personalizedUrl = getPersonalizedThumbnail(video, defaultThumbnail);
-    
-    // Adjust thumbnail quality based on network
-    let quality = 'high';
-    if (networkQuality === '2g' || networkQuality === 'slow-2g') {
-      quality = 'low';
-    } else if (networkQuality === '3g') {
-      quality = 'medium';
-    }
-    
-    // Modify URL if possible to get different quality (depends on API)
-    let optimizedUrl = personalizedUrl;
-    if (personalizedUrl && quality !== 'high') {
-      // Try to get lower quality version (if API supports it)
-      // This is API-specific and would need to be adjusted
-      if (personalizedUrl.includes('thumb')) {
-        optimizedUrl = personalizedUrl.replace(/thumb[^/]*/, `thumb${quality}`);
+    try {
+      if (!video || !defaultThumbnail) {
+        return {
+          url: defaultThumbnail || 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video',
+          quality: 'high',
+          personalized: false,
+          loading: 'lazy',
+        };
       }
+      
+      const personalizedUrl = getPersonalizedThumbnail(video, defaultThumbnail);
+      
+      // Adjust thumbnail quality based on network
+      let quality = 'high';
+      if (networkQuality === '2g' || networkQuality === 'slow-2g') {
+        quality = 'low';
+      } else if (networkQuality === '3g') {
+        quality = 'medium';
+      }
+      
+      // Modify URL if possible to get different quality (depends on API)
+      let optimizedUrl = personalizedUrl;
+      if (personalizedUrl && quality !== 'high') {
+        // Try to get lower quality version (if API supports it)
+        // This is API-specific and would need to be adjusted
+        if (personalizedUrl.includes('thumb')) {
+          optimizedUrl = personalizedUrl.replace(/thumb[^/]*/, `thumb${quality}`);
+        }
+      }
+      
+      return {
+        url: optimizedUrl || defaultThumbnail,
+        quality,
+        personalized: personalizedUrl !== defaultThumbnail,
+        loading: networkQuality === '2g' || networkQuality === 'slow-2g' ? 'lazy' : 'eager',
+      };
+    } catch (error) {
+      console.error('Error in getOptimizedThumbnail:', error);
+      // Return safe fallback
+      return {
+        url: defaultThumbnail || 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video',
+        quality: 'high',
+        personalized: false,
+        loading: 'lazy',
+      };
     }
-    
-    return {
-      url: optimizedUrl,
-      quality,
-      personalized: personalizedUrl !== defaultThumbnail,
-      loading: networkQuality === '2g' || networkQuality === 'slow-2g' ? 'lazy' : 'eager',
-    };
   }
 
   /**
