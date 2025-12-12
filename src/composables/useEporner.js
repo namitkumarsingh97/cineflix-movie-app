@@ -39,6 +39,24 @@ export function useEporner() {
       .filter(k => k.length > 0)
       .slice(0, 5); // Limit to 5 categories
 
+    // Extract direct video URL - prefer direct URL over embed
+    // Eporner API may return url as direct MP4 or as embed URL
+    // Check if url is a direct video file (ends with .mp4, .webm, etc.) or is an embed URL
+    let directVideoUrl = epornerVideo.url || '';
+    const isDirectVideo = directVideoUrl && (
+      directVideoUrl.endsWith('.mp4') || 
+      directVideoUrl.endsWith('.webm') || 
+      directVideoUrl.endsWith('.m3u8') ||
+      directVideoUrl.includes('/video/') && !directVideoUrl.includes('/embed/')
+    );
+    
+    // If url is not a direct video, try to extract from embed URL or use embed as fallback
+    if (!isDirectVideo && epornerVideo.embed) {
+      // Try to extract direct video URL from embed URL if possible
+      // Otherwise, we'll need to use a proxy or different approach
+      directVideoUrl = epornerVideo.embed;
+    }
+
     return {
       id: epornerVideo.id,
       title: epornerVideo.title,
@@ -49,8 +67,8 @@ export function useEporner() {
       durationFormatted: epornerVideo.length_min || '0:00',
       views: epornerVideo.views || 0,
       rating: parseFloat(epornerVideo.rate) || 0,
-      url: epornerVideo.url,
-      embedUrl: epornerVideo.embed,
+      url: directVideoUrl, // Use direct video URL
+      embedUrl: epornerVideo.embed, // Keep embed URL for reference but don't use it
       added: epornerVideo.added,
       categories,
       keywords: keywords,

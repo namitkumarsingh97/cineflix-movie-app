@@ -31,23 +31,14 @@
                 </button>
               </div>
             </div>
-            <!-- Iframe for movies and Eporner videos -->
-            <div v-else-if="video && (video.iframe || ((isEporner || video._source === 'eporner') && (video.embedUrl || video.url)))" class="watch-iframe-container">
-              <div v-if="video.iframe" v-html="video.iframe" class="watch-iframe-player"></div>
-              <iframe
-                v-else-if="(isEporner || video._source === 'eporner') && (video.embedUrl || video.url)"
-                :src="video.embedUrl || video.url"
-                frameborder="0"
-                allowfullscreen
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                class="watch-iframe-player"
-                loading="lazy"
-              ></iframe>
+            <!-- Iframe for movies with iframe content -->
+            <div v-else-if="video && video.iframe" class="watch-iframe-container">
+              <div v-html="video.iframe" class="watch-iframe-player"></div>
             </div>
-            <!-- Modern Video Player for S3 videos -->
+            <!-- Modern Video Player for all direct video URLs (including Eporner) -->
             <ModernVideoPlayer
-              v-else-if="video && video.url && !isEporner && (!video.isPremium || isPremium)"
-              :src="video.url"
+              v-else-if="video && video.url && (!video.isPremium || isPremium)"
+              :src="getDirectVideoUrl(video)"
               :poster="video.thumbnail"
               :autoplay="shouldAutoplay"
               :muted="false"
@@ -1069,6 +1060,21 @@ function navigateToVideo(video) {
 
 function goToPremium() {
   router.push('/premium');
+}
+
+// Get direct video URL, avoiding embed URLs that redirect to Eporner
+function getDirectVideoUrl(video) {
+  if (!video) return '';
+  
+  // For Eporner videos, use direct URL (not embedUrl which shows Eporner's player)
+  if (isEporner.value || video._source === 'eporner') {
+    // Use direct video URL from API, not embedUrl
+    // The API returns 'url' as direct MP4 and 'embed' as iframe embed
+    return video.url || '';
+  }
+  
+  // For other videos, use the URL directly
+  return video.url || '';
 }
 
 function formatViews(views) {
