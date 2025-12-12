@@ -13,6 +13,7 @@
         @saved="handleMovieSaved"
       />
     </div>
+    <Analytics />
   </div>
 </template>
 
@@ -21,6 +22,7 @@ import { ref, provide, onMounted, watch } from 'vue';
 import PublicLayout from './layouts/PublicLayout.vue';
 import AddMovieModal from './components/AddMovieModal.vue';
 import AgeVerification from './components/AgeVerification.vue';
+import { Analytics } from '@vercel/analytics/vue';
 
 const searchQuery = ref('');
 const showAddModal = ref(false);
