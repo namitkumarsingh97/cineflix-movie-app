@@ -578,6 +578,126 @@
             >
               <span>Hardcore</span>
             </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hentai' }]"
+              @click="navigateToMobileHentai"
+            >
+              <span>Hentai</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/homemade' }]"
+              @click="navigateToMobileHomemade"
+            >
+              <span>Homemade</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hotel' }]"
+              @click="navigateToMobileHotel"
+            >
+              <span>Hotel</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/housewives' }]"
+              @click="navigateToMobileHousewives"
+            >
+              <span>Housewives</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/interracial' }]"
+              @click="navigateToMobileInterracial"
+            >
+              <span>Interracial</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/latina' }]"
+              @click="navigateToMobileLatina"
+            >
+              <span>Latina</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/lesbian' }]"
+              @click="navigateToMobileLesbian"
+            >
+              <span>Lesbian</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/massage' }]"
+              @click="navigateToMobileMassage"
+            >
+              <span>Massage</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/masturbation' }]"
+              @click="navigateToMobileMasturbation"
+            >
+              <span>Masturbation</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/mature' }]"
+              @click="navigateToMobileMature"
+            >
+              <span>Mature</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/milf' }]"
+              @click="navigateToMobileMILF"
+            >
+              <span>MILF</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/nurse' }]"
+              @click="navigateToMobileNurse"
+            >
+              <span>Nurse</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/office' }]"
+              @click="navigateToMobileOffice"
+            >
+              <span>Office</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/outdoor' }]"
+              @click="navigateToMobileOutdoor"
+            >
+              <span>Outdoor</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/pov' }]"
+              @click="navigateToMobilePOV"
+            >
+              <span>POV</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/public' }]"
+              @click="navigateToMobilePublic"
+            >
+              <span>Public</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/shemale' }]"
+              @click="navigateToMobileShemale"
+            >
+              <span>Shemale</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/sleep' }]"
+              @click="navigateToMobileSleep"
+            >
+              <span>Sleep</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/small-tits' }]"
+              @click="navigateToMobileSmallTits"
+            >
+              <span>Small Tits</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/squirt' }]"
+              @click="navigateToMobileSquirt"
+            >
+              <span>Squirt</span>
+            </button>
           </div>
 
           <!-- <router-link
@@ -1405,6 +1525,166 @@ function navigateToMobileHardcore() {
   selectedMobileProduction.value = "all";
   selectedMobileTopNav.value = null;
   router.push("/hardcore");
+  closeMobileMenu();
+}
+
+function navigateToMobileHentai() {
+  selectedMobileCategory.value = "hentai";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hentai");
+  closeMobileMenu();
+}
+
+function navigateToMobileHomemade() {
+  selectedMobileCategory.value = "homemade";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/homemade");
+  closeMobileMenu();
+}
+
+function navigateToMobileHotel() {
+  selectedMobileCategory.value = "hotel";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hotel");
+  closeMobileMenu();
+}
+
+function navigateToMobileHousewives() {
+  selectedMobileCategory.value = "housewives";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/housewives");
+  closeMobileMenu();
+}
+
+function navigateToMobileInterracial() {
+  selectedMobileCategory.value = "interracial";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/interracial");
+  closeMobileMenu();
+}
+
+function navigateToMobileLatina() {
+  selectedMobileCategory.value = "latina";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/latina");
+  closeMobileMenu();
+}
+
+function navigateToMobileLesbian() {
+  selectedMobileCategory.value = "lesbian";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/lesbian");
+  closeMobileMenu();
+}
+
+function navigateToMobileMassage() {
+  selectedMobileCategory.value = "massage";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/massage");
+  closeMobileMenu();
+}
+
+function navigateToMobileMasturbation() {
+  selectedMobileCategory.value = "masturbation";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/masturbation");
+  closeMobileMenu();
+}
+
+function navigateToMobileMature() {
+  selectedMobileCategory.value = "mature";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/mature");
+  closeMobileMenu();
+}
+
+function navigateToMobileMILF() {
+  selectedMobileCategory.value = "milf";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/milf");
+  closeMobileMenu();
+}
+
+function navigateToMobileNurse() {
+  selectedMobileCategory.value = "nurse";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/nurse");
+  closeMobileMenu();
+}
+
+function navigateToMobileOffice() {
+  selectedMobileCategory.value = "office";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/office");
+  closeMobileMenu();
+}
+
+function navigateToMobileOutdoor() {
+  selectedMobileCategory.value = "outdoor";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/outdoor");
+  closeMobileMenu();
+}
+
+function navigateToMobilePOV() {
+  selectedMobileCategory.value = "pov";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/pov");
+  closeMobileMenu();
+}
+
+function navigateToMobilePublic() {
+  selectedMobileCategory.value = "public";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/public");
+  closeMobileMenu();
+}
+
+function navigateToMobileShemale() {
+  selectedMobileCategory.value = "shemale";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/shemale");
+  closeMobileMenu();
+}
+
+function navigateToMobileSleep() {
+  selectedMobileCategory.value = "sleep";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/sleep");
+  closeMobileMenu();
+}
+
+function navigateToMobileSmallTits() {
+  selectedMobileCategory.value = "small tits";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/small-tits");
+  closeMobileMenu();
+}
+
+function navigateToMobileSquirt() {
+  selectedMobileCategory.value = "squirt";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/squirt");
   closeMobileMenu();
 }
 

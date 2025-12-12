@@ -223,6 +223,186 @@ const routes = [
     }
   },
   {
+    path: '/hentai',
+    name: 'Hentai',
+    component: () => import('../pages/Hentai.vue'),
+    meta: {
+      preload: false,
+      title: 'Hentai'
+    }
+  },
+  {
+    path: '/homemade',
+    name: 'Homemade',
+    component: () => import('../pages/Homemade.vue'),
+    meta: {
+      preload: false,
+      title: 'Homemade'
+    }
+  },
+  {
+    path: '/hotel',
+    name: 'Hotel',
+    component: () => import('../pages/Hotel.vue'),
+    meta: {
+      preload: false,
+      title: 'Hotel'
+    }
+  },
+  {
+    path: '/housewives',
+    name: 'Housewives',
+    component: () => import('../pages/Housewives.vue'),
+    meta: {
+      preload: false,
+      title: 'Housewives'
+    }
+  },
+  {
+    path: '/interracial',
+    name: 'Interracial',
+    component: () => import('../pages/Interracial.vue'),
+    meta: {
+      preload: false,
+      title: 'Interracial'
+    }
+  },
+  {
+    path: '/latina',
+    name: 'Latina',
+    component: () => import('../pages/Latina.vue'),
+    meta: {
+      preload: false,
+      title: 'Latina'
+    }
+  },
+  {
+    path: '/lesbian',
+    name: 'Lesbian',
+    component: () => import('../pages/Lesbian.vue'),
+    meta: {
+      preload: false,
+      title: 'Lesbian'
+    }
+  },
+  {
+    path: '/massage',
+    name: 'Massage',
+    component: () => import('../pages/Massage.vue'),
+    meta: {
+      preload: false,
+      title: 'Massage'
+    }
+  },
+  {
+    path: '/masturbation',
+    name: 'Masturbation',
+    component: () => import('../pages/Masturbation.vue'),
+    meta: {
+      preload: false,
+      title: 'Masturbation'
+    }
+  },
+  {
+    path: '/mature',
+    name: 'Mature',
+    component: () => import('../pages/Mature.vue'),
+    meta: {
+      preload: false,
+      title: 'Mature'
+    }
+  },
+  {
+    path: '/milf',
+    name: 'MILF',
+    component: () => import('../pages/MILF.vue'),
+    meta: {
+      preload: false,
+      title: 'MILF'
+    }
+  },
+  {
+    path: '/nurse',
+    name: 'Nurse',
+    component: () => import('../pages/Nurse.vue'),
+    meta: {
+      preload: false,
+      title: 'Nurse'
+    }
+  },
+  {
+    path: '/office',
+    name: 'Office',
+    component: () => import('../pages/Office.vue'),
+    meta: {
+      preload: false,
+      title: 'Office'
+    }
+  },
+  {
+    path: '/outdoor',
+    name: 'Outdoor',
+    component: () => import('../pages/Outdoor.vue'),
+    meta: {
+      preload: false,
+      title: 'Outdoor'
+    }
+  },
+  {
+    path: '/pov',
+    name: 'POV',
+    component: () => import('../pages/POV.vue'),
+    meta: {
+      preload: false,
+      title: 'POV'
+    }
+  },
+  {
+    path: '/public',
+    name: 'Public',
+    component: () => import('../pages/Public.vue'),
+    meta: {
+      preload: false,
+      title: 'Public'
+    }
+  },
+  {
+    path: '/shemale',
+    name: 'Shemale',
+    component: () => import('../pages/Shemale.vue'),
+    meta: {
+      preload: false,
+      title: 'Shemale'
+    }
+  },
+  {
+    path: '/sleep',
+    name: 'Sleep',
+    component: () => import('../pages/Sleep.vue'),
+    meta: {
+      preload: false,
+      title: 'Sleep'
+    }
+  },
+  {
+    path: '/small-tits',
+    name: 'SmallTits',
+    component: () => import('../pages/SmallTits.vue'),
+    meta: {
+      preload: false,
+      title: 'Small Tits'
+    }
+  },
+  {
+    path: '/squirt',
+    name: 'Squirt',
+    component: () => import('../pages/Squirt.vue'),
+    meta: {
+      preload: false,
+      title: 'Squirt'
+    }
+  },
+  {
     path: '/big-dick',
     name: 'BigDick',
     component: () => import('../pages/BigDick.vue'),

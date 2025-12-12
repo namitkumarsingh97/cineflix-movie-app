@@ -1,0 +1,125 @@
+<template>
+  <div class="hotel-page-container">
+    <CategorySidebar :is-open="sidebarOpen" @filter-change="handleFilterChange" />
+    <div class="hotel-content">
+      <div class="hotel-page">
+        <div class="page-header">
+          <h1 class="page-title">Hotel</h1>
+          <p class="page-subtitle">Browse all Hotel videos</p>
+        </div>
+        <SkeletonSection v-if="loading" :count="maxThumbnailsPerPage" :columns="4" />
+        <div v-else-if="videos.length > 0" class="videos-content">
+          <div class="videos-info">
+            <p class="videos-count">Showing {{ videos.length }} of {{ totalCount }} videos</p>
+          </div>
+          <div class="youtube-videos-grid">
+            <VideoCard v-for="video in videos" :key="video.id" :video="video" @click="navigateToVideo" />
+          </div>
+          <div v-if="totalPages > 1" class="pagination-wrapper">
+            <div class="pagination-info"><span>Page {{ currentPage }} of {{ displayTotalPages }}</span></div>
+            <div class="pagination">
+              <button class="pagination-btn" :disabled="currentPage === 1 || loading" @click="goToPage(currentPage - 1)">
+                <ChevronLeft :size="18" /><span>Previous</span>
+              </button>
+              <div class="page-numbers">
+                <button v-for="page in visiblePages" :key="page" :class="['page-number', { active: page === currentPage }]" @click="goToPage(page)" :disabled="page === '...' || loading">{{ page }}</button>
+              </div>
+              <button class="pagination-btn" :disabled="currentPage >= Math.min(totalPages, 1000) || loading" @click="goToPage(currentPage + 1)">
+                <span>Next</span><ChevronRight :size="18" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-else class="empty-state">
+          <Video :size="80" class="empty-icon" />
+          <h3>No videos found</h3>
+          <p>Try again later</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useEporner } from '../composables/useEporner';
+import SkeletonSection from '../components/SkeletonSection.vue';
+import VideoCard from '../components/VideoCard.vue';
+import CategorySidebar from '../components/CategorySidebar.vue';
+import { Video, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+
+const router = useRouter();
+const { videos, loading, currentPage, totalPages, totalCount, searchVideos } = useEporner();
+const sidebarOpen = ref(true);
+function handleFilterChange(filter) { console.log('Filter changed:', filter); }
+const maxThumbnailsPerPage = 30;
+const displayTotalPages = computed(() => { const total = totalPages.value; return total > 1000 ? '1000+' : total.toString(); });
+const visiblePages = computed(() => {
+  const pages = [];
+  const total = Math.min(totalPages.value, 1000);
+  const current = currentPage.value;
+  if (total <= 7) { for (let i = 1; i <= total; i++) pages.push(i); }
+  else {
+    pages.push(1);
+    if (current > 3) pages.push('...');
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+  }
+  return pages;
+});
+function navigateToVideo(video) { router.push(`/watch/${video.id}?source=eporner`); }
+function goToPage(page) {
+  if (page === '...' || page < 1 || page > totalPages.value) return;
+  searchVideos('hotel', page, { order: 'most-popular' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+onMounted(() => { searchVideos('hotel', 1, { order: 'most-popular' }); });
+</script>
+
+<style scoped>
+.hotel-page-container { display: flex; position: relative; align-items: flex-start; gap: 0; }
+.hotel-content { flex: 1; min-width: 0; }
+.hotel-page { width: 100%; padding: 40px; margin: 0 auto; max-width: 1600px; }
+@media (max-width: 1024px) { .hotel-content { margin-left: 0; } }
+.page-header { margin-bottom: 2rem; }
+.page-title { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; }
+.page-subtitle { color: var(--text-secondary); font-size: 1rem; }
+.videos-content { margin-top: 2rem; }
+.videos-info { margin-bottom: 1.5rem; }
+.videos-count { color: var(--text-secondary); font-size: 14px; }
+.pagination-wrapper { margin-top: 3rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.pagination-info { color: var(--text-secondary); font-size: 14px; }
+.pagination { display: flex; align-items: center; gap: 8px; }
+.pagination-btn { display: flex; align-items: center; gap: 6px; padding: 10px 16px; background: var(--dark-lighter); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 14px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+.pagination-btn:hover:not(:disabled) { background: var(--dark-light); border-color: var(--primary); }
+.pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.page-numbers { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.page-number { min-width: 40px; padding: 10px; background: var(--dark-lighter); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 14px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+.page-number:hover:not(:disabled) { background: var(--dark-light); border-color: var(--primary); }
+.page-number.active { background: var(--gradient-primary); border-color: var(--primary); color: white; }
+.page-number:disabled { cursor: not-allowed; opacity: 0.5; }
+.empty-state { text-align: center; padding: 4rem 2rem; }
+.empty-icon { color: var(--text-secondary); margin-bottom: 1rem; }
+.empty-state h3 { font-size: 1.5rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+.empty-state p { color: var(--text-secondary); }
+@media (max-width: 1024px) { .hotel-page { padding: 24px; } }
+@media (max-width: 768px) {
+  .hotel-page { padding: 16px; }
+  .page-title { font-size: 1.5rem; }
+  .pagination { gap: 4px; }
+  .pagination-btn { padding: 8px 12px; font-size: 12px; }
+  .pagination-btn span { display: none; }
+  .page-number { min-width: 36px; padding: 8px; font-size: 12px; }
+  .pagination-info { font-size: 12px; text-align: center; }
+}
+@media (max-width: 480px) {
+  .pagination { flex-direction: column; gap: 8px; }
+  .pagination-btn { width: 100%; justify-content: center; }
+  .page-numbers { width: 100%; justify-content: center; }
+}
+</style>
+

@@ -124,6 +124,126 @@
         >
           <span class="item-label">Hardcore</span>
         </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/hentai' }]"
+          @click="navigateToHentai"
+        >
+          <span class="item-label">Hentai</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/homemade' }]"
+          @click="navigateToHomemade"
+        >
+          <span class="item-label">Homemade</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/hotel' }]"
+          @click="navigateToHotel"
+        >
+          <span class="item-label">Hotel</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/housewives' }]"
+          @click="navigateToHousewives"
+        >
+          <span class="item-label">Housewives</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/interracial' }]"
+          @click="navigateToInterracial"
+        >
+          <span class="item-label">Interracial</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/latina' }]"
+          @click="navigateToLatina"
+        >
+          <span class="item-label">Latina</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/lesbian' }]"
+          @click="navigateToLesbian"
+        >
+          <span class="item-label">Lesbian</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/massage' }]"
+          @click="navigateToMassage"
+        >
+          <span class="item-label">Massage</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/masturbation' }]"
+          @click="navigateToMasturbation"
+        >
+          <span class="item-label">Masturbation</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/mature' }]"
+          @click="navigateToMature"
+        >
+          <span class="item-label">Mature</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/milf' }]"
+          @click="navigateToMILF"
+        >
+          <span class="item-label">MILF</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/nurse' }]"
+          @click="navigateToNurse"
+        >
+          <span class="item-label">Nurse</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/office' }]"
+          @click="navigateToOffice"
+        >
+          <span class="item-label">Office</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/outdoor' }]"
+          @click="navigateToOutdoor"
+        >
+          <span class="item-label">Outdoor</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/pov' }]"
+          @click="navigateToPOV"
+        >
+          <span class="item-label">POV</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/public' }]"
+          @click="navigateToPublic"
+        >
+          <span class="item-label">Public</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/shemale' }]"
+          @click="navigateToShemale"
+        >
+          <span class="item-label">Shemale</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/sleep' }]"
+          @click="navigateToSleep"
+        >
+          <span class="item-label">Sleep</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/small-tits' }]"
+          @click="navigateToSmallTits"
+        >
+          <span class="item-label">Small Tits</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/squirt' }]"
+          @click="navigateToSquirt"
+        >
+          <span class="item-label">Squirt</span>
+        </button>
       </div>
     </div>
   </aside>
@@ -448,6 +568,166 @@ function navigateToHardcore() {
   selectedTopNav.value = null;
   router.push("/hardcore");
   emit("filter-change", { type: "category", value: "hardcore" });
+}
+
+function navigateToHentai() {
+  selectedCategory.value = "hentai";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/hentai");
+  emit("filter-change", { type: "category", value: "hentai" });
+}
+
+function navigateToHomemade() {
+  selectedCategory.value = "homemade";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/homemade");
+  emit("filter-change", { type: "category", value: "homemade" });
+}
+
+function navigateToHotel() {
+  selectedCategory.value = "hotel";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/hotel");
+  emit("filter-change", { type: "category", value: "hotel" });
+}
+
+function navigateToHousewives() {
+  selectedCategory.value = "housewives";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/housewives");
+  emit("filter-change", { type: "category", value: "housewives" });
+}
+
+function navigateToInterracial() {
+  selectedCategory.value = "interracial";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/interracial");
+  emit("filter-change", { type: "category", value: "interracial" });
+}
+
+function navigateToLatina() {
+  selectedCategory.value = "latina";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/latina");
+  emit("filter-change", { type: "category", value: "latina" });
+}
+
+function navigateToLesbian() {
+  selectedCategory.value = "lesbian";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/lesbian");
+  emit("filter-change", { type: "category", value: "lesbian" });
+}
+
+function navigateToMassage() {
+  selectedCategory.value = "massage";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/massage");
+  emit("filter-change", { type: "category", value: "massage" });
+}
+
+function navigateToMasturbation() {
+  selectedCategory.value = "masturbation";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/masturbation");
+  emit("filter-change", { type: "category", value: "masturbation" });
+}
+
+function navigateToMature() {
+  selectedCategory.value = "mature";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/mature");
+  emit("filter-change", { type: "category", value: "mature" });
+}
+
+function navigateToMILF() {
+  selectedCategory.value = "milf";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/milf");
+  emit("filter-change", { type: "category", value: "milf" });
+}
+
+function navigateToNurse() {
+  selectedCategory.value = "nurse";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/nurse");
+  emit("filter-change", { type: "category", value: "nurse" });
+}
+
+function navigateToOffice() {
+  selectedCategory.value = "office";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/office");
+  emit("filter-change", { type: "category", value: "office" });
+}
+
+function navigateToOutdoor() {
+  selectedCategory.value = "outdoor";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/outdoor");
+  emit("filter-change", { type: "category", value: "outdoor" });
+}
+
+function navigateToPOV() {
+  selectedCategory.value = "pov";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/pov");
+  emit("filter-change", { type: "category", value: "pov" });
+}
+
+function navigateToPublic() {
+  selectedCategory.value = "public";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/public");
+  emit("filter-change", { type: "category", value: "public" });
+}
+
+function navigateToShemale() {
+  selectedCategory.value = "shemale";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/shemale");
+  emit("filter-change", { type: "category", value: "shemale" });
+}
+
+function navigateToSleep() {
+  selectedCategory.value = "sleep";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/sleep");
+  emit("filter-change", { type: "category", value: "sleep" });
+}
+
+function navigateToSmallTits() {
+  selectedCategory.value = "small tits";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/small-tits");
+  emit("filter-change", { type: "category", value: "small tits" });
+}
+
+function navigateToSquirt() {
+  selectedCategory.value = "squirt";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/squirt");
+  emit("filter-change", { type: "category", value: "squirt" });
 }
 
 // Load initial categories
