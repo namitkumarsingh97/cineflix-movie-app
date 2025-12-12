@@ -86,22 +86,18 @@
                   <ThumbsDown :size="20" />
                   <span>{{ formatViews(video.dislikes || 0) }}</span>
                 </button>
-                <button class="action-btn" @click="handleShare">
+                <button class="action-btn" :class="{ active: showSharePanel }" @click="toggleSharePanel">
                   <Share2 :size="20" />
                   <span>Share</span>
                 </button>
-                <button class="action-btn" @click="handleDownload">
-                  <Download :size="20" />
-                  <span>Download</span>
-                </button>
                 <button 
-                  v-if="video.url" 
-                  class="action-btn download-offline-btn" 
-                  @click="downloadForOffline"
-                  title="Download for Offline Viewing"
+                  class="action-btn" 
+                  @click="handleDownload"
+                  :disabled="isDownloading"
+                  :title="isDownloading ? `Downloading... ${downloadProgress}%` : 'Download video'"
                 >
                   <Download :size="20" />
-                  <span>Download for Offline Viewing</span>
+                  <span>{{ isDownloading ? `Downloading ${downloadProgress}%` : 'Download' }}</span>
                 </button>
                 <button
                   class="action-btn"
@@ -121,17 +117,70 @@
                   <Star :size="20" />
                   <span>{{ isFollowingStar ? 'Following' : 'Follow' }}</span>
                 </button>
-                <button 
-                  class="action-btn" 
-                  :class="{ active: isFavorite }"
-                  @click="handleFavorite"
-                  title="Add to favorites"
-                >
-                  <Heart :size="20" :fill="isFavorite ? 'currentColor' : 'none'" />
-                </button>
-                <button class="action-btn">
-                  <MoreVertical :size="20" />
-                </button>
+              </div>
+            </div>
+
+            <!-- Share Panel -->
+            <div v-if="showSharePanel" class="share-panel">
+              <div class="share-section">
+                <div class="share-section-header">
+                  <Link :size="18" />
+                  <h3>Copy page link</h3>
+                </div>
+                <div class="share-input-group">
+                  <input 
+                    type="text" 
+                    :value="pageUrl" 
+                    readonly 
+                    class="share-input"
+                    ref="pageUrlInput"
+                  />
+                  <button class="copy-btn" @click="copyPageLink" title="Copy link">
+                    <Copy :size="16" />
+                  </button>
+                </div>
+              </div>
+
+              <div class="share-section">
+                <div class="share-section-header">
+                  <Code :size="18" />
+                  <h3>Embed this video to your page with this code</h3>
+                </div>
+                <div class="share-input-group">
+                  <textarea 
+                    :value="embedCode" 
+                    readonly 
+                    class="share-textarea"
+                    ref="embedCodeInput"
+                  ></textarea>
+                  <button class="copy-btn" @click="copyEmbedCode" title="Copy embed code">
+                    <Copy :size="16" />
+                  </button>
+                </div>
+              </div>
+
+              <div class="share-section">
+                <div class="share-section-header">
+                  <Share2 :size="18" />
+                  <h3>Share this video</h3>
+                </div>
+                <div class="social-share-buttons">
+                  <button class="social-share-btn" @click="shareToTwitter" title="Share on X (Twitter)">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </button>
+                  <button class="social-share-btn" @click="shareToReddit" title="Share on Reddit">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                      <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                    </svg>
+                  </button>
+                  <button class="social-share-btn" @click="shareToEmail" title="Share via Email">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -333,6 +382,9 @@ import {
   Clock,
   Star,
   Users,
+  Link,
+  Copy,
+  Code,
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -1003,21 +1055,75 @@ async function handleDislike() {
   }
 }
 
-function handleShare() {
-  const url = window.location.href;
-  
-  if (navigator.share) {
-    navigator.share({
-      title: video.value?.title || 'Check out this video',
-      text: video.value?.title || 'Check out this video',
-      url: url
-    }).catch(err => {
-      console.log('Error sharing:', err);
-      copyToClipboard(url);
-    });
-  } else {
-    copyToClipboard(url);
+const showSharePanel = ref(false);
+
+const pageUrl = computed(() => {
+  return window.location.href;
+});
+
+const embedCode = computed(() => {
+  if (!video.value) return '';
+  const videoId = video.value._id || video.value.id;
+  const embedUrl = isEporner.value 
+    ? `${window.location.origin}/embed/${videoId}?source=eporner`
+    : `${window.location.origin}/embed/${videoId}`;
+  return `<iframe src="${embedUrl}" frameborder="0" width="510" height="400" scrolling="no" allowfullscreen="allowfullscreen"></iframe>`;
+});
+
+function toggleSharePanel() {
+  showSharePanel.value = !showSharePanel.value;
+}
+
+async function copyPageLink() {
+  try {
+    await navigator.clipboard.writeText(pageUrl.value);
+    // Show feedback
+    const btn = document.querySelector('.share-section:first-child .copy-btn');
+    if (btn) {
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+      setTimeout(() => {
+        btn.innerHTML = originalHTML;
+      }, 2000);
+    }
+  } catch (err) {
+    console.error('Failed to copy:', err);
   }
+}
+
+async function copyEmbedCode() {
+  try {
+    await navigator.clipboard.writeText(embedCode.value);
+    // Show feedback
+    const btn = document.querySelector('.share-section:nth-child(2) .copy-btn');
+    if (btn) {
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+      setTimeout(() => {
+        btn.innerHTML = originalHTML;
+      }, 2000);
+    }
+  } catch (err) {
+    console.error('Failed to copy:', err);
+  }
+}
+
+function shareToTwitter() {
+  const url = encodeURIComponent(pageUrl.value);
+  const text = encodeURIComponent(video.value?.title || 'Check out this video');
+  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+}
+
+function shareToReddit() {
+  const url = encodeURIComponent(pageUrl.value);
+  const title = encodeURIComponent(video.value?.title || 'Check out this video');
+  window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank');
+}
+
+function shareToEmail() {
+  const subject = encodeURIComponent(video.value?.title || 'Check out this video');
+  const body = encodeURIComponent(`Check out this video: ${pageUrl.value}`);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
 }
 
 function copyToClipboard(text) {
@@ -1036,20 +1142,183 @@ function copyToClipboard(text) {
   });
 }
 
-function handleDownload() {
-  if (!video.value) return;
+const isDownloading = ref(false);
+const downloadProgress = ref(0);
+
+async function handleDownload() {
+  if (!video.value || isDownloading.value) return;
   
-  if (video.value.url) {
-    // For S3 videos, create download link
+  isDownloading.value = true;
+  downloadProgress.value = 0;
+  
+  try {
+    // Check video source type
+    if (isEporner.value || video.value._source === 'eporner') {
+      // Eporner videos - try to extract direct URL or show message
+      await downloadEpornerVideo();
+    } else if (isHlsSource.value) {
+      // HLS stream - download segments and combine
+      await downloadHlsVideo();
+    } else if (video.value.url && hasDirectVideoUrl(video.value)) {
+      // Direct video URL - simple download
+      await downloadDirectVideo(video.value.url);
+    } else {
+      alert('Download not available for this video type.');
+    }
+  } catch (error) {
+    console.error('Download error:', error);
+    alert('Failed to download video. Please try again.');
+  } finally {
+    isDownloading.value = false;
+    downloadProgress.value = 0;
+  }
+}
+
+async function downloadDirectVideo(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch video');
+    
+    const contentLength = response.headers.get('content-length');
+    const total = contentLength ? parseInt(contentLength, 10) : 0;
+    
+    const reader = response.body.getReader();
+    const chunks = [];
+    let received = 0;
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      chunks.push(value);
+      received += value.length;
+      
+      if (total > 0) {
+        downloadProgress.value = Math.round((received / total) * 100);
+      }
+    }
+    
+    // Combine chunks into blob
+    const blob = new Blob(chunks, { type: 'video/mp4' });
+    const blobUrl = URL.createObjectURL(blob);
+    
+    // Create download link
     const link = document.createElement('a');
-    link.href = video.value.url;
-    link.download = video.value.title || 'video';
+    link.href = blobUrl;
+    link.download = `${video.value.title || 'video'}.mp4`;
+    document.body.appendChild(link);
     link.click();
-  } else if (video.value.iframeSrc) {
-    // For iframe videos, open in new tab
-    window.open(video.value.iframeSrc, '_blank');
-  } else {
-    alert(t('download.downloadFailed'));
+    document.body.removeChild(link);
+    
+    // Clean up
+    URL.revokeObjectURL(blobUrl);
+    
+    downloadProgress.value = 100;
+  } catch (error) {
+    console.error('Direct download error:', error);
+    // Fallback: try simple link download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = video.value.title || 'video';
+    link.target = '_blank';
+    link.click();
+  }
+}
+
+async function downloadHlsVideo() {
+  try {
+    // Check if Hls.js is available
+    if (typeof Hls === 'undefined') {
+      alert('HLS download requires HLS.js library. Please use a direct video URL.');
+      return;
+    }
+    
+    const hlsUrl = video.value.url;
+    const hls = new Hls();
+    
+    // Load manifest
+    const manifestResponse = await fetch(hlsUrl);
+    const manifestText = await manifestResponse.text();
+    
+    // Parse manifest to get segment URLs
+    const baseUrl = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+    const segmentUrls = [];
+    
+    manifestText.split('\n').forEach(line => {
+      if (line && !line.startsWith('#')) {
+        const segmentUrl = line.startsWith('http') ? line : baseUrl + line;
+        segmentUrls.push(segmentUrl);
+      }
+    });
+    
+    if (segmentUrls.length === 0) {
+      throw new Error('No segments found in HLS manifest');
+    }
+    
+    // Download all segments
+    const segments = [];
+    const total = segmentUrls.length;
+    
+    for (let i = 0; i < segmentUrls.length; i++) {
+      const response = await fetch(segmentUrls[i]);
+      const arrayBuffer = await response.arrayBuffer();
+      segments.push(arrayBuffer);
+      
+      downloadProgress.value = Math.round(((i + 1) / total) * 100);
+    }
+    
+    // Combine segments into single blob
+    const totalSize = segments.reduce((sum, seg) => sum + seg.byteLength, 0);
+    const combined = new Uint8Array(totalSize);
+    let offset = 0;
+    
+    segments.forEach(segment => {
+      combined.set(new Uint8Array(segment), offset);
+      offset += segment.byteLength;
+    });
+    
+    // Create blob and download
+    const blob = new Blob([combined], { type: 'video/mp4' });
+    const blobUrl = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `${video.value.title || 'video'}.mp4`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(blobUrl);
+    downloadProgress.value = 100;
+  } catch (error) {
+    console.error('HLS download error:', error);
+    alert('Failed to download HLS video. The video may be protected or the format is not supported.');
+  }
+}
+
+async function downloadEpornerVideo() {
+  // Eporner videos are embedded, so direct download is not possible
+  // We can try to extract the video URL from the embed, but it's often protected
+  try {
+    // Try to get video URL from Eporner API if available
+    if (video.value.url && !video.value.url.includes('embed')) {
+      // If we have a direct URL (unlikely for Eporner), use it
+      await downloadDirectVideo(video.value.url);
+    } else {
+      // Show user-friendly message
+      alert('Direct download is not available for this video. You can:\n\n1. Use browser extensions for video downloading\n2. Right-click on the video player and select "Save video as..."\n3. Use the video URL in a download manager');
+      
+      // Copy video page URL to clipboard as alternative
+      try {
+        await navigator.clipboard.writeText(pageUrl.value);
+        console.log('Video page URL copied to clipboard');
+      } catch (e) {
+        console.error('Failed to copy URL:', e);
+      }
+    }
+  } catch (error) {
+    console.error('Eporner download error:', error);
+    alert('Download not available for embedded videos. Please use browser extensions or download managers.');
   }
 }
 
@@ -1697,6 +1966,12 @@ onBeforeUnmount(() => {
   transform: scale(0.95);
 }
 
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .action-btn svg {
   width: 20px;
   height: 20px;
@@ -2011,14 +2286,118 @@ onBeforeUnmount(() => {
   background: var(--primary-dark);
 }
 
-.download-offline-btn {
-  background: var(--gradient-primary);
-  color: white;
+.share-panel {
+  background: var(--dark-lighter);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.download-offline-btn:hover {
-  background: var(--primary-dark);
+.share-section {
+  margin-bottom: 24px;
 }
+
+.share-section:last-child {
+  margin-bottom: 0;
+}
+
+.share-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.share-section-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.share-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.share-input,
+.share-textarea {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  resize: none;
+}
+
+.share-input:focus,
+.share-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.share-textarea {
+  min-height: 80px;
+  font-family: 'Courier New', monospace;
+}
+
+.copy-btn {
+  padding: 10px 16px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.copy-btn:hover {
+  background: var(--dark-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.social-share-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.social-share-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.social-share-btn:hover {
+  background: var(--dark-light);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.social-share-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
 
 /* Playback Speed Control */
 .playback-controls {
@@ -2136,9 +2515,6 @@ onBeforeUnmount(() => {
     height: 18px;
   }
 
-  .download-offline-btn span {
-    display: none;
-  }
 
   .channel-header {
     flex-wrap: wrap;
@@ -2328,15 +2704,6 @@ onBeforeUnmount(() => {
     padding: 8px;
   }
 
-  .download-offline-btn {
-    flex: 1 1 100%;
-    min-width: 100%;
-  }
-
-  .download-offline-btn span {
-    display: inline;
-    font-size: 11px;
-  }
 
   .channel-header {
     gap: 10px;
