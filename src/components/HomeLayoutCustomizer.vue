@@ -190,7 +190,7 @@ const {
   toggleSection,
   moveSectionUp,
   moveSectionDown,
-  resetToDefaults,
+  resetToDefaults: resetSectionsToDefaults,
   isSectionEnabled
 } = useHomeLayout();
 
@@ -323,7 +323,7 @@ function saveAndClose() {
 function resetToDefaults() {
   if (confirm('Are you sure you want to reset all layout preferences to defaults?')) {
     // Reset sections
-    useHomeLayout().resetToDefaults();
+    resetSectionsToDefaults();
     
     // Reset sidebar and navbar
     sidebarEnabled.value = true;
