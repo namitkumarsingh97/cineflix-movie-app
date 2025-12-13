@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate-icons": "node scripts/generate-icons.js"
+    "generate-icons": "node scripts/generate-icons.js",
+    "get-vercel-creds": "node scripts/get-vercel-credentials.js"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.5.3",
