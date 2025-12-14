@@ -326,7 +326,7 @@
           </router-link>
         </div>
         <div class="category-trending-scroll">
-          <div class="category-trending-grid">
+          <div class="youtube-videos-grid">
             <VideoCard
               v-for="video in videos"
               :key="video.id"
@@ -2054,28 +2054,10 @@ function scrollToSection(section) {
   padding-bottom: 0;
 }
 
-.category-trending-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
-  max-width: 100%;
-}
-
-.category-trending-grid .youtube-video-card {
-  min-width: auto;
-  width: 100%;
-  max-width: 100%;
-}
-
 /* Responsive Styles for Trending by Category */
 @media (max-width: 1440px) {
   .trending-categories-section {
     padding: 0 30px;
-  }
-  
-  .category-trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.25rem;
   }
 }
 
@@ -2091,11 +2073,6 @@ function scrollToSection(section) {
   
   .category-trending-title {
     font-size: 1.35rem;
-  }
-  
-  .category-trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1.25rem;
   }
 }
 
@@ -2116,11 +2093,6 @@ function scrollToSection(section) {
   
   .category-trending-title {
     font-size: 1.25rem;
-  }
-  
-  .category-trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
   }
   
   .view-all-link {
@@ -2145,11 +2117,6 @@ function scrollToSection(section) {
   .category-trending-title {
     font-size: 1.15rem;
   }
-  
-  .category-trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 0.875rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -2173,11 +2140,6 @@ function scrollToSection(section) {
     font-size: 1.1rem;
   }
   
-  .category-trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0.75rem;
-  }
-  
   .view-all-link {
     font-size: 0.85rem;
     align-self: flex-end;
@@ -2187,11 +2149,6 @@ function scrollToSection(section) {
 @media (max-width: 360px) {
   .trending-categories-section {
     padding: 0 8px;
-  }
-  
-  .category-trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.625rem;
   }
   
   .category-trending-title {
@@ -2404,9 +2361,6 @@ function scrollToSection(section) {
     height: 18px;
   }
   
-  .category-trending-grid .youtube-video-card {
-    min-width: 160px;
-  }
 }
 
 /* Responsive Styles for All Sections (HD/4K Quality, Staff Picks, and Others) */

@@ -418,12 +418,7 @@ onMounted(() => {
   font-size: 1rem;
 }
 
-.youtube-videos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
+/* Grid styles are inherited from global style.css .youtube-videos-grid */
 
 @media (max-width: 768px) {
   .tag-page {
@@ -432,11 +427,6 @@ onMounted(() => {
 
   .page-title {
     font-size: 1.5rem;
-  }
-
-  .youtube-videos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
   }
 
   .pagination {
