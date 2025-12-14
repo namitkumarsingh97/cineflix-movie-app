@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-to-main" @click.prevent="skipToMain">
       Skip to main content
     </a>
@@ -79,31 +78,6 @@
                   <span>Actors</span>
                 </router-link>
               </li>
-              <!-- Categories temporarily hidden -->
-              <!--
-              <li class="navbar-nav-item">
-                <router-link
-                  to="/categories"
-                  class="navbar-link"
-                  active-class="active"
-                  @click="closeMobileMenu"
-                >
-                  <FolderOpen :size="16" />
-                  <span>Categories</span>
-                </router-link>
-              </li>
-              -->
-              <!-- <li class="navbar-nav-item">
-                <router-link
-                  to="/stories"
-                  class="navbar-link"
-                  active-class="active"
-                  @click="closeMobileMenu"
-                >
-                  <Heart :size="16" />
-                  <span>Stories</span>
-                </router-link>
-              </li> -->
               <li class="navbar-nav-item">
                 <router-link
                   to="/premium"
@@ -302,14 +276,14 @@
             >
               <Settings :size="20" />
             </button>
-            <button
+            <!-- <button
               class="navbar-btn accessibility-btn"
               @click="showAccessibility = true"
               title="Accessibility Settings"
               aria-label="Open accessibility settings"
             >
               <Accessibility :size="20" />
-            </button>
+            </button> -->
             <button
               class="navbar-btn refresh-btn"
               @click="$emit('refresh')"
@@ -775,16 +749,6 @@
               <span>Webcam</span>
             </button>
           </div>
-
-          <!-- <router-link
-            to="/stories"
-            class="mobile-menu-link"
-            active-class="active"
-            @click="closeMobileMenu"
-          >
-            <Heart :size="20" />
-            <span>Stories</span>
-          </router-link> -->
           <router-link
             v-if="isAdminLoggedIn"
             to="/admin/panel"
@@ -794,15 +758,6 @@
             <Shield :size="20" />
             <span>Admin Panel</span>
           </router-link>
-          <!-- <router-link
-            v-else
-            to="/admin/login"
-            class="mobile-menu-link"
-            @click="closeMobileMenu"
-          >
-            <Shield :size="20" />
-            <span>Admin</span>
-          </router-link> -->
         </nav>
       </div>
 
@@ -949,6 +904,7 @@ import {
   FolderOpen,
   Star,
   Heart,
+  FileText,
   Facebook,
   Twitter,
   Instagram,

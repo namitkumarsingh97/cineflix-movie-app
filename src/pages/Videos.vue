@@ -493,8 +493,7 @@ watch(() => route.query.order, (newOrder) => {
 }
 
 .search-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
+  /* Focus indicators disabled */
 }
 
 .search-btn {
@@ -533,7 +532,7 @@ watch(() => route.query.order, (newOrder) => {
 }
 
 .filter-select:focus {
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .categories-section {

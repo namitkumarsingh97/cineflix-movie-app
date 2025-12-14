@@ -2196,7 +2196,7 @@ onBeforeUnmount(() => {
 
 .comment-author-input:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .comment-text-input {
@@ -2214,7 +2214,7 @@ onBeforeUnmount(() => {
 
 .comment-text-input:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .comment-text-input::placeholder {
@@ -2383,7 +2383,7 @@ onBeforeUnmount(() => {
 .share-input:focus,
 .share-textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .share-textarea {
@@ -2476,7 +2476,7 @@ onBeforeUnmount(() => {
 
 .speed-select:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 /* Related Content Section */

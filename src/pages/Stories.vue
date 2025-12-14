@@ -6,9 +6,25 @@
         <span>Stories</span>
       </h1>
       <div class="stories-filters">
-        <select v-model="selectedCategory" class="filter-select" @change="loadStories">
+        <div class="search-container">
+          <Search :size="18" class="search-icon" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search stories..."
+            class="search-input"
+            @keyup.enter="handleSearch"
+          />
+          <button v-if="searchQuery" class="clear-search" @click="searchQuery = ''; handleSearch()">×</button>
+        </div>
+        <select v-model="selectedCategory" class="filter-select" @change="handleCategoryChange">
           <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+        </select>
+        <select v-model="selectedLanguage" class="filter-select language-select">
+          <option v-for="lang in languages" :key="lang.code" :value="lang.code">
+            {{ lang.flag }} {{ lang.name }}
+          </option>
         </select>
       </div>
     </div>
@@ -69,11 +85,11 @@
       </table>
 
       <!-- Pagination -->
-      <div v-if="pagination.pages > 1" class="pagination">
+      <div v-if="totalPages > 1" class="pagination">
         <button
           class="pagination-btn"
-          @click="changePage(pagination.page - 1)"
-          :disabled="pagination.page === 1"
+          @click="changePage(currentPage - 1)"
+          :disabled="currentPage === 1 || loading"
         >
           <ChevronLeft :size="18" />
           <span>Previous</span>
@@ -82,16 +98,17 @@
           <button
             v-for="page in visiblePages"
             :key="page"
-            :class="['page-number', { active: page === pagination.page }]"
-            @click="changePage(page)"
+            :class="['page-number', { active: page === currentPage, disabled: page === '...' }]"
+            @click="page !== '...' && changePage(page)"
+            :disabled="page === '...' || loading"
           >
             {{ page }}
           </button>
         </div>
         <button
           class="pagination-btn"
-          @click="changePage(pagination.page + 1)"
-          :disabled="pagination.page === pagination.pages"
+          @click="changePage(currentPage + 1)"
+          :disabled="currentPage >= totalPages || loading"
         >
           <span>Next</span>
           <ChevronRight :size="18" />
@@ -99,6 +116,12 @@
       </div>
     </div>
 
+    <div v-else-if="error" class="empty-state error-state">
+      <FileText :size="64" />
+      <h3>Error loading stories</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="loadStories">Retry</button>
+    </div>
     <div v-else class="empty-state">
       <FileText :size="64" />
       <h3>No stories found</h3>
@@ -108,74 +131,79 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { FileText, ChevronRight, Star, ChevronLeft } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
+import { FileText, ChevronRight, Star, ChevronLeft, Languages, Search } from 'lucide-vue-next';
+import { useStories } from '../composables/useStories';
 import Loader from '../components/Loader.vue';
 
 const router = useRouter();
+const {
+  stories,
+  loading,
+  error,
+  currentPage,
+  totalPages,
+  totalCount,
+  selectedLanguage,
+  languages,
+  categories,
+  fetchStories,
+  filterByCategory,
+  filterByLanguage,
+} = useStories();
 
-const stories = ref([]);
-const categories = ref([]);
-const loading = ref(true);
 const selectedCategory = ref('');
-const pagination = ref({
-  page: 1,
-  limit: 10,
-  total: 0,
-  pages: 0,
-});
+const searchQuery = ref('');
 
 onMounted(async () => {
-  await Promise.all([loadCategories(), loadStories()]);
+  await loadStories();
 });
 
-async function loadCategories() {
-  try {
-    const response = await apiClient.get('/stories/categories');
-    if (response.data.success) {
-      categories.value = response.data.data || [];
-    }
-  } catch (error) {
-    console.error('Failed to load categories:', error);
-  }
-}
-
 async function loadStories() {
-  loading.value = true;
-  try {
-    const params = {
-      page: pagination.value.page,
-      limit: pagination.value.limit,
-    };
-    if (selectedCategory.value) {
-      params.category = selectedCategory.value;
-    }
+  const options = {
+    limit: 20,
+    category: selectedCategory.value || undefined,
+    search: searchQuery.value || undefined,
+  };
+  await fetchStories(currentPage.value, options);
+}
 
-    const response = await apiClient.get('/stories/published', { params });
-    if (response.data.success) {
-      stories.value = response.data.data || [];
-      pagination.value = response.data.pagination || pagination.value;
-    }
-  } catch (error) {
-    console.error('Failed to load stories:', error);
-  } finally {
-    loading.value = false;
+async function handleSearch() {
+  if (searchQuery.value.trim()) {
+    await fetchStories(1, { search: searchQuery.value.trim() });
+  } else {
+    await loadStories();
   }
 }
 
-function changePage(page) {
-  if (page >= 1 && page <= pagination.value.pages) {
-    pagination.value.page = page;
-    loadStories();
+async function handleCategoryChange() {
+  await loadStories();
+}
+
+async function handleLanguageChange() {
+  await filterByLanguage(selectedLanguage.value, 1);
+}
+
+// Watch for language changes
+watch(selectedLanguage, () => {
+  handleLanguageChange();
+});
+
+async function changePage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    await fetchStories(page, {
+      limit: 20,
+      category: selectedCategory.value || undefined,
+      search: searchQuery.value || undefined,
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
 
 const visiblePages = computed(() => {
-  const current = pagination.value.page;
-  const total = pagination.value.pages;
+  const current = currentPage.value;
+  const total = totalPages.value;
   const pages = [];
   
   if (total <= 7) {
@@ -279,6 +307,59 @@ function getRating(story) {
 .stories-filters {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--dark-lighter);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 8px 16px;
+  min-width: 250px;
+  transition: all 0.3s ease;
+}
+
+.search-container:focus-within {
+  /* Focus indicators disabled */
+}
+
+.search-icon {
+  color: var(--text-secondary);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  padding: 0;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.clear-search {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.clear-search:hover {
+  color: var(--text-primary);
 }
 
 .filter-select {
@@ -290,12 +371,16 @@ function getRating(story) {
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 150px;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
+  /* Focus indicators disabled */
+}
+
+.language-select {
+  min-width: 180px;
 }
 
 .stories-table-container {
@@ -524,11 +609,33 @@ function getRating(story) {
   opacity: 0.5;
 }
 
-.empty-state h3 {
-  font-size: 24px;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-}
+  .empty-state h3 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .error-state {
+    color: #ef4444;
+  }
+
+  .retry-btn {
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .retry-btn:hover {
+    background: var(--gradient-primary);
+    transform: translateY(-2px);
+  }
 
 /* Tablet Styles */
 @media (min-width: 769px) and (max-width: 1024px) {

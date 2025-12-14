@@ -950,7 +950,7 @@ const routes = [
     name: 'Stories',
     component: () => import('../pages/Stories.vue'),
     meta: { 
-      preload: false, // Less critical - load on demand
+      preload: false,
       title: 'Stories'
     }
   },

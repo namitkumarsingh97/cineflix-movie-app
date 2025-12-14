@@ -1412,8 +1412,7 @@ function scrollToSection(section) {
 }
 
 .layout-customizer-btn:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .surprise-me-btn {
