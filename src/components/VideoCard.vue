@@ -53,6 +53,7 @@ import { formatDuration } from '../utils/date';
 import { Star } from 'lucide-vue-next';
 import { useNetworkQuality } from '../composables/useNetworkQuality';
 import { useAIThumbnails } from '../composables/useAIThumbnails';
+import { generateWatchUrl } from '../utils/slug';
 import OptimizedImage from './OptimizedImage.vue';
 
 const props = defineProps({
@@ -71,22 +72,16 @@ const emit = defineEmits(['click']);
 const { shouldPreloadThumbnails } = useNetworkQuality();
 const { getOptimizedThumbnail } = useAIThumbnails();
 
-// Generate watch URL for router-link
+// Generate watch URL for router-link using slug
 const watchUrl = computed(() => {
   if (!props.video) return '/';
-  // Check if it's an Eporner video (has id but no _id)
-  if (props.video.id && !props.video._id) {
-    return `/watch/${props.video.id}?source=eporner`;
-  }
-  // Regular video from backend
-  if (props.video._id) {
-    return `/watch/${props.video._id}`;
-  }
-  // Fallback to id
-  if (props.video.id) {
-    return `/watch/${props.video.id}`;
-  }
-  return '/';
+  
+  // Determine source
+  const source = (props.video.id && !props.video._id) || props.video._source === 'eporner' 
+    ? 'eporner' 
+    : undefined;
+  
+  return generateWatchUrl(props.video, { source });
 });
 
 function getDefaultThumbnail() {

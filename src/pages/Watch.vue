@@ -339,6 +339,7 @@ const loadHls = async () => {
   return Hls;
 };
 import { useRoute, useRouter } from 'vue-router';
+import { generateSlug, generateWatchUrl } from '../utils/slug';
 import { videosApi } from '../api/videos';
 import { moviesApi } from '../api/movies';
 import { useEporner } from '../composables/useEporner';
@@ -390,7 +391,23 @@ const { movies, loadMovies } = useMovies();
 const { getVideoById, videos: epornerVideos, searchVideos } = useEporner();
 const { initializeSmartQueue, predictedVideos, isPreloading } = useSmartQueue();
 
-const videoId = computed(() => route.params.id);
+// Get video ID from query param (for lookup) or from slug (backward compatibility)
+const videoId = computed(() => {
+  // Priority 1: ID from query param (most reliable)
+  if (route.query.id) {
+    return route.query.id;
+  }
+  // Priority 2: Slug might be an ID (backward compatibility)
+  const slug = route.params.slug;
+  // Check if slug looks like an ID (alphanumeric, no hyphens, or specific format)
+  if (slug && /^[A-Za-z0-9]+$/.test(slug) && slug.length > 10) {
+    return slug;
+  }
+  return null;
+});
+
+// Get slug from route
+const routeSlug = computed(() => route.params.slug);
 const isMovie = ref(false);
 const isEporner = computed(() => route.query.source === 'eporner');
 const isHlsSource = computed(() => {
@@ -743,7 +760,7 @@ const relatedContent = computed(() => {
 });
 
 // Watch for route changes
-watch(() => route.params.id, () => {
+watch(() => route.params.slug, () => {
   // Scroll to top when video changes
   window.scrollTo({ top: 0, behavior: 'smooth' });
   loadVideo();
@@ -754,6 +771,13 @@ watch(() => route.params.id, () => {
   commentText.value = '';
   commentAuthor.value = '';
   tagBasedRecommendations.value = []; // Reset tag-based recommendations
+});
+
+// Watch for ID query param changes (for backward compatibility)
+watch(() => route.query.id, () => {
+  if (route.query.id && route.query.id !== videoId.value) {
+    loadVideo();
+  }
 });
 
 // Helper function to check if ID looks like Eporner video ID (11 chars, alphanumeric)
@@ -1013,6 +1037,23 @@ async function loadVideo() {
     console.error('Unexpected error loading video:', error);
   } finally {
     loading.value = false;
+    
+    // Update URL to use slug if we have video title
+    if (video.value && video.value.title) {
+      const currentSlug = route.params.slug;
+      const expectedSlug = generateSlug(video.value.title);
+      const currentId = route.query.id || videoId.value;
+      
+      // Only update URL if slug doesn't match or ID is missing from query
+      if (currentSlug !== expectedSlug || !route.query.id) {
+        const newUrl = generateWatchUrl(video.value, { 
+          source: isEporner.value ? 'eporner' : undefined 
+        });
+        
+        // Use replace to avoid adding to history
+        router.replace(newUrl);
+      }
+    }
   }
 }
 
@@ -1428,8 +1469,10 @@ function navigateToTag(tag) {
 }
 
 function navigateToVideo(video) {
-  const source = video._source === 'eporner' ? '?source=eporner' : '';
-  router.push(`/watch/${video.id || video._id}${source}`);
+  const url = generateWatchUrl(video, {
+    source: video._source === 'eporner' ? 'eporner' : undefined
+  });
+  router.push(url);
 }
 
 function goToPremium() {
@@ -1608,9 +1651,17 @@ function processIframe() {
 // Watch for video changes to process iframe
 watch(() => video.value, () => {
   processIframe();
+  
+  // Update page title when video loads
+  if (video.value && video.value.title) {
+    document.title = `${video.value.title} - Cineflix`;
+  }
 }, { deep: true });
 
 onMounted(async () => {
+  // Set default title while loading
+  document.title = 'Loading... - Cineflix';
+  
   // Scroll to top on initial mount
   window.scrollTo({ top: 0, behavior: 'instant' });
   
@@ -1624,6 +1675,13 @@ onMounted(async () => {
     setTimeout(() => {
       loadTagBasedRecommendations();
     }, 2000); // Delay 2 seconds on slow networks
+  }
+  
+  // Update title if video loaded
+  if (video.value && video.value.title) {
+    document.title = `${video.value.title} - Cineflix`;
+  } else {
+    document.title = 'Video - Cineflix';
   }
 });
 
