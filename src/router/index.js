@@ -529,7 +529,7 @@ const routes = [
     }
   },
   {
-    path: '/watch/:id',
+    path: '/watch/:slug',
     name: 'Watch',
     component: () => import('../pages/Watch.vue'),
     meta: { 

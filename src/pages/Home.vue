@@ -1020,9 +1020,12 @@ function navigateToMovie(movie) {
   router.push(`/watch/${movie._id}`);
 }
 
+import { generateWatchUrl } from '../utils/slug';
+
 function navigateToVideo(video) {
-  // Navigate to watch page with video ID and eporner source
-  router.push(`/watch/${video.id}?source=eporner`);
+  // Navigate to watch page with slug-based URL
+  const url = generateWatchUrl(video, { source: 'eporner' });
+  router.push(url);
 }
 
 function navigateToActor(actorName) {

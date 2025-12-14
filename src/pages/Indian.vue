@@ -180,8 +180,11 @@ function handleSortChange() {
   searchVideos(query, 1, { order: sortOrder.value });
 }
 
+import { generateWatchUrl } from '../utils/slug';
+
 function navigateToVideo(video) {
-  router.push(`/watch/${video.id}?source=eporner`);
+  const url = generateWatchUrl(video, { source: 'eporner' });
+  router.push(url);
 }
 
 // Update URL with page parameter
