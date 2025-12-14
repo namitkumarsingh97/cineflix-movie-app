@@ -15,15 +15,31 @@
               <h1 class="page-title">Actors</h1>
               <p class="page-subtitle">Browse all actors and performers</p>
             </div>
-            <button 
-              class="refresh-actresses-btn"
-              @click="refreshActresses"
-              :disabled="extracting || loading"
-              title="Refresh actresses list from API"
-            >
-              <RefreshCw :size="18" :class="{ spinning: extracting || loading }" />
-              <span>{{ extracting || loading ? 'Extracting...' : 'Refresh' }}</span>
-            </button>
+            <div class="header-actions">
+              <div class="filter-container">
+                <label for="letter-filter" class="filter-label">Filter by Letter:</label>
+                <select 
+                  id="letter-filter"
+                  v-model="selectedLetter" 
+                  @change="handleLetterFilterChange"
+                  class="letter-filter-select"
+                >
+                  <option value="">All Letters</option>
+                  <option v-for="letter in alphabetLetters" :key="letter" :value="letter">
+                    {{ letter }}
+                  </option>
+                </select>
+              </div>
+              <button 
+                class="refresh-actresses-btn"
+                @click="refreshActresses"
+                :disabled="extracting || loading"
+                title="Refresh actresses list from API"
+              >
+                <RefreshCw :size="18" :class="{ spinning: extracting || loading }" />
+                <span>{{ extracting || loading ? 'Extracting...' : 'Refresh' }}</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -114,18 +130,45 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import CategorySidebar from '../components/CategorySidebar.vue';
 import { Star, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-vue-next';
 import { useActresses } from '../composables/useActresses';
 
 const router = useRouter();
+const route = useRoute();
 
 const sidebarOpen = ref(true);
-const currentPage = ref(1);
 const actorsPerPage = 24; // 4 columns x 6 rows
 const extracting = ref(false);
+
+// Initialize currentPage from URL query parameter or default to 1
+function getPageFromUrl() {
+  const pageParam = route.query.page;
+  if (pageParam) {
+    const page = parseInt(pageParam, 10);
+    if (page > 0 && !isNaN(page)) {
+      return page;
+    }
+  }
+  return 1;
+}
+
+// Initialize selectedLetter from URL query parameter or default to empty (all)
+function getLetterFromUrl() {
+  const letterParam = route.query.letter;
+  if (letterParam && /^[A-Z]$/i.test(letterParam)) {
+    return letterParam.toUpperCase();
+  }
+  return '';
+}
+
+const currentPage = ref(getPageFromUrl());
+const selectedLetter = ref(getLetterFromUrl());
+
+// Generate alphabet letters A-Z
+const alphabetLetters = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 
 const { actresses, loading, extractAllActresses, loadFromStorage, getActressImage, getAllKnownActresses, isValidActressName } = useActresses();
 
@@ -138,11 +181,95 @@ const allActors = ref([]);
 
 // No longer needed - we only use KNOWN_ACTRESSES
 
+// Update URL with page and letter filter parameters
+function updateUrlParams(page, letter = null) {
+  const query = { ...route.query };
+  
+  // Handle page parameter
+  if (page === 1) {
+    delete query.page;
+  } else {
+    query.page = page.toString();
+  }
+  
+  // Handle letter filter parameter
+  if (letter === null) {
+    letter = selectedLetter.value;
+  }
+  if (letter) {
+    query.letter = letter;
+  } else {
+    delete query.letter;
+  }
+  
+  router.push({ 
+    path: '/actors',
+    query: query
+  });
+}
+
+// Update URL with page parameter (backward compatibility)
+function updateUrlPage(page) {
+  updateUrlParams(page);
+}
+
+// Watch for URL query parameter changes (e.g., browser back/forward)
+watch(() => route.query.page, (newPageParam) => {
+  const page = newPageParam ? parseInt(newPageParam, 10) : 1;
+  if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+    currentPage.value = page;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}, { immediate: false });
+
+// Watch for letter filter changes in URL (browser back/forward)
+watch(() => route.query.letter, (newLetterParam) => {
+  const letter = newLetterParam && /^[A-Z]$/i.test(newLetterParam) 
+    ? newLetterParam.toUpperCase() 
+    : '';
+  if (letter !== selectedLetter.value) {
+    selectedLetter.value = letter;
+    // Reset to page 1 when filter changes from URL
+    currentPage.value = 1;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}, { immediate: false });
+
+// Handle letter filter change
+function handleLetterFilterChange() {
+  // Reset to page 1 when filter changes
+  currentPage.value = 1;
+  // Update URL with new filter
+  updateUrlParams(1, selectedLetter.value);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Load actresses on mount - use only KNOWN_ACTRESSES
 onMounted(async () => {
   // Load known actresses from KNOWN_ACTRESSES with images from pornpics.com
   const knownActresses = getAllKnownActresses();
   allActors.value = knownActresses;
+  
+  // Calculate total pages
+  const totalPagesCount = Math.ceil(knownActresses.length / actorsPerPage);
+  
+  // Get page from URL or default to 1
+  const urlPage = getPageFromUrl();
+  
+  // Validate and set page
+  if (urlPage > totalPagesCount) {
+    // If URL page is beyond total pages, go to last page and update URL
+    currentPage.value = totalPagesCount;
+    updateUrlPage(totalPagesCount);
+  } else if (urlPage > 1) {
+    // Valid page from URL
+    currentPage.value = urlPage;
+  } else {
+    // Page 1 - ensure URL doesn't have page param
+    if (route.query.page) {
+      updateUrlPage(1);
+    }
+  }
   
   // Save to localStorage for persistence
   try {
@@ -150,6 +277,9 @@ onMounted(async () => {
   } catch (e) {
     console.warn('Could not save actresses to localStorage:', e);
   }
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'instant' });
 });
 
 // Function to manually refresh actresses - reload from KNOWN_ACTRESSES
@@ -173,10 +303,21 @@ async function refreshActresses() {
   }
 }
 
-// Computed for total actors count
-const totalActorsCount = computed(() => allActors.value.length);
+// Filter actors by selected letter
+const filteredActors = computed(() => {
+  if (!selectedLetter.value) {
+    return allActors.value;
+  }
+  return allActors.value.filter(actor => {
+    const firstLetter = actor.name.charAt(0).toUpperCase();
+    return firstLetter === selectedLetter.value;
+  });
+});
 
-// Computed for total pages
+// Computed for total actors count (filtered)
+const totalActorsCount = computed(() => filteredActors.value.length);
+
+// Computed for total pages (based on filtered actors)
 const totalPages = computed(() => {
   return Math.ceil(totalActorsCount.value / actorsPerPage);
 });
@@ -194,7 +335,7 @@ const displayTotalPages = computed(() => {
 const displayedActors = computed(() => {
   const start = (currentPage.value - 1) * actorsPerPage;
   const end = start + actorsPerPage;
-  return allActors.value.slice(start, end);
+  return filteredActors.value.slice(start, end);
 });
 
 // Calculate visible pages for pagination
@@ -289,7 +430,13 @@ function handleImageError(event, actor) {
 // Go to page
 function goToPage(page) {
   if (page === '...' || page < 1 || page > totalPages.value) return;
+  
+  // Update URL with new page
+  updateUrlPage(page);
+  
+  // Update current page (URL watcher will also update it, but this is immediate)
   currentPage.value = page;
+  
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -369,6 +516,55 @@ function goToPage(page) {
   align-items: flex-start;
   gap: 20px;
   flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.letter-filter-select {
+  padding: 10px 16px;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  outline: none;
+}
+
+.letter-filter-select:hover {
+  background: var(--dark-light);
+  border-color: var(--primary);
+}
+
+.letter-filter-select:focus {
+  /* Focus indicators disabled */
+}
+
+.letter-filter-select option {
+  background: var(--dark-lighter);
+  color: var(--text-primary);
+  padding: 10px;
 }
 
 .refresh-actresses-btn {
@@ -811,6 +1007,29 @@ function goToPage(page) {
     margin-bottom: 1.5rem;
   }
 
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .filter-container {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .letter-filter-select {
+    width: 100%;
+    min-width: 120px;
+  }
+
   .page-title {
     font-size: 1.5rem;
   }
@@ -909,6 +1128,39 @@ function goToPage(page) {
 
   .page-header {
     margin-bottom: 1.25rem;
+  }
+
+  .header-content {
+    gap: 12px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filter-container {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .filter-label {
+    font-size: 12px;
+  }
+
+  .letter-filter-select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: auto;
+  }
+
+  .refresh-actresses-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .page-title {
