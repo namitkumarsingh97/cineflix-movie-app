@@ -14,13 +14,7 @@
           <p class="page-subtitle">Browse all actors and performers</p>
         </div>
 
-        <SkeletonSection
-          v-if="loading"
-          :count="maxActorsPerPage"
-          :columns="4"
-        />
-
-        <div v-else-if="displayedActors.length > 0" class="actors-content-section">
+        <div v-if="displayedActors.length > 0" class="actors-content-section">
           <div class="actors-info">
             <p class="actors-count">
               Showing {{ displayedActors.length }} of {{ totalActorsCount }} actors
@@ -32,35 +26,33 @@
               v-for="(actor, index) in displayedActors"
               :key="actor.name"
               class="actor-card"
-              :class="{ 'actor-card-with-thumbnail': actor.thumbnail }"
               @click="navigateToActor(actor.name)"
             >
-              <!-- Cards with thumbnail -->
-              <div v-if="actor.thumbnail" class="actor-card-thumbnail-wrapper">
-                <img
-                  :src="actor.thumbnail"
-                  :alt="actor.name"
-                  class="actor-thumbnail"
-                  @error="handleThumbnailError"
-                />
-                <div class="actor-thumbnail-overlay">
-                  <div class="actor-card-content">
-                    <h3 class="actor-name">{{ actor.name }}</h3>
-                    <p class="actor-video-count" v-if="actor.videoCount">
-                      {{ actor.videoCount }} {{ actor.videoCount === 1 ? 'video' : 'videos' }}
-                    </p>
+              <!-- Cards with actress picture or avatar fallback -->
+              <div class="actor-card-content">
+                <div class="actor-image-wrapper">
+                  <img
+                    v-if="actor.image"
+                    :src="actor.image"
+                    :alt="actor.name"
+                    class="actor-image"
+                    @error="handleImageError($event, actor)"
+                  />
+                  <div
+                    v-else
+                    class="actor-avatar"
+                    :style="getAvatarStyle(actor.name, index)"
+                  >
+                    {{ getInitials(actor.name) }}
                   </div>
                 </div>
-              </div>
-              <!-- Cards with avatar (when no thumbnail) -->
-              <div v-else class="actor-card-content">
-                <div class="actor-avatar">
-                  {{ getInitials(actor.name) }}
+                <div class="actor-name-wrapper">
+                  <h3 class="actor-name">{{ actor.name }}</h3>
+                  <div class="actor-card-badge">
+                    <Star :size="12" />
+                    <span>Featured</span>
+                  </div>
                 </div>
-                <h3 class="actor-name">{{ actor.name }}</h3>
-                <p class="actor-video-count" v-if="actor.videoCount">
-                  {{ actor.videoCount }} {{ actor.videoCount === 1 ? 'video' : 'videos' }}
-                </p>
               </div>
             </div>
           </div>
@@ -73,7 +65,7 @@
             <div class="pagination">
               <button
                 class="pagination-btn"
-                :disabled="currentPage === 1 || loading"
+                :disabled="currentPage === 1"
                 @click="goToPage(currentPage - 1)"
               >
                 <ChevronLeft :size="18" />
@@ -85,14 +77,14 @@
                   :key="page"
                   :class="['page-number', { active: page === currentPage }]"
                   @click="goToPage(page)"
-                  :disabled="page === '...' || loading"
+                  :disabled="page === '...'"
                 >
                   {{ page }}
                 </button>
               </div>
               <button
                 class="pagination-btn"
-                :disabled="currentPage >= totalPages || loading"
+                :disabled="currentPage >= totalPages"
                 @click="goToPage(currentPage + 1)"
               >
                 <span>Next</span>
@@ -113,53 +105,48 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useEporner } from '../composables/useEporner';
-import SkeletonSection from '../components/SkeletonSection.vue';
 import CategorySidebar from '../components/CategorySidebar.vue';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
 const router = useRouter();
-const { searchVideos, videos: epornerVideos, totalCount: epornerTotalCount } = useEporner();
 
 const sidebarOpen = ref(true);
-const loading = ref(true); // Start with loading to show skeleton while fetching thumbnail
 const currentPage = ref(1);
 const actorsPerPage = 24; // 4 columns x 6 rows
-const maxActorsPerPage = actorsPerPage;
 
 function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
 }
 
 const allActors = ref([
-  { name: 'Abella Danger', videoCount: null, thumbnail: null },
-  { name: 'AJ Applegate', videoCount: null, thumbnail: null },
-  { name: 'Aaliyah Hadid', videoCount: null, thumbnail: null },
-  { name: 'Aaliyah Love', videoCount: null, thumbnail: null },
-  { name: 'Abigaile Johnson', videoCount: null, thumbnail: null },
-  /* { name: 'Adira Allure', videoCount: null, thumbnail: null },
-  { name: 'Adria Rae', videoCount: null, thumbnail: null },
-  { name: 'Adriana Chechik', videoCount: null, thumbnail: null },
-  { name: 'Aletta Ocean', videoCount: null, thumbnail: null },
-  { name: 'Alex Blake', videoCount: null, thumbnail: null },
-  { name: 'Alex Chance', videoCount: null, thumbnail: null },
-  { name: 'Alex Coal', videoCount: null, thumbnail: null },
-  { name: 'Alex De La Flor', videoCount: null, thumbnail: null },
-  { name: 'Alex Gonz', videoCount: null, thumbnail: null },
-  { name: 'Alex Grey', videoCount: null, thumbnail: null },
-  { name: 'Alex Harper', videoCount: null, thumbnail: null },
-  { name: 'Alex Jett', videoCount: null, thumbnail: null },
-  { name: 'Alex Jones', videoCount: null, thumbnail: null },
-  { name: 'Alex Legend', videoCount: null, thumbnail: null },
-  { name: 'Alex Lynn', videoCount: null, thumbnail: null },
-  { name: 'Alex Mack', videoCount: null, thumbnail: null },
-  { name: 'Alex Moreno', videoCount: null, thumbnail: null },
-  { name: 'Alex Tanner', videoCount: null, thumbnail: null },
-  { name: 'Alex Victor', videoCount: null, thumbnail: null },
-  { name: 'Alexa Flexy', videoCount: null, thumbnail: null },
-  { name: 'Alexa Grace', videoCount: null, thumbnail: null },*/
+  { name: 'Abella Danger', image: 'https://cdni.pornpics.com/models/a/abella_danger.jpg' },
+  { name: 'AJ Applegate', image: 'https://cdni.pornpics.com/models/a/aj_applegate.jpg' },
+  { name: 'Aaliyah Hadid', image: 'https://cdni.pornpics.com/models/a/aaliyah_hadid.jpg' },
+  { name: 'Aaliyah Love', image: 'https://cdni.pornpics.com/models/a/aaliyah_love.jpg' },
+  { name: 'Abigaile Johnson', image: 'https://cdni.pornpics.com/models/a/abigaile_johnson.jpg' },
+  { name: 'Adira Allure', image: 'https://cdni.pornpics.com/models/a/adira_allure.jpg' },
+  { name: 'Adria Rae', image: 'https://cdni.pornpics.com/models/a/adria_rae.jpg' },
+  { name: 'Adriana Chechik', image: 'https://cdni.pornpics.com/models/a/adriana_chechik.jpg' },
+  { name: 'Aletta Ocean', image: 'https://cdni.pornpics.com/models/a/aletta_ocean.jpg' },
+  { name: 'Alex Blake', image: 'https://cdni.pornpics.com/models/a/alex_blake.jpg' },
+  { name: 'Alex Chance', image: 'https://cdni.pornpics.com/models/a/alex_chance.jpg' },
+  { name: 'Alex Coal', image: 'https://cdni.pornpics.com/models/a/alex_coal.jpg' },
+  { name: 'Alex De La Flor', image: 'https://cdni.pornpics.com/1280/7/67/82324668/82324668_030_5342.jpg' },
+  { name: 'Alex Gonz', image: 'https://cdni.pornpics.com/1280/7/434/89442331/89442331_060_ba21.jpg' },
+  { name: 'Alex Grey', image: 'https://cdni.pornpics.com/1280/1/167/42274713/42274713_002_8091.jpg' },
+  { name: 'Alex Harper', image: null },
+  { name: 'Alex Jett', image: null },
+  { name: 'Alex Jones', image: null },
+  { name: 'Alex Legend', image: null },
+  { name: 'Alex Lynn', image: null },
+  { name: 'Alex Mack', image: null },
+  { name: 'Alex Moreno', image: null },
+  { name: 'Alex Tanner', image: null },
+  { name: 'Alex Victor', image: null },
+  { name: 'Alexa Flexy', image: null },
+  { name: 'Alexa Grace', image: null },
 ]);
 
 // Computed for total actors count
@@ -231,6 +218,35 @@ function getInitials(name) {
     .slice(0, 2);
 }
 
+// Get unique gradient style for each avatar based on name hash
+function getAvatarStyle(name, index) {
+  const gradients = [
+    'linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)',
+    'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+    'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
+    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+  ];
+  
+  // Use name hash to consistently assign gradient
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const gradientIndex = Math.abs(hash) % gradients.length;
+  
+  return {
+    background: gradients[gradientIndex],
+  };
+}
+
 // Navigate to actor page
 function navigateToActor(actorName) {
   if (!actorName) return;
@@ -238,87 +254,13 @@ function navigateToActor(actorName) {
   router.push(`/${encodedName}`);
 }
 
-// Handle thumbnail error
-function handleThumbnailError(event) {
-  // Fallback to avatar if thumbnail fails to load
-  const actorCard = event.target.closest('.actor-card');
-  if (actorCard) {
-    const actorName = actorCard.querySelector('.actor-name')?.textContent;
-    if (actorName) {
-      // Remove thumbnail and show avatar instead
-      const thumbnailWrapper = actorCard.querySelector('.actor-card-thumbnail-wrapper');
-      if (thumbnailWrapper) {
-        thumbnailWrapper.innerHTML = `
-          <div class="actor-card-content">
-            <div class="actor-avatar">${getInitials(actorName)}</div>
-            <h3 class="actor-name">${actorName}</h3>
-          </div>
-        `;
-      }
-    }
-  }
+// Handle image load error - fallback to avatar
+function handleImageError(event, actor) {
+  // Hide the image and show avatar instead
+  actor.image = null;
+  event.target.style.display = 'none';
 }
 
-// Fetch actor's most viewed video thumbnail with retry logic
-async function loadActorThumbnail(actorName, retries = 3) {
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      // Search for actor videos, sorted by most popular (most views)
-      // Get just 1 video to get the most viewed one for thumbnail
-      await searchVideos(actorName.toLowerCase(), 1, { 
-        perPage: 1, 
-        order: 'most-popular' 
-      });
-      
-      // Get the first (most viewed) video
-      if (epornerVideos.value && epornerVideos.value.length > 0) {
-        const mostViewedVideo = epornerVideos.value[0];
-        const actor = allActors.value.find(a => a.name === actorName);
-        if (actor) {
-          // Get total count if available
-          if (epornerTotalCount.value) {
-            actor.videoCount = epornerTotalCount.value;
-            // If video count is less than 100, remove the actor
-            if (epornerTotalCount.value < 100) {
-              const index = allActors.value.findIndex(a => a.name === actorName);
-              if (index > -1) {
-                allActors.value.splice(index, 1);
-              }
-              return; // Don't set thumbnail for removed actor
-            }
-          }
-          // Only set thumbnail if actor still exists (wasn't removed)
-          if (mostViewedVideo.thumbnail && allActors.value.find(a => a.name === actorName)) {
-            actor.thumbnail = mostViewedVideo.thumbnail;
-          }
-        }
-      }
-      return; // Success, exit retry loop
-    } catch (error) {
-      // Suppress console errors for expected failures (CORS, rate limiting, network issues)
-      const isExpectedError = error?.message?.includes('Failed to fetch') || 
-                              error?.message?.includes('CORS') ||
-                              error?.message?.includes('503') ||
-                              error?.message?.includes('NetworkError');
-      
-      if (!isExpectedError && attempt === retries - 1) {
-        // Only log unexpected errors on final attempt
-        console.warn(`Failed to load thumbnail for ${actorName} after ${retries} attempts`);
-      }
-      
-      // If not the last attempt, wait before retrying with exponential backoff
-      if (attempt < retries - 1) {
-        const delay = Math.min(1000 * Math.pow(2, attempt), 5000); // Max 5 seconds
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-}
-
-// Fetch Abella Danger's most viewed video thumbnail (kept for backward compatibility)
-async function loadAbellaDangerThumbnail() {
-  await loadActorThumbnail('Abella Danger');
-}
 
 // Go to page
 function goToPage(page) {
@@ -327,66 +269,6 @@ function goToPage(page) {
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-// Load actors on mount
-onMounted(async () => {
-  // Actors list is already initialized
-  // Load thumbnails in the background
-  loading.value = true;
-  try {
-    // Load thumbnails for all actors (in smaller batches with delays to avoid rate limiting)
-    const allActorNames = allActors.value.map(a => a.name);
-    
-    // Process actors sequentially in small batches to avoid overwhelming the API
-    const BATCH_SIZE = 3; // Reduced from 10 to 3
-    const DELAY_BETWEEN_REQUESTS = 800; // Delay between individual requests (ms)
-    const DELAY_BETWEEN_BATCHES = 2000; // Delay between batches (ms)
-    
-    for (let i = 0; i < allActorNames.length; i += BATCH_SIZE) {
-      const batch = allActorNames.slice(i, i + BATCH_SIZE);
-      
-      // Process batch sequentially (not in parallel) to reduce concurrent requests
-      for (let j = 0; j < batch.length; j++) {
-        const name = batch[j];
-        await loadActorThumbnail(name).catch(() => {
-          // Errors are already handled in loadActorThumbnail with retry logic
-          return null; // Continue even if one fails
-        });
-        
-        // Delay between individual requests within a batch (except for the last one)
-        if (j < batch.length - 1 || i + BATCH_SIZE < allActorNames.length) {
-          await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_REQUESTS));
-        }
-      }
-      
-      // Delay between batches to avoid rate limiting
-      if (i + BATCH_SIZE < allActorNames.length) {
-        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
-      }
-    }
-    
-    // Filter out actors with less than 100 videos
-    allActors.value = allActors.value.filter(actor => {
-      // If videoCount is null/undefined, keep the actor (count not loaded yet)
-      // If videoCount exists and is < 100, remove the actor
-      if (actor.videoCount !== null && actor.videoCount !== undefined && actor.videoCount < 100) {
-        return false;
-      }
-      return true;
-    });
-  } catch (error) {
-    // Suppress expected errors - they're already handled in loadActorThumbnail
-    // Only log unexpected errors
-    if (!error?.message?.includes('Failed to fetch') && 
-        !error?.message?.includes('CORS') &&
-        !error?.message?.includes('503')) {
-      console.warn('Error loading actor thumbnails:', error);
-    }
-    // Continue even if thumbnail fails - actor cards will show with avatars
-  } finally {
-    loading.value = false;
-  }
-});
 </script>
 
 <style scoped>
@@ -415,6 +297,14 @@ onMounted(async () => {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1.25rem;
   }
+  
+  .actor-image-wrapper {
+    aspect-ratio: 1;
+  }
+  
+  .actor-avatar {
+    font-size: 32px;
+  }
 }
 
 /* Tablet and smaller (1024px and below) */
@@ -431,13 +321,13 @@ onMounted(async () => {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1rem;
   }
-
-  .actor-card-with-thumbnail {
-    min-height: 240px;
+  
+  .actor-image-wrapper {
+    aspect-ratio: 1;
   }
-
-  .actor-card-thumbnail-wrapper {
-    min-height: 240px;
+  
+  .actor-avatar {
+    font-size: 28px;
   }
 
   .page-title {
@@ -482,22 +372,84 @@ onMounted(async () => {
 }
 
 .actor-card {
-  background: var(--dark-lighter, #2a2a3e);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 24px;
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.actor-card:nth-child(1) { animation-delay: 0.05s; }
+.actor-card:nth-child(2) { animation-delay: 0.1s; }
+.actor-card:nth-child(3) { animation-delay: 0.15s; }
+.actor-card:nth-child(4) { animation-delay: 0.2s; }
+.actor-card:nth-child(5) { animation-delay: 0.25s; }
+.actor-card:nth-child(6) { animation-delay: 0.3s; }
+.actor-card:nth-child(7) { animation-delay: 0.35s; }
+.actor-card:nth-child(8) { animation-delay: 0.4s; }
+.actor-card:nth-child(n+9) { animation-delay: 0.45s; }
+
+.actor-card {
+  background: linear-gradient(135deg, rgba(42, 42, 62, 0.8) 0%, rgba(30, 30, 50, 0.9) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   overflow: hidden;
   position: relative;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.actor-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 69, 0, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.actor-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 69, 0, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
 }
 
 .actor-card:hover {
-  background: var(--dark-light, #3a3a4e);
+  background: linear-gradient(135deg, rgba(58, 58, 78, 0.95) 0%, rgba(42, 42, 62, 0.95) 100%);
   border-color: var(--primary, #ff4500);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(255, 69, 0, 0.2);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(255, 69, 0, 0.35), 0 0 30px rgba(255, 69, 0, 0.15);
+}
+
+.actor-card:hover::before {
+  opacity: 1;
+}
+
+.actor-card:hover::after {
+  opacity: 1;
 }
 
 .actor-card-with-thumbnail {
@@ -539,29 +491,152 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.actor-image-wrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: var(--dark-lighter);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.actor-image-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  border-radius: 16px;
+}
+
+.actor-card:hover .actor-image-wrapper::after {
+  opacity: 1;
+}
+
+.actor-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+  background: var(--dark-lighter);
+}
+
+.actor-card:hover .actor-image {
+  transform: scale(1.08);
+}
+
+.actor-card:hover .actor-image-wrapper {
+  box-shadow: 0 12px 32px rgba(255, 69, 0, 0.3);
+  transform: translateY(-4px);
+  border-color: rgba(255, 69, 0, 0.3);
 }
 
 .actor-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
   background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   color: white;
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(255, 69, 0, 0.4), 
+              0 0 0 4px rgba(255, 69, 0, 0.1),
+              inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.actor-avatar::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: rotate(45deg);
+  transition: transform 0.6s ease;
+}
+
+.actor-card:hover .actor-avatar {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 32px rgba(255, 69, 0, 0.5), 
+              0 0 0 6px rgba(255, 69, 0, 0.2),
+              inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.actor-card:hover .actor-avatar::before {
+  transform: rotate(45deg) translate(100%, 100%);
 }
 
 .actor-name {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text-primary, #ffffff);
   margin: 0;
   text-align: center;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  position: relative;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.actor-card:hover .actor-name {
+  color: var(--primary, #ff4500);
+  transform: translateY(-2px);
+  text-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
+}
+
+.actor-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.actor-card-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 69, 0, 0.15);
+  border: 1px solid rgba(255, 69, 0, 0.3);
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary, #ff4500);
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.3s ease 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.actor-card:hover .actor-card-badge {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .actor-card-with-thumbnail .actor-name {
@@ -720,6 +795,18 @@ onMounted(async () => {
   .actor-card {
     padding: 20px;
   }
+  
+  .actor-image-wrapper {
+    aspect-ratio: 1;
+  }
+  
+  .actor-avatar {
+    font-size: 24px;
+  }
+  
+  .actor-name {
+    font-size: 16px;
+  }
 
   .actor-card-with-thumbnail {
     min-height: 220px;
@@ -807,6 +894,18 @@ onMounted(async () => {
 
   .actor-card {
     padding: 16px;
+  }
+  
+  .actor-image-wrapper {
+    aspect-ratio: 1;
+  }
+  
+  .actor-avatar {
+    font-size: 20px;
+  }
+  
+  .actor-name {
+    font-size: 14px;
   }
 
   .actor-card-with-thumbnail {
@@ -916,6 +1015,23 @@ onMounted(async () => {
 
   .actor-card {
     padding: 12px;
+  }
+  
+  .actor-image-wrapper {
+    aspect-ratio: 1;
+  }
+  
+  .actor-avatar {
+    font-size: 18px;
+  }
+  
+  .actor-name {
+    font-size: 12px;
+  }
+  
+  .actor-card-badge {
+    font-size: 8px;
+    padding: 3px 8px;
   }
 
   .actor-card-with-thumbnail {
