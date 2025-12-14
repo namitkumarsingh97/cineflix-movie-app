@@ -127,13 +127,19 @@ onMounted(async () => {
     imgRef.value.style.transition = 'filter 0.3s, opacity 0.3s';
     
     // Setup lazy loading with Intersection Observer
-    setupLazyImage(imgRef.value, fallbackSrc.value, srcset.value, placeholder.value);
+    // Use a small delay to ensure DOM is ready
+    setTimeout(() => {
+      if (imgRef.value) {
+        setupLazyImage(imgRef.value, fallbackSrc.value, srcset.value, placeholder.value);
+      }
+    }, 50);
   } else {
     // Eager loading - load immediately
     imgRef.value.src = fallbackSrc.value;
     if (srcset.value) {
       imgRef.value.srcset = srcset.value;
     }
+    imgRef.value.style.opacity = '1';
   }
 });
 
