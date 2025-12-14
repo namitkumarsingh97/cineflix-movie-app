@@ -115,7 +115,8 @@ const MALE_ACTORS = new Set([
  */
 const NON_NAME_WORDS = new Set([
   'an aphrodisiac', 'aphrodisiac', 'amateur', 'anal', 'asian', 'ass',
-  'big tits', 'big ass', 'blonde', 'brunette', 'compilation', 'creampie',
+  'big tits', 'big ass', 'big white', 'big cock', 'blonde', 'brunette', 
+  'compilation', 'creampie', 'cum', 'cum load', 'load',
   'facial', 'gangbang', 'hardcore', 'lesbian', 'milf', 'teen', 'threesome',
   'pov', 'public', 'rough', 'soft', 'swinger', 'swingers', 'group',
   'party', 'scene', 'video', 'videos', 'movie', 'movies', 'film', 'films',
@@ -124,12 +125,37 @@ const NON_NAME_WORDS = new Set([
   'xxx', 'porn', 'adult', 'explicit', 'nsfw', 'uncensored', 'censored',
   'premium', 'free', 'download', 'stream', 'watch', 'online', 'site',
   'channel', 'studio', 'production', 'network', 'website', 'platform',
+  // Video title words
+  'her', 'my', 'with', 'forbidden', 'awakening', 'continuous', 'climax',
+  'boss', 'boyfriend', 'father', 'in law', 'friends', 'huge', 'tits',
+  'favourite', 'favorite', 'lady', 'sex', 'sister', 'care', 'helper',
+  'home', 'devilish', 'temptation', 'mei', 'washio', 'asami', 'ogawa',
   // Indonesian/Asian tags
   'bokep', 'indo', 'indonesia', 'indonesian', 'tante', 'hijab', 'jilbab',
   'montok', 'diewe', 'ponakan', 'janda', 'mahasiswi', 'abg', 'cewek',
   'japan', 'japanese', 'china', 'chinese', 'korea', 'korean',
   'thai', 'thailand', 'philippines', 'filipina', 'vietnam', 'vietnamese',
 ]);
+
+/**
+ * Common video title patterns that should be rejected
+ */
+const VIDEO_TITLE_PATTERNS = [
+  /^her\s+/i,           // "Her Boss", "Her Boyfriend"
+  /^my\s+/i,            // "My Favourite"
+  /\swith\s/i,          // "Sex With Sister"
+  /^forbidden\s+/i,     // "Forbidden Care"
+  /^awakening\s+/i,     // "Awakening Continuous"
+  /^big\s+/i,           // "Big White Cock"
+  /^cum\s+/i,           // "Cum Load"
+  /^sex\s+/i,           // "Sex With"
+  /continuous\s+climax/i, // "Continuous Climax"
+  /home\s+helper/i,     // "Home Helper"
+  /father\s+in\s+law/i, // "Father In Law"
+  /huge\s+tits/i,       // "Huge Tits"
+  /favourite\s+lady/i,  // "Favourite Lady"
+  /devilish\s+temptation/i, // "Devilish Temptation"
+];
 
 /**
  * Check if a string looks like a real person name
@@ -145,6 +171,11 @@ function isValidPersonName(name) {
   
   // Should not have too many words (likely a sentence/tag)
   if (words.length > 4) return false;
+  
+  // Check against video title patterns first
+  for (const pattern of VIDEO_TITLE_PATTERNS) {
+    if (pattern.test(trimmed)) return false;
+  }
   
   // Each word should start with capital letter and be reasonable length
   if (!words.every(word => /^[A-Z][a-z]{1,20}$/.test(word))) return false;
@@ -179,7 +210,12 @@ function isValidPersonName(name) {
                     'diewe', 'ponakan', 'jilbab', 'janda', 'mahasiswi', 'abg',
                     'japan', 'japanese', 'china', 'chinese', 'korea', 'korean',
                     'thai', 'thailand', 'philippines', 'filipina', 'vietnam',
-                    'compilation', 'collection', 'series', 'episode', 'part'];
+                    'compilation', 'collection', 'series', 'episode', 'part',
+                    'her', 'my', 'with', 'forbidden', 'awakening', 'continuous',
+                    'climax', 'boss', 'boyfriend', 'father', 'friends', 'huge',
+                    'favourite', 'favorite', 'lady', 'sex', 'sister', 'care',
+                    'helper', 'home', 'devilish', 'temptation', 'cum', 'load',
+                    'big', 'white', 'cock', 'tits'];
   const lowerWords = words.map(w => w.toLowerCase());
   if (tagWords.some(tag => lowerWords.includes(tag))) return false;
   
@@ -188,6 +224,18 @@ function isValidPersonName(name) {
   
   // Each word should be a reasonable name (2-20 characters, mostly letters)
   if (!words.every(word => word.length >= 2 && word.length <= 20 && /^[A-Za-z]+$/.test(word))) return false;
+  
+  // Reject if it contains common video title words in the middle
+  const commonTitleWords = ['boss', 'boyfriend', 'father', 'friends', 'helper', 
+                            'home', 'lady', 'sister', 'care', 'temptation', 
+                            'climax', 'awakening', 'continuous', 'forbidden',
+                            'devilish', 'huge', 'favourite', 'favorite'];
+  const hasTitleWord = lowerWords.some(word => commonTitleWords.includes(word));
+  if (hasTitleWord && words.length > 2) return false; // If it has a title word and more than 2 words, likely a title
+  
+  // Reject if it looks like a descriptive phrase (contains "In", "With", "And" as separate words)
+  const descriptiveWords = ['in', 'with', 'and', 'or', 'the', 'a', 'an', 'of', 'for'];
+  if (lowerWords.some(word => descriptiveWords.includes(word))) return false;
   
   return true;
 }
@@ -415,9 +463,9 @@ export function useActresses() {
       const backendActresses = await extractFromBackendVideos();
       backendActresses.forEach(name => allActresses.add(name));
       
-      // Convert to sorted array
+      // Convert to sorted array and filter invalid names
       actresses.value = Array.from(allActresses)
-        .filter(name => name && name.trim())
+        .filter(name => name && name.trim() && isValidPersonName(name.trim()))
         .map(name => ({
           name: name.trim(),
           image: null, // Will be set later if available
@@ -457,12 +505,41 @@ export function useActresses() {
   }
   
   /**
-   * Get actress image URL (placeholder for now)
+   * Get actress image URL from pornpics.com
+   * URL pattern: https://cdni.pornpics.com/models/{first_letter}/{name_slug}.jpg
+   * Handles special cases like apostrophes: "Maddy O'Reilly" -> "maddy_oreilly"
    */
   function getActressImage(actressName) {
-    // Try to construct image URL from known sources
-    const nameSlug = actressName.toLowerCase().replace(/\s+/g, '_');
-    return `https://cdni.pornpics.com/models/${nameSlug.charAt(0)}/${nameSlug}.jpg`;
+    if (!actressName) return null;
+    
+    // Convert name to slug format: "Abella Danger" -> "abella_danger"
+    // Handle apostrophes: "Maddy O'Reilly" -> "maddy_oreilly"
+    let nameSlug = actressName
+      .toLowerCase()
+      .trim()
+      .replace(/'/g, '') // Remove apostrophes
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/[^a-z0-9_]/g, ''); // Remove other special characters
+    
+    if (!nameSlug) return null;
+    
+    // Get first letter for directory structure
+    const firstLetter = nameSlug.charAt(0);
+    
+    // Construct pornpics.com CDN URL
+    return `https://cdni.pornpics.com/models/${firstLetter}/${nameSlug}.jpg`;
+  }
+  
+  /**
+   * Get all known actresses with their images
+   */
+  function getAllKnownActresses() {
+    return Array.from(KNOWN_ACTRESSES)
+      .map(name => ({
+        name: name.trim(),
+        image: getActressImage(name),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
   
   return {
@@ -473,7 +550,9 @@ export function useActresses() {
     extractFromBackendVideos,
     loadFromStorage,
     getActressImage,
+    getAllKnownActresses,
     KNOWN_ACTRESSES,
+    isValidActressName: isValidPersonName, // Export validation function
   };
 }
 
