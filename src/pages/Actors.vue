@@ -133,14 +133,13 @@ function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
 }
 
-// Define actors list (you can expand this later or fetch from API)
 const allActors = ref([
   { name: 'Abella Danger', videoCount: null, thumbnail: null },
   { name: 'AJ Applegate', videoCount: null, thumbnail: null },
   { name: 'Aaliyah Hadid', videoCount: null, thumbnail: null },
   { name: 'Aaliyah Love', videoCount: null, thumbnail: null },
   { name: 'Abigaile Johnson', videoCount: null, thumbnail: null },
-  { name: 'Adira Allure', videoCount: null, thumbnail: null },
+  /* { name: 'Adira Allure', videoCount: null, thumbnail: null },
   { name: 'Adria Rae', videoCount: null, thumbnail: null },
   { name: 'Adriana Chechik', videoCount: null, thumbnail: null },
   { name: 'Aletta Ocean', videoCount: null, thumbnail: null },
@@ -160,7 +159,7 @@ const allActors = ref([
   { name: 'Alex Tanner', videoCount: null, thumbnail: null },
   { name: 'Alex Victor', videoCount: null, thumbnail: null },
   { name: 'Alexa Flexy', videoCount: null, thumbnail: null },
-  { name: 'Alexa Grace', videoCount: null, thumbnail: null },
+  { name: 'Alexa Grace', videoCount: null, thumbnail: null },*/
 ]);
 
 // Computed for total actors count
