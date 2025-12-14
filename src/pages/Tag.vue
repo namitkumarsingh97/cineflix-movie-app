@@ -170,10 +170,30 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
 }
 
+// Update URL with page parameter
+function updateUrlPage(page) {
+  const query = { ...route.query };
+  
+  if (page === 1) {
+    delete query.page;
+  } else {
+    query.page = page.toString();
+  }
+  
+  router.push({ 
+    path: route.path,
+    query: query
+  });
+}
+
 // Go to page
 function goToPage(page) {
   if (page === '...' || page < 1 || page > totalPages.value) return;
   
+  // Update URL first
+  updateUrlPage(page);
+  
+  // Then load videos
   const tag = decodedTag.value;
   if (!tag) return;
   
@@ -188,13 +208,37 @@ function loadVideos() {
   const tag = decodedTag.value;
   if (!tag) return;
   
-  searchVideos(tag, 1, { order: 'most-popular' });
+  // Get page from URL or default to 1
+  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
+  
+  searchVideos(tag, page, { order: 'most-popular' });
 }
 
 // Watch for route changes
 watch(() => route.params.tag, () => {
   loadVideos();
 }, { immediate: true });
+
+// Watch for page parameter changes (browser back/forward)
+watch(() => route.query.page, (newPageParam) => {
+  if (newPageParam) {
+    const page = parseInt(newPageParam, 10);
+    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+      const tag = decodedTag.value;
+      if (tag) {
+        searchVideos(tag, page, { order: 'most-popular' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  } else if (currentPage.value !== 1) {
+    // If no page param and we're not on page 1, reset to 1
+    const tag = decodedTag.value;
+    if (tag) {
+      searchVideos(tag, 1, { order: 'most-popular' });
+    }
+  }
+}, { immediate: false });
 
 // Load videos on mount
 onMounted(() => {

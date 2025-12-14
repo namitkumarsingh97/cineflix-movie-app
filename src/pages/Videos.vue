@@ -269,6 +269,15 @@ const visiblePages = computed(() => {
 function handleSearch() {
   const query = searchInput.value.trim() || 'all';
   selectedCategory.value = '';
+  // Update URL with search query and reset to page 1
+  router.push({ 
+    path: '/videos',
+    query: { 
+      ...route.query,
+      q: query !== 'all' ? query : undefined,
+      page: undefined // Reset to page 1
+    }
+  });
   searchVideos(query, 1, { order: sortOrder.value });
 }
 
@@ -276,6 +285,15 @@ function handleSearch() {
 function handleSortChange() {
   setSortOrder(sortOrder.value);
   const query = searchQuery.value || searchInput.value.trim() || 'all';
+  // Update URL with sort order and reset to page 1
+  router.push({ 
+    path: '/videos',
+    query: { 
+      ...route.query,
+      order: sortOrder.value,
+      page: undefined // Reset to page 1
+    }
+  });
   searchVideos(query, 1, { order: sortOrder.value });
 }
 
@@ -292,6 +310,15 @@ function handleThumbSizeChange() {
 // Select category
 function selectCategory(category) {
   selectedCategory.value = category;
+  // Update URL with category and reset to page 1
+  router.push({ 
+    path: '/videos',
+    query: { 
+      ...route.query,
+      category: category || undefined,
+      page: undefined // Reset to page 1
+    }
+  });
   searchVideos(category, 1, { order: sortOrder.value });
 }
 
@@ -348,36 +375,64 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
 }
 
+// Update URL with page parameter
+function updateUrlPage(page) {
+  const query = { ...route.query };
+  
+  if (page === 1) {
+    delete query.page;
+  } else {
+    query.page = page.toString();
+  }
+  
+  router.push({ 
+    path: '/videos',
+    query: query
+  });
+}
+
 // Go to page
 function goToPage(page) {
   if (page === '...' || page < 1 || page > totalPages.value) return;
   
+  // Update URL first
+  updateUrlPage(page);
+  
+  // Then load videos
   const query = searchQuery.value || searchInput.value.trim() || 'all';
   searchVideos(query, page, { order: sortOrder.value });
 }
 
 // Load videos on mount with default sort (Most Popular) or search query
 onMounted(() => {
+  // Get page from URL or default to 1
+  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
+  
   // Check if there's an order parameter from URL (e.g., from "View All" link)
   const urlOrder = route.query.order;
   if (urlOrder && ['latest', 'most-popular', 'top-weekly', 'top-monthly', 'top-rated', 'longest', 'shortest'].includes(urlOrder)) {
     setSortOrder(urlOrder);
     sortOrder.value = urlOrder;
-    // Load videos with the specified order
-    searchVideos('all', 1, { order: urlOrder });
+    // Load videos with the specified order and page
+    searchVideos('all', page, { order: urlOrder });
     return;
   }
   
   // Check if there's a search query from URL
   const urlQuery = route.query.q;
   if (urlQuery && urlQuery.trim()) {
-    // Set search input and perform search
+    // Set search input and perform search with page
     searchInput.value = urlQuery.trim();
-    handleSearch();
+    searchVideos(urlQuery.trim(), page, { order: sortOrder.value });
   } else {
-    // Set default sort to most-popular and load
+    // Set default sort to most-popular and load with page
     setSortOrder('most-popular');
-    getPopularVideos(1);
+    if (page > 1) {
+      getPopularVideos(page);
+    } else {
+      getPopularVideos(1);
+    }
   }
 });
 
@@ -385,7 +440,8 @@ onMounted(() => {
 watch(() => route.query.q, (newQuery) => {
   if (newQuery && newQuery.trim()) {
     searchInput.value = newQuery.trim();
-    handleSearch();
+    const page = route.query.page ? parseInt(route.query.page, 10) : 1;
+    searchVideos(newQuery.trim(), page > 0 && !isNaN(page) ? page : 1, { order: sortOrder.value });
   }
 });
 
@@ -394,9 +450,26 @@ watch(() => route.query.order, (newOrder) => {
   if (newOrder && ['latest', 'most-popular', 'top-weekly', 'top-monthly', 'top-rated', 'longest', 'shortest'].includes(newOrder)) {
     setSortOrder(newOrder);
     sortOrder.value = newOrder;
-    searchVideos('all', 1, { order: newOrder });
+    const page = route.query.page ? parseInt(route.query.page, 10) : 1;
+    searchVideos('all', page > 0 && !isNaN(page) ? page : 1, { order: newOrder });
   }
 });
+
+// Watch for page parameter changes (browser back/forward)
+watch(() => route.query.page, (newPageParam) => {
+  if (newPageParam) {
+    const page = parseInt(newPageParam, 10);
+    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+      const query = searchQuery.value || searchInput.value.trim() || 'all';
+      searchVideos(query, page, { order: sortOrder.value });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  } else if (currentPage.value !== 1) {
+    // If no page param and we're not on page 1, reset to 1
+    const query = searchQuery.value || searchInput.value.trim() || 'all';
+    searchVideos(query, 1, { order: sortOrder.value });
+  }
+}, { immediate: false });
 </script>
 
 <style scoped>

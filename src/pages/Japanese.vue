@@ -104,14 +104,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useEporner } from '../composables/useEporner';
 import SkeletonSection from '../components/SkeletonSection.vue';
 import VideoCard from '../components/VideoCard.vue';
 import { Video, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
 const router = useRouter();
+const route = useRoute();
 const {
   videos,
   loading,
@@ -183,17 +184,57 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
 }
 
+// Update URL with page parameter
+function updateUrlPage(page) {
+  const query = { ...route.query };
+  
+  if (page === 1) {
+    delete query.page;
+  } else {
+    query.page = page.toString();
+  }
+  
+  router.push({ 
+    path: '/japanese',
+    query: query
+  });
+}
+
 function goToPage(page) {
   if (page === '...' || page < 1 || page > totalPages.value) return;
+  
+  // Update URL first
+  updateUrlPage(page);
+  
+  // Then load videos
   const query = (searchInput.value.trim() || 'japanese') + ' japanese';
   searchVideos(query, page, { order: sortOrder.value });
 }
 
 onMounted(() => {
   setSortOrder('most-popular');
+  // Get page from URL or default to 1
+  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
   // Initial load focused on Japanese
-  searchVideos('japanese', 1, { order: 'most-popular' });
+  searchVideos('japanese', page, { order: 'most-popular' });
 });
+
+// Watch for page parameter changes (browser back/forward)
+watch(() => route.query.page, (newPageParam) => {
+  if (newPageParam) {
+    const page = parseInt(newPageParam, 10);
+    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+      const query = (searchInput.value.trim() || 'japanese') + ' japanese';
+      searchVideos(query, page, { order: sortOrder.value });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  } else if (currentPage.value !== 1) {
+    // If no page param and we're not on page 1, reset to 1
+    const query = (searchInput.value.trim() || 'japanese') + ' japanese';
+    searchVideos(query, 1, { order: sortOrder.value });
+  }
+}, { immediate: false });
 </script>
 
 <style scoped>
