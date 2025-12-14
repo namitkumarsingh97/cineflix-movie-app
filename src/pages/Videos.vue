@@ -2,11 +2,24 @@
   <div class="videos-page">
     <!-- Header with Search -->
     <div class="videos-header">
-      <h1 class="videos-title">
-        <Video :size="32" />
-        <span>Videos</span>
-      </h1>
-      <p class="videos-subtitle">Browse and search videos</p>
+      <div class="videos-header-content">
+        <div>
+          <h1 class="videos-title">
+            <Video :size="32" />
+            <span>Videos</span>
+          </h1>
+          <p class="videos-subtitle">Browse and search videos</p>
+        </div>
+        <button 
+          class="surprise-me-btn" 
+          @click="pickRandomVideo"
+          title="Surprise Me"
+          aria-label="Pick a random video to watch"
+        >
+          <Shuffle :size="20" />
+          <span>Surprise Me</span>
+        </button>
+      </div>
     </div>
 
     <!-- Search and Filters -->
@@ -57,30 +70,6 @@
           @click="selectPopularTag(tag)"
         >
           {{ tag }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Category Tags (from video keywords) -->
-    <div v-if="availableCategories.length > 0" class="categories-section">
-      <div class="categories-header">
-        <h3>Categories</h3>
-      </div>
-      <div class="categories-list">
-        <button
-          v-for="category in availableCategories"
-          :key="category"
-          :class="['category-tag', { active: selectedCategory === category }]"
-          @click="selectCategory(category)"
-        >
-          {{ category }}
-        </button>
-        <button
-          v-if="selectedCategory"
-          class="category-tag clear"
-          @click="clearCategory"
-        >
-          Clear Filter
         </button>
       </div>
     </div>
@@ -165,7 +154,7 @@ import { useNetworkQuality } from '../composables/useNetworkQuality';
 import Loader from '../components/Loader.vue';
 import SkeletonSection from '../components/SkeletonSection.vue';
 import VideoCard from '../components/VideoCard.vue';
-import { Video, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { Video, Search, ChevronLeft, ChevronRight, Shuffle } from 'lucide-vue-next';
 
 const router = useRouter();
 const route = useRoute();
@@ -321,6 +310,40 @@ function selectPopularTag(tag) {
 }
 
 // Navigate to video
+// Pick random video from all available videos
+async function pickRandomVideo() {
+  try {
+    // Fetch a random page (between 1 and 100 to get variety)
+    const randomPage = Math.floor(Math.random() * 100) + 1;
+    
+    // Search for all videos on a random page
+    await searchVideos('all', randomPage, { 
+      order: 'most-popular',
+      perPage: 50 // Get more videos to choose from
+    });
+    
+    if (videos.value && videos.value.length > 0) {
+      // Pick a random video from the fetched results
+      const randomIndex = Math.floor(Math.random() * videos.value.length);
+      const randomVideo = videos.value[randomIndex];
+      navigateToVideo(randomVideo);
+    } else {
+      // Fallback: try latest videos
+      await searchVideos('all', 1, { order: 'latest', perPage: 50 });
+      if (videos.value && videos.value.length > 0) {
+        const randomIndex = Math.floor(Math.random() * videos.value.length);
+        navigateToVideo(videos.value[randomIndex]);
+      }
+    }
+  } catch (error) {
+    console.error('Error picking random video:', error);
+    // Fallback to first video if available
+    if (videos.value && videos.value.length > 0) {
+      navigateToVideo(videos.value[0]);
+    }
+  }
+}
+
 function navigateToVideo(video) {
   router.push(`/watch/${video.id}?source=eporner`);
 }
@@ -385,6 +408,47 @@ watch(() => route.query.order, (newOrder) => {
 
 .videos-header {
   margin-bottom: 2rem;
+}
+
+.videos-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.surprise-me-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
+  white-space: nowrap;
+}
+
+.surprise-me-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(230, 57, 70, 0.4);
+}
+
+.surprise-me-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.surprise-me-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .videos-title {
@@ -690,6 +754,15 @@ watch(() => route.query.order, (newOrder) => {
 }
 
 @media (max-width: 768px) {
+  .videos-header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .surprise-me-btn {
+    width: 100%;
+    justify-content: center;
+  }
   .videos-page {
     padding: 16px;
   }

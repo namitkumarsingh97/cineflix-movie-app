@@ -782,11 +782,11 @@ onMounted(() => {
 }
 
 .section-header {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ffd700;
+  font-size: 13px; /* Larger */
+  font-weight: 800; /* Bolder */
+  color: var(--accent); /* Use CSS variable */
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px; /* More spacing */
   margin-bottom: 12px;
   padding: 0 4px;
 }
@@ -796,7 +796,9 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 16px; /* More padding */
+  font-size: 14px; /* Larger font */
+  font-weight: 500; /* Slightly bolder */
   margin-bottom: 4px;
   background: transparent;
   border: none;
@@ -811,16 +813,22 @@ onMounted(() => {
 
 .sidebar-item:hover {
   background: var(--dark-lighter);
+  color: var(--text-primary);
+  transform: translateX(4px); /* Subtle slide effect */
+  transition: all 0.2s ease;
 }
 
 .sidebar-item.active {
-  background: rgba(255, 69, 0, 0.15);
-  color: #ff4500;
-  font-weight: 600;
+  background: rgba(230, 57, 70, 0.2); /* Use new primary color */
+  color: var(--primary);
+  font-weight: 700; /* Bolder */
+  border-left: 3px solid var(--primary); /* Visual indicator */
+  padding-left: 13px; /* Adjust for border */
 }
 
 .sidebar-item.active .item-count {
-  color: #ff4500;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .sidebar-item svg {
@@ -830,7 +838,8 @@ onMounted(() => {
 
 .sidebar-item.active svg {
   opacity: 1;
-  color: #ff4500;
+  color: var(--primary);
+  transform: scale(1.1);
 }
 
 .featured-item {

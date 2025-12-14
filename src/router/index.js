@@ -999,6 +999,16 @@ const routes = [
       preload: false,
       title: 'Help Center'
     }
+  },
+  {
+    // Dynamic route for any actress (must be at the end to avoid conflicts)
+    path: '/:actressName',
+    name: 'ActressPage',
+    component: () => import('../pages/ActressPage.vue'),
+    meta: {
+      preload: false,
+      title: 'Actress'
+    }
   }
 ]
 

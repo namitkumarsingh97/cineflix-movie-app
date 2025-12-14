@@ -6,15 +6,19 @@ const STORAGE_KEY = 'homeLayoutPreferences';
 export const availableSections = [
   { id: 'continueWatching', label: 'Continue Watching', icon: 'Clock', defaultEnabled: true, order: 0 },
   { id: 'watchLater', label: 'Watch Later', icon: 'Clock', defaultEnabled: true, order: 1 },
-  { id: 'trending', label: 'Trending Now', icon: 'TrendingUp', defaultEnabled: true, order: 2 },
-  { id: 'yourStars', label: 'Your Stars', icon: 'Star', defaultEnabled: true, order: 3 },
-  { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 4 },
-  { id: 'pov', label: 'Recent POV Videos', icon: 'Film', defaultEnabled: true, order: 5 },
-  { id: 'family', label: 'Recent Family Videos', icon: 'Film', defaultEnabled: true, order: 6 },
-  { id: 'premium', label: 'Premium Content', icon: 'Crown', defaultEnabled: true, order: 7 },
-  { id: 'trendingVideos', label: 'Trending Videos', icon: 'TrendingUp', defaultEnabled: true, order: 8 },
-  { id: 'recentlyAddedVideos', label: 'Recently Added Videos', icon: 'Calendar', defaultEnabled: true, order: 9 },
-  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 10 },
+  { id: 'recentlyAdded', label: 'Recently Added', icon: 'Sparkles', defaultEnabled: true, order: 2 },
+  { id: 'mostWatchedToday', label: 'Most Watched Today', icon: 'Eye', defaultEnabled: true, order: 3 },
+  { id: 'quickWatch', label: 'Quick Watch', icon: 'Zap', defaultEnabled: true, order: 4 },
+  { id: 'topRated', label: 'Top Rated This Week', icon: 'Award', defaultEnabled: true, order: 5 },
+  { id: 'trending', label: 'Trending Now', icon: 'TrendingUp', defaultEnabled: true, order: 6 },
+  { id: 'yourStars', label: 'Your Stars', icon: 'Star', defaultEnabled: true, order: 7 },
+  { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 8 },
+  { id: 'pov', label: 'Recent POV Videos', icon: 'Film', defaultEnabled: true, order: 9 },
+  { id: 'family', label: 'Recent Family Videos', icon: 'Film', defaultEnabled: true, order: 10 },
+  { id: 'premium', label: 'Premium Content', icon: 'Crown', defaultEnabled: true, order: 11 },
+  { id: 'trendingVideos', label: 'Trending Videos', icon: 'TrendingUp', defaultEnabled: true, order: 12 },
+  { id: 'recentlyAddedVideos', label: 'Recently Added Videos', icon: 'Calendar', defaultEnabled: false, order: 13 },
+  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 14 },
 ];
 
 // Load preferences from localStorage

@@ -9,8 +9,8 @@
     
     <!-- Main Content (with sidebar offset) -->
     <div class="home-content">
-    <!-- Layout Customizer Button -->
-    <div class="layout-customizer-btn-container">
+    <!-- Top Action Buttons -->
+    <div class="top-actions-container">
       <button 
         class="layout-customizer-btn" 
         @click="showLayoutCustomizer = true"
@@ -18,6 +18,15 @@
       >
         <Layout :size="18" />
         <span>Customize Layout</span>
+      </button>
+      <button 
+        class="surprise-me-btn" 
+        @click="pickRandomVideo"
+        title="Surprise Me"
+        aria-label="Pick a random video to watch"
+      >
+        <Shuffle :size="20" />
+        <span>Surprise Me</span>
       </button>
     </div>
 
@@ -32,7 +41,7 @@
           <Clock :size="24" class="title-icon" />
           <span>Continue Watching</span>
         </h2>
-        <button class="clear-btn" @click="clearContinueWatching">Clear</button>
+        <button class="clear-btn" @click="clearContinueWatching" aria-label="Clear continue watching list">Clear</button>
       </div>
       <div class="youtube-videos-grid">
         <MovieCard
@@ -68,6 +77,113 @@
           v-for="item in watchLaterVideos"
           :key="`wl-video-${item.id}`"
           :video="item"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Recently Added Section -->
+    <section 
+      v-if="recentlyAddedVideos.length > 0 && isSectionEnabled('recentlyAdded')" 
+      class="movies-section"
+      aria-label="Recently added"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Sparkles :size="24" class="title-icon" />
+          <span>Recently Added</span>
+        </h2>
+        <router-link to="/videos?order=latest" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in recentlyAddedVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Most Watched Today Section -->
+    <section 
+      v-if="mostWatchedToday.length > 0 && isSectionEnabled('mostWatchedToday')" 
+      class="movies-section"
+      aria-label="Most watched today"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Eye :size="24" class="title-icon" />
+          <span>Most Watched Today</span>
+        </h2>
+        <router-link to="/videos?order=most-popular" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in mostWatchedToday"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Quick Watch Section (Short Videos) -->
+    <section 
+      v-if="quickWatchVideos.length > 0 && isSectionEnabled('quickWatch')" 
+      class="movies-section"
+      aria-label="Quick watch"
+    >
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <h2 class="section-title">
+            <Zap :size="24" class="title-icon" />
+            <span>Quick Watch</span>
+          </h2>
+          <p class="section-description">Videos under 10 minutes for quick sessions</p>
+        </div>
+        <router-link to="/videos?duration=short" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in quickWatchVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Top Rated This Week Section -->
+    <section 
+      v-if="topRatedThisWeek.length > 0 && isSectionEnabled('topRated')" 
+      class="movies-section"
+      aria-label="Top rated this week"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Award :size="24" class="title-icon" />
+          <span>Top Rated This Week</span>
+        </h2>
+        <router-link to="/videos?order=top-rated" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in topRatedThisWeek"
+          :key="video.id"
+          :video="video"
           @click="navigateToVideo"
         />
       </div>
@@ -440,19 +556,19 @@
             @click="showAdvancedFilters = !showAdvancedFilters"
             :class="{ active: showAdvancedFilters }"
             title="Filters"
+            aria-label="Toggle filters"
           >
             <Filter :size="18" />
             <span>Filters</span>
           </button>
-          <button class="random-btn" @click="pickRandom" title="Random">
-            <Shuffle :size="18" />
-            <span>Random</span>
-          </button>
           <div class="dropdown">
+            <label for="sort-select" class="sr-only">Sort movies by</label>
             <select
+              id="sort-select"
               class="dropdown-select"
               v-model="sortBy"
               @change="sortMovies"
+              aria-label="Sort movies"
             >
               <option value="date">Recently Added</option>
               <option value="title">Title (A-Z)</option>
@@ -572,6 +688,11 @@ import {
   Play,
   Crown,
   Lock,
+  Sparkles,
+  Zap,
+  Award,
+  Timer,
+  Eye,
 } from "lucide-vue-next";
 import { useEporner } from "../composables/useEporner";
 import VideoCard from "../components/VideoCard.vue";
@@ -618,6 +739,9 @@ const { getTrendingByContext, getPersonalized } = useRecommendations();
 const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
 const latestVideos = ref([]);
+const mostWatchedToday = ref([]);
+const quickWatchVideos = ref([]);
+const topRatedThisWeek = ref([]);
 const indianVideos = ref([]);
 const povVideos = ref([]);
 const familyVideos = ref([]);
@@ -958,6 +1082,67 @@ function pickRandom() {
   navigateToMovie(randomMovie);
 }
 
+// Pick random video from all available videos (fetches from API, not just loaded videos)
+async function pickRandomVideo() {
+  try {
+    // First, try to get a random video from Eporner API
+    // Pick a random page (between 1 and 100 for variety)
+    const randomPage = Math.floor(Math.random() * 100) + 1;
+    
+    // Fetch videos from a random page
+    await searchVideos('all', randomPage, { 
+      order: 'most-popular',
+      perPage: 50 // Get more videos to choose from
+    });
+    
+    if (epornerVideos.value && epornerVideos.value.length > 0) {
+      // Pick a random video from the fetched results
+      const randomIndex = Math.floor(Math.random() * epornerVideos.value.length);
+      const randomVideo = epornerVideos.value[randomIndex];
+      navigateToVideo(randomVideo);
+      return;
+    }
+    
+    // Fallback 1: Try latest videos
+    await searchVideos('all', 1, { order: 'latest', perPage: 50 });
+    if (epornerVideos.value && epornerVideos.value.length > 0) {
+      const randomIndex = Math.floor(Math.random() * epornerVideos.value.length);
+      navigateToVideo(epornerVideos.value[randomIndex]);
+      return;
+    }
+    
+    // Fallback 2: Use already loaded videos if available
+    const allLoadedVideos = [
+      ...epornerVideos.value,
+      ...(videos.value || []),
+      ...movies.value.map(m => ({ ...m, id: m._id }))
+    ];
+    
+    if (allLoadedVideos.length > 0) {
+      const randomIndex = Math.floor(Math.random() * allLoadedVideos.length);
+      const randomVideo = allLoadedVideos[randomIndex];
+      
+      if (randomVideo._id) {
+        navigateToMovie(randomVideo);
+      } else {
+        navigateToVideo(randomVideo);
+      }
+      return;
+    }
+    
+    // Final fallback: Use movies
+    if (filteredMovies.value.length > 0) {
+      pickRandom();
+    }
+  } catch (error) {
+    console.error('Error picking random video:', error);
+    // Fallback to movies if API fails
+    if (filteredMovies.value.length > 0) {
+      pickRandom();
+    }
+  }
+}
+
 // Load Eporner videos - network-aware limits
 async function loadEpornerSections() {
   try {
@@ -967,9 +1152,79 @@ async function loadEpornerSections() {
     await getPopularVideos(1);
     trendingVideos.value = epornerVideos.value.slice(0, limit);
     
-    // Load recently added videos (Latest)
-    await loadEpornerVideos(1);
-    recentlyAddedVideos.value = epornerVideos.value.slice(0, limit);
+    // Load recently added videos (Latest) - last 24-48 hours
+    await searchVideos('all', 1, { perPage: limit * 2, order: 'latest' });
+    recentlyAddedVideos.value = epornerVideos.value
+      .filter(video => {
+        // Filter videos uploaded in last 48 hours
+        if (video.added || video.date) {
+          try {
+            const videoDate = new Date(video.added || video.date);
+            if (isNaN(videoDate.getTime())) return true; // Include if date is invalid
+            const now = new Date();
+            const hoursDiff = (now - videoDate) / (1000 * 60 * 60);
+            return hoursDiff <= 48;
+          } catch {
+            return true; // Include if date parsing fails
+          }
+        }
+        // If no date, include it (assume recent)
+        return true;
+      })
+      .slice(0, limit);
+    
+    // If not enough recent videos, use latest videos
+    if (recentlyAddedVideos.value.length < limit) {
+      recentlyAddedVideos.value = epornerVideos.value.slice(0, limit);
+    }
+    
+    // Load most watched today (highest views in last 24 hours)
+    await searchVideos('all', 1, { perPage: limit * 2, order: 'most-popular' });
+    mostWatchedToday.value = epornerVideos.value
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
+      .slice(0, limit);
+    
+    // Load quick watch videos (under 10 minutes)
+    await searchVideos('all', 1, { perPage: limit * 3, order: 'latest' });
+    quickWatchVideos.value = epornerVideos.value
+      .filter(video => {
+        // Try multiple duration fields
+        const duration = video.length_sec || video.duration || video.length || 0;
+        // Convert to seconds if in minutes
+        const durationInSeconds = duration < 1000 ? duration : Math.floor(duration / 60);
+        return durationInSeconds > 0 && durationInSeconds < 600; // Under 10 minutes (600 seconds)
+      })
+      .slice(0, limit);
+    
+    // Load top rated this week
+    await searchVideos('all', 1, { perPage: limit * 2, order: 'top-rated' });
+    topRatedThisWeek.value = epornerVideos.value
+      .filter(video => {
+        // Filter videos with ratings (prefer 4+ star, but include 3+ if not enough)
+        const rating = video.rating || video.rate || 0;
+        if (rating < 3) return false; // Minimum 3 star rating
+        
+        // Try to filter by date if available
+        if (video.added || video.date) {
+          try {
+            const videoDate = new Date(video.added || video.date);
+            if (!isNaN(videoDate.getTime())) {
+              const now = new Date();
+              const daysDiff = (now - videoDate) / (1000 * 60 * 60 * 24);
+              return daysDiff <= 7;
+            }
+          } catch {
+            // If date parsing fails, include it
+          }
+        }
+        return true; // Include if no date but has rating
+      })
+      .sort((a, b) => {
+        const ratingA = a.rating || a.rate || 0;
+        const ratingB = b.rating || b.rate || 0;
+        return ratingB - ratingA;
+      })
+      .slice(0, limit);
     
     // Load latest videos for "Trending Now" section
     await searchVideos('all', 1, { perPage: limit, order: 'latest' });
@@ -1118,11 +1373,19 @@ function scrollToSection(section) {
 </script>
 
 <style scoped>
+.top-actions-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 40px 0;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
 .layout-customizer-btn-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .layout-customizer-btn {
@@ -1130,25 +1393,59 @@ function scrollToSection(section) {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: var(--gradient-primary);
-  border: none;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  color: white;
+  color: var(--text-primary);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
 }
 
 .layout-customizer-btn:hover {
+  background: var(--dark-light);
+  border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 69, 0, 0.5);
+  box-shadow: var(--shadow-card);
 }
 
 .layout-customizer-btn:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+.surprise-me-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
+}
+
+.surprise-me-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
+
+.surprise-me-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.surprise-me-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .view-all-link {
@@ -1209,6 +1506,15 @@ function scrollToSection(section) {
   }
 
   .layout-customizer-btn span {
+    display: none;
+  }
+
+  .surprise-me-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .surprise-me-btn span {
     display: none;
   }
 }

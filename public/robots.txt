@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /signup
+
+Sitemap: https://cineflix-movie-app-eight.vercel.app/sitemap.xml
+

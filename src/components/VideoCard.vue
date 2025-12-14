@@ -93,10 +93,16 @@ function getDefaultThumbnail() {
   return 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video';
 }
 
-// Get network quality for thumbnail optimization
+// Get network quality for thumbnail optimization (lazy to avoid forced reflow)
 const networkQuality = computed(() => {
-  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  return connection?.effectiveType || '4g';
+  // Defer connection check to avoid forced reflow on initial render
+  if (typeof window === 'undefined') return '4g';
+  try {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    return connection?.effectiveType || '4g';
+  } catch {
+    return '4g';
+  }
 });
 
 // Get personalized thumbnail
@@ -201,12 +207,21 @@ function getInitials(name) {
 .video-thumbnail-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
+  padding-top: 56.25%; /* 16:9 aspect ratio - prevents CLS */
   background: var(--dark-lighter);
-  border-radius: 8px;
+  border-radius: 12px; /* More rounded */
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 12px; /* More spacing */
   height: 0;
+  /* Prevent layout shift */
+  contain: layout style paint;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-card);
+}
+
+.youtube-video-card:hover .video-thumbnail-wrapper {
+  transform: scale(1.02);
+  box-shadow: var(--shadow);
 }
 
 .video-thumbnail-wrapper :deep(.optimized-image) {
@@ -236,15 +251,17 @@ function getInitials(name) {
 
 .video-duration-badge {
   position: absolute;
-  bottom: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.8);
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.9);
   color: white;
-  padding: 2px 5px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 500;
+  padding: 4px 8px; /* More padding */
+  border-radius: 6px; /* More rounded */
+  font-size: 11px; /* Larger */
+  font-weight: 600; /* Bolder */
   line-height: 1.3;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .video-info-section {
@@ -260,27 +277,29 @@ function getInitials(name) {
 }
 
 .video-title-text {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px; /* Larger for better readability */
+  font-weight: 600; /* Bolder */
   color: var(--text-primary);
-  margin: 0 0 3px 0;
-  line-height: 1.3;
+  margin: 0 0 6px 0; /* More spacing */
+  line-height: 1.4; /* Better line height */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 2.6em;
+  max-height: 2.8em;
+  transition: color 0.2s ease;
 }
 
 .video-meta-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px 6px;
-  font-size: 11px;
+  gap: 4px 8px; /* More spacing */
+  font-size: 12px; /* Larger font */
   color: var(--text-secondary);
-  line-height: 1.3;
+  line-height: 1.4;
+  font-weight: 500; /* Slightly bolder */
 }
 
 .view-count,

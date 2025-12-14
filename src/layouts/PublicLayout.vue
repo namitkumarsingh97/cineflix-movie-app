@@ -390,7 +390,7 @@
             <Film :size="24" />
             <span>MovieHub</span>
           </div>
-          <button class="mobile-menu-close" @click="closeMobileMenu">
+          <button class="mobile-menu-close" @click="closeMobileMenu" aria-label="Close mobile menu">
             <X :size="24" />
           </button>
         </div>

@@ -186,7 +186,15 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import Hls from 'hls.js';
+// Lazy load HLS.js only when needed (saves 1MB+ on initial load)
+let Hls = null;
+const loadHls = async () => {
+  if (!Hls) {
+    const hlsModule = await import('hls.js');
+    Hls = hlsModule.default;
+  }
+  return Hls;
+};
 import {
   Play,
   Pause,
@@ -276,12 +284,13 @@ function formatTime(seconds) {
 }
 
 // Setup HLS if needed
-function setupHls() {
+async function setupHls() {
   if (!props.isHls || !videoElement.value || !props.src) return;
   
-  if (Hls.isSupported()) {
+  const HlsClass = await loadHls();
+  if (HlsClass.isSupported()) {
     destroyHls();
-    hlsInstance.value = new Hls({
+    hlsInstance.value = new HlsClass({
       enableWorker: true,
       lowLatencyMode: true,
       backBufferLength: 30,
@@ -292,13 +301,13 @@ function setupHls() {
     hlsInstance.value.loadSource(props.src);
     hlsInstance.value.attachMedia(videoElement.value);
     
-    hlsInstance.value.on(Hls.Events.ERROR, (event, data) => {
+    hlsInstance.value.on(HlsClass.Events.ERROR, (event, data) => {
       if (data.fatal) {
         switch (data.type) {
-          case Hls.ErrorTypes.NETWORK_ERROR:
+          case HlsClass.ErrorTypes.NETWORK_ERROR:
             hlsInstance.value.startLoad();
             break;
-          case Hls.ErrorTypes.MEDIA_ERROR:
+          case HlsClass.ErrorTypes.MEDIA_ERROR:
             hlsInstance.value.recoverMediaError();
             break;
           default:
@@ -586,13 +595,13 @@ watch(() => props.muted, (newVal) => {
 
 watch(() => props.src, () => {
   if (props.isHls) {
-    setupHls();
+    setupHls().catch(err => console.error('HLS setup error:', err));
   }
 });
 
 watch(() => props.isHls, () => {
   if (props.isHls) {
-    setupHls();
+    setupHls().catch(err => console.error('HLS setup error:', err));
   } else {
     destroyHls();
   }
@@ -609,7 +618,7 @@ onMounted(() => {
   
   if (props.isHls) {
     nextTick(() => {
-      setupHls();
+      setupHls().catch(err => console.error('HLS setup error:', err));
     });
   }
   
