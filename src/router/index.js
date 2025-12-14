@@ -556,6 +556,96 @@ const routes = [
     }
   },
   {
+    path: '/vr-360',
+    name: 'VR360',
+    component: () => import('../pages/VR360.vue'),
+    meta: {
+      preload: false,
+      title: 'VR/360° Videos'
+    }
+  },
+  {
+    path: '/hd-4k',
+    name: 'HD4K',
+    component: () => import('../pages/HD4K.vue'),
+    meta: {
+      preload: false,
+      title: '4K/HD Only'
+    }
+  },
+  {
+    path: '/verified-amateur',
+    name: 'VerifiedAmateur',
+    component: () => import('../pages/VerifiedAmateur.vue'),
+    meta: {
+      preload: false,
+      title: 'Verified Amateur'
+    }
+  },
+  {
+    path: '/live-cams',
+    name: 'LiveCams',
+    component: () => import('../pages/LiveCams.vue'),
+    meta: {
+      preload: false,
+      title: 'Live Cams'
+    }
+  },
+  {
+    path: '/compilations',
+    name: 'Compilations',
+    component: () => import('../pages/Compilations.vue'),
+    meta: {
+      preload: false,
+      title: 'Compilations'
+    }
+  },
+  {
+    path: '/behind-the-scenes',
+    name: 'BehindTheScenes',
+    component: () => import('../pages/BehindTheScenes.vue'),
+    meta: {
+      preload: false,
+      title: 'Behind the Scenes'
+    }
+  },
+  {
+    path: '/interviews',
+    name: 'Interviews',
+    component: () => import('../pages/Interviews.vue'),
+    meta: {
+      preload: false,
+      title: 'Interviews'
+    }
+  },
+  {
+    path: '/parodies',
+    name: 'Parodies',
+    component: () => import('../pages/Parodies.vue'),
+    meta: {
+      preload: false,
+      title: 'Parodies'
+    }
+  },
+  {
+    path: '/documentaries',
+    name: 'Documentaries',
+    component: () => import('../pages/Documentaries.vue'),
+    meta: {
+      preload: false,
+      title: 'Documentaries'
+    }
+  },
+  {
+    path: '/webcam',
+    name: 'Webcam',
+    component: () => import('../pages/Webcam.vue'),
+    meta: {
+      preload: false,
+      title: 'Webcam'
+    }
+  },
+  {
     path: '/abella-danger',
     name: 'AbellaDanger',
     component: () => import('../pages/AbellaDanger.vue'),
