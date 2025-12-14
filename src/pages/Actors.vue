@@ -127,145 +127,45 @@ const currentPage = ref(1);
 const actorsPerPage = 24; // 4 columns x 6 rows
 const extracting = ref(false);
 
-const { actresses, loading, extractAllActresses, loadFromStorage, getActressImage } = useActresses();
+const { actresses, loading, extractAllActresses, loadFromStorage, getActressImage, getAllKnownActresses, isValidActressName } = useActresses();
 
 function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
 }
 
-// Start with hardcoded actresses, then merge with extracted ones
-const allActors = ref([
-  { name: 'Abella Danger', image: 'https://cdni.pornpics.com/models/a/abella_danger.jpg' },
-  { name: 'AJ Applegate', image: 'https://cdni.pornpics.com/models/a/aj_applegate.jpg' },
-  { name: 'Aaliyah Hadid', image: 'https://cdni.pornpics.com/models/a/aaliyah_hadid.jpg' },
-  { name: 'Aaliyah Love', image: 'https://cdni.pornpics.com/models/a/aaliyah_love.jpg' },
-  { name: 'Abigaile Johnson', image: 'https://cdni.pornpics.com/models/a/abigaile_johnson.jpg' },
-  { name: 'Adira Allure', image: 'https://cdni.pornpics.com/models/a/adira_allure.jpg' },
-  { name: 'Adria Rae', image: 'https://cdni.pornpics.com/models/a/adria_rae.jpg' },
-  { name: 'Adriana Chechik', image: 'https://cdni.pornpics.com/models/a/adriana_chechik.jpg' },
-  { name: 'Aletta Ocean', image: 'https://cdni.pornpics.com/models/a/aletta_ocean.jpg' },
-  { name: 'Alex Blake', image: 'https://cdni.pornpics.com/models/a/alex_blake.jpg' },
-  { name: 'Alex Chance', image: 'https://cdni.pornpics.com/models/a/alex_chance.jpg' },
-  { name: 'Alex Coal', image: 'https://cdni.pornpics.com/models/a/alex_coal.jpg' },
-  { name: 'Alex De La Flor', image: 'https://cdni.pornpics.com/1280/7/67/82324668/82324668_030_5342.jpg' },
-  { name: 'Alex Gonz', image: 'https://cdni.pornpics.com/1280/7/434/89442331/89442331_060_ba21.jpg' },
-  { name: 'Alex Grey', image: 'https://cdni.pornpics.com/1280/1/167/42274713/42274713_002_8091.jpg' },
-  { name: 'Alex Harper', image: null },
-  { name: 'Alex Jett', image: null },
-  { name: 'Alex Jones', image: null },
-  { name: 'Alex Legend', image: null },
-  { name: 'Alex Lynn', image: null },
-  { name: 'Alex Mack', image: null },
-  { name: 'Alex Moreno', image: null },
-  { name: 'Alex Tanner', image: null },
-  { name: 'Alex Victor', image: null },
-  { name: 'Alexa Flexy', image: null },
-  { name: 'Alexa Grace', image: null },
-]);
+// Use only actresses from KNOWN_ACTRESSES with images from pornpics.com
+const allActors = ref([]);
 
-// Validate actress name (strict validation)
-function isValidActressName(name) {
-  if (!name || typeof name !== 'string') return false;
-  
-  const trimmed = name.trim();
-  
-  // Must be at least 2 words (first name + last name)
-  const words = trimmed.split(/\s+/);
-  if (words.length < 2 || words.length > 4) return false;
-  
-  // Each word should start with capital letter and be reasonable length
-  if (!words.every(word => /^[A-Z][a-z]{1,20}$/.test(word))) return false;
-  
-  // Should not contain multiple hyphens (likely a tag like "bokep-indo-tante")
-  if ((trimmed.match(/-/g) || []).length > 1) return false;
-  
-  // Should not contain special characters that indicate it's not a name
-  if (trimmed.includes('/') || trimmed.startsWith('-') || 
-      trimmed.startsWith('an ') || trimmed.startsWith('a ') ||
-      trimmed.startsWith('the ')) return false;
-  
-  // Should not be too short or too long
-  if (trimmed.length < 4 || trimmed.length > 50) return false;
-  
-  // Should not be all caps (likely a tag/category)
-  if (trimmed === trimmed.toUpperCase() && trimmed.length > 5) return false;
-  
-  // Should not be all lowercase (likely a tag)
-  if (trimmed === trimmed.toLowerCase() && trimmed.length > 10) return false;
-  
-  // Filter out common tag words
-  const lowerName = trimmed.toLowerCase();
-  const tagWords = ['bokep', 'indo', 'indonesia', 'tante', 'hijab', 'montok', 
-                    'diewe', 'ponakan', 'jilbab', 'janda', 'mahasiswi', 'abg'];
-  if (tagWords.some(tag => lowerName.includes(tag))) return false;
-  
-  // Each word should be a reasonable name (2-20 characters, only letters)
-  if (!words.every(word => word.length >= 2 && word.length <= 20 && /^[A-Za-z]+$/.test(word))) return false;
-  
-  return true;
-}
+// No longer needed - we only use KNOWN_ACTRESSES
 
-// Clean up invalid names from the list
-function cleanupInvalidNames() {
-  allActors.value = allActors.value.filter(actor => 
-    isValidActressName(actor.name)
-  );
-  // Sort alphabetically after cleanup
-  allActors.value.sort((a, b) => a.name.localeCompare(b.name));
-}
-
-// Merge extracted actresses with existing ones
-function mergeActresses() {
-  // First, clean up existing actors - remove invalid names
-  cleanupInvalidNames();
-  
-  const existingNames = new Set(allActors.value.map(a => a.name.toLowerCase()));
-  const merged = [...allActors.value];
-  
-  actresses.value.forEach(actress => {
-    // Only add if it's a valid name and not already in the list
-    if (isValidActressName(actress.name) && !existingNames.has(actress.name.toLowerCase())) {
-      merged.push({
-        name: actress.name,
-        image: actress.image || getActressImage(actress.name),
-      });
-    }
-  });
-  
-  // Sort alphabetically
-  merged.sort((a, b) => a.name.localeCompare(b.name));
-  allActors.value = merged;
-}
-
-// Load actresses on mount
+// Load actresses on mount - use only KNOWN_ACTRESSES
 onMounted(async () => {
-  // Clean up any invalid names that might already be in the list
-  cleanupInvalidNames();
-  // First, try to load from localStorage
-  const stored = loadFromStorage();
-  if (stored && stored.length > 0) {
-    actresses.value = stored;
-    mergeActresses();
-  }
+  // Load known actresses from KNOWN_ACTRESSES with images from pornpics.com
+  const knownActresses = getAllKnownActresses();
+  allActors.value = knownActresses;
   
-  // Then extract from API in background (non-blocking)
-  extracting.value = true;
+  // Save to localStorage for persistence
   try {
-    await extractAllActresses();
-    mergeActresses();
-  } catch (error) {
-    console.error('Error extracting actresses:', error);
-  } finally {
-    extracting.value = false;
+    localStorage.setItem('extracted_actresses', JSON.stringify(knownActresses));
+  } catch (e) {
+    console.warn('Could not save actresses to localStorage:', e);
   }
 });
 
-// Function to manually refresh actresses
+// Function to manually refresh actresses - reload from KNOWN_ACTRESSES
 async function refreshActresses() {
   extracting.value = true;
   try {
-    await extractAllActresses();
-    mergeActresses();
+    // Reload known actresses
+    const knownActresses = getAllKnownActresses();
+    allActors.value = knownActresses;
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('extracted_actresses', JSON.stringify(knownActresses));
+    } catch (e) {
+      console.warn('Could not save actresses to localStorage:', e);
+    }
   } catch (error) {
     console.error('Error refreshing actresses:', error);
   } finally {
