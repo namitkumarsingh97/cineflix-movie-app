@@ -189,6 +189,155 @@
       </div>
     </section>
 
+    <!-- Longest Videos Section -->
+    <section 
+      v-if="longestVideos.length > 0 && isSectionEnabled('longestVideos')" 
+      class="movies-section"
+      aria-label="Longest videos"
+    >
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <h2 class="section-title">
+            <Timer :size="24" class="title-icon" />
+            <span>Longest Videos</span>
+          </h2>
+          <p class="section-description">Extended content for immersive viewing</p>
+        </div>
+        <router-link to="/videos?order=longest" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in longestVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- HD/4K Quality Section -->
+    <section 
+      v-if="hd4kVideos.length > 0 && isSectionEnabled('hd4k')" 
+      class="movies-section premium-section"
+      aria-label="HD/4K quality"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Monitor :size="24" class="title-icon" />
+          <span>HD/4K Quality</span>
+          <span class="premium-badge">Premium</span>
+        </h2>
+        <router-link to="/hd-4k" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in hd4kVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Most Liked Section -->
+    <section 
+      v-if="mostLikedVideos.length > 0 && isSectionEnabled('mostLiked')" 
+      class="movies-section"
+      aria-label="Most liked"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <Heart :size="24" class="title-icon" fill="currentColor" />
+          <span>Most Liked</span>
+        </h2>
+        <router-link to="/videos?order=most-liked" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in mostLikedVideos"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Staff Picks / Editor's Choice -->
+    <section 
+      v-if="staffPicks.length > 0 && isSectionEnabled('staffPicks')" 
+      class="movies-section premium-section"
+      aria-label="Staff picks"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <BookMarked :size="24" class="title-icon" />
+          <span>Staff Picks</span>
+          <span class="editor-badge">Editor's Choice</span>
+        </h2>
+        <router-link to="/videos?order=staff-picks" class="view-all-link">
+          View All
+          <ChevronRight :size="16" />
+        </router-link>
+      </div>
+      <div class="youtube-videos-grid">
+        <VideoCard
+          v-for="video in staffPicks"
+          :key="video.id"
+          :video="video"
+          @click="navigateToVideo"
+        />
+      </div>
+    </section>
+
+    <!-- Trending by Category -->
+    <section 
+      v-if="Object.keys(trendingByCategory).length > 0 && isSectionEnabled('trendingByCategory')" 
+      class="trending-categories-section"
+      aria-label="Trending by category"
+    >
+      <div class="section-header">
+        <h2 class="section-title">
+          <TrendingUp :size="24" class="title-icon" />
+          <span>Trending by Category</span>
+        </h2>
+      </div>
+      <div 
+        v-for="(videos, category) in trendingByCategory" 
+        :key="category"
+        class="category-trending-section"
+      >
+        <div class="category-trending-header">
+          <h3 class="category-trending-title">{{ category }}</h3>
+          <router-link 
+            :to="`/tag/${encodeURIComponent(category.toLowerCase())}`" 
+            class="view-all-link"
+          >
+            View All
+            <ChevronRight :size="16" />
+          </router-link>
+        </div>
+        <div class="category-trending-scroll">
+          <div class="category-trending-grid">
+            <VideoCard
+              v-for="video in videos"
+              :key="video.id"
+              :video="video"
+              @click="navigateToVideo"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Trending Section (Latest Eporner Videos) -->
     <section 
       v-if="latestVideos.length > 0 && isSectionEnabled('trending')" 
@@ -466,38 +615,6 @@
       </div>
     </section>
 
-    <!-- Trending Videos Section (Eporner) -->
-    <section 
-      v-if="isSectionEnabled('trendingVideos')" 
-      class="movies-section"
-      aria-label="Trending videos"
-    >
-      <div class="section-header">
-        <h2 class="section-title">
-          <TrendingUp :size="24" class="title-icon" />
-          <span>Trending Videos</span>
-        </h2>
-        <router-link to="/videos" class="view-all-link">
-          View All
-          <ChevronRight :size="16" />
-        </router-link>
-      </div>
-      <SkeletonSection 
-        v-if="epornerLoading && trendingVideos.length === 0" 
-        :count="12" 
-        :columns="4"
-        :show-header="false"
-      />
-      <div v-else-if="trendingVideos.length > 0" class="youtube-videos-grid">
-        <VideoCard
-          v-for="video in trendingVideos"
-          :key="video.id"
-          :video="video"
-          @click="navigateToVideo"
-        />
-      </div>
-    </section>
-
     <!-- Recently Added Videos Section (Eporner) -->
     <section 
       v-if="isSectionEnabled('recentlyAddedVideos')" 
@@ -530,116 +647,6 @@
       </div>
     </section>
 
-    <!-- All Movies Section -->
-    <section 
-      v-if="isSectionEnabled('allMovies')"
-      class="movies-section"
-      aria-label="All movies"
-    >
-      <!-- Advanced Search Filters -->
-      <AdvancedSearch
-        :show-filters="showAdvancedFilters"
-        :categories="uniqueCategories"
-        :stars="uniqueStars"
-        @filter="handleFilter"
-      />
-      
-      <div class="section-header">
-        <h2 class="section-title">
-          <Film :size="24" class="title-icon" />
-          <span>All Movies</span>
-          <span class="movie-count">({{ filteredMovies.length }})</span>
-        </h2>
-        <div class="header-controls">
-          <button 
-            class="filter-toggle-btn" 
-            @click="showAdvancedFilters = !showAdvancedFilters"
-            :class="{ active: showAdvancedFilters }"
-            title="Filters"
-            aria-label="Toggle filters"
-          >
-            <Filter :size="18" />
-            <span>Filters</span>
-          </button>
-          <div class="dropdown">
-            <label for="sort-select" class="sr-only">Sort movies by</label>
-            <select
-              id="sort-select"
-              class="dropdown-select"
-              v-model="sortBy"
-              @change="sortMovies"
-              aria-label="Sort movies"
-            >
-              <option value="date">Recently Added</option>
-              <option value="title">Title (A-Z)</option>
-              <option value="popular">Most Popular</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <SkeletonSection 
-        v-if="loading && movies.length === 0" 
-        :count="maxThumbnailsPerPage" 
-        :columns="4"
-        :show-header="false"
-      />
-
-      <div
-        v-else-if="filteredMovies.length > 0"
-        class="youtube-videos-grid"
-      >
-        <MovieCard
-          v-for="movie in paginatedItems"
-          :key="movie._id"
-          :movie="movie"
-          @click="navigateToMovie"
-        />
-      </div>
-
-      <div v-else-if="!loading" class="empty-state">
-        <Film :size="80" class="empty-icon" />
-        <h3>No movies found</h3>
-        <p v-if="movies.length === 0">Click "Add Movie" to add your first movie!</p>
-        <p v-else>No movies match your current filters. Try adjusting your search or filters.</p>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="filteredMovies.length > 0 && totalPages > 1" class="pagination-wrapper">
-        <div class="pagination-info">
-          <span>Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ filteredMovies.length }} movies</span>
-        </div>
-        <div class="pagination">
-          <button
-            class="pagination-btn"
-            :disabled="currentPage === 1"
-            @click="prevPage"
-          >
-            <ChevronLeft :size="18" />
-            <span>Previous</span>
-          </button>
-          <div class="page-numbers">
-            <button
-              v-for="page in visiblePages"
-              :key="page"
-              :class="['page-number', { active: page === currentPage }]"
-              @click="goToPage(page)"
-              :disabled="page === '...'"
-            >
-              {{ page }}
-            </button>
-          </div>
-          <button
-            class="pagination-btn"
-            :disabled="currentPage >= totalPages"
-            @click="nextPage"
-          >
-            <span>Next</span>
-            <ChevronRight :size="18" />
-          </button>
-        </div>
-      </div>
-    </section>
 
     <!-- Layout Customizer Modal -->
     <HomeLayoutCustomizer 
@@ -651,7 +658,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject, watch } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useMovies } from "../composables/useMovies";
 import { usePagination } from "../composables/usePagination";
@@ -693,6 +700,12 @@ import {
   Award,
   Timer,
   Eye,
+  Heart,
+  Monitor,
+  Users,
+  BookMarked,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-vue-next";
 import { useEporner } from "../composables/useEporner";
 import VideoCard from "../components/VideoCard.vue";
@@ -736,17 +749,27 @@ const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } = useN
 // Smart recommendations
 const { getTrendingByContext, getPersonalized } = useRecommendations();
 
-const trendingVideos = ref([]);
 const recentlyAddedVideos = ref([]);
 const latestVideos = ref([]);
 const mostWatchedToday = ref([]);
 const quickWatchVideos = ref([]);
 const topRatedThisWeek = ref([]);
+const longestVideos = ref([]); // 30+ minutes
+const hd4kVideos = ref([]); // HD/4K quality
+const mostLikedVideos = ref([]); // Highest like counts
+const newReleasesCarousel = ref([]); // For hero carousel
+const trendingByCategory = ref({}); // Object with category keys
+const staffPicks = ref([]); // Curated content
 const indianVideos = ref([]);
 const povVideos = ref([]);
 const familyVideos = ref([]);
 const premiumPreviewVideos = ref([]);
 const blurredPreviewVideos = ref([]);
+
+// Carousel state
+const currentCarouselIndex = ref(0);
+const carouselAutoPlay = ref(true);
+const carouselInterval = ref(null);
 
 // Premium subscription
 const { isPremium, checkPremiumStatus } = useSubscription();
@@ -1078,6 +1101,71 @@ function clearContinueWatching() {
   }
 }
 
+// Carousel functions
+function nextCarouselSlide() {
+  if (newReleasesCarousel.value.length === 0) return;
+  currentCarouselIndex.value = (currentCarouselIndex.value + 1) % newReleasesCarousel.value.length;
+}
+
+function previousCarouselSlide() {
+  if (newReleasesCarousel.value.length === 0) return;
+  currentCarouselIndex.value = currentCarouselIndex.value === 0 
+    ? newReleasesCarousel.value.length - 1 
+    : currentCarouselIndex.value - 1;
+}
+
+function goToCarouselSlide(index) {
+  if (index >= 0 && index < newReleasesCarousel.value.length) {
+    currentCarouselIndex.value = index;
+  }
+}
+
+function toggleCarouselAutoPlay() {
+  carouselAutoPlay.value = !carouselAutoPlay.value;
+  if (carouselAutoPlay.value) {
+    startCarouselAutoPlay();
+  } else {
+    stopCarouselAutoPlay();
+  }
+}
+
+function startCarouselAutoPlay() {
+  stopCarouselAutoPlay(); // Clear any existing interval
+  if (newReleasesCarousel.value.length > 1) {
+    carouselInterval.value = setInterval(() => {
+      nextCarouselSlide();
+    }, 5000); // Change slide every 5 seconds
+  }
+}
+
+function stopCarouselAutoPlay() {
+  if (carouselInterval.value) {
+    clearInterval(carouselInterval.value);
+    carouselInterval.value = null;
+  }
+}
+
+function pauseCarousel() {
+  stopCarouselAutoPlay();
+}
+
+function resumeCarousel() {
+  if (carouselAutoPlay.value) {
+    startCarouselAutoPlay();
+  }
+}
+
+// Helper functions
+function truncateText(text, maxLength) {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength).trim() + '...';
+}
+
+function handleThumbnailError(event) {
+  event.target.src = 'https://via.placeholder.com/1280x720/1a1a2e/ffffff?text=Video';
+}
+
 function pickRandom() {
   if (filteredMovies.value.length === 0) return;
   const randomIndex = Math.floor(Math.random() * filteredMovies.value.length);
@@ -1150,10 +1238,6 @@ async function pickRandomVideo() {
 async function loadEpornerSections() {
   try {
     const limit = Math.min(maxThumbnailsPerPage.value, 12);
-    
-    // Load trending videos (Most Popular)
-    await getPopularVideos(1);
-    trendingVideos.value = epornerVideos.value.slice(0, limit);
     
     // Load recently added videos (Latest) - last 24-48 hours
     await searchVideos('all', 1, { perPage: limit * 2, order: 'latest' });
@@ -1233,6 +1317,84 @@ async function loadEpornerSections() {
     await searchVideos('all', 1, { perPage: limit, order: 'latest' });
     latestVideos.value = epornerVideos.value.slice(0, limit);
     
+    // Load longest videos (30+ minutes)
+    await searchVideos('all', 1, { perPage: limit * 3, order: 'longest' });
+    longestVideos.value = epornerVideos.value
+      .filter(video => {
+        const duration = video.length_sec || video.duration || video.length || 0;
+        const durationInSeconds = duration < 1000 ? duration : Math.floor(duration / 60);
+        return durationInSeconds >= 1800; // 30 minutes = 1800 seconds
+      })
+      .sort((a, b) => {
+        const durationA = a.length_sec || a.duration || a.length || 0;
+        const durationB = b.length_sec || b.duration || b.length || 0;
+        return durationB - durationA; // Longest first
+      })
+      .slice(0, limit);
+    
+    // Load HD/4K quality videos
+    await searchVideos('4k hd', 1, { perPage: limit * 2, order: 'most-popular' });
+    hd4kVideos.value = epornerVideos.value
+      .filter(video => {
+        const title = (video.title || '').toLowerCase();
+        const categories = (video.categories || []).map(c => c.toLowerCase());
+        const tags = (video.tags || []).map(t => t.toLowerCase());
+        return title.includes('4k') || title.includes('hd') || 
+               title.includes('1080p') || title.includes('2160p') ||
+               categories.some(c => c.includes('4k') || c.includes('hd')) ||
+               tags.some(t => t.includes('4k') || t.includes('hd'));
+      })
+      .slice(0, limit);
+    
+    // Load most liked videos (highest like counts)
+    await searchVideos('all', 1, { perPage: limit * 2, order: 'most-popular' });
+    mostLikedVideos.value = epornerVideos.value
+      .filter(video => (video.likes || 0) > 0)
+      .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+      .slice(0, limit);
+    
+    // Load new releases for carousel (latest high-quality videos)
+    await searchVideos('all', 1, { perPage: 20, order: 'latest' });
+    newReleasesCarousel.value = epornerVideos.value
+      .filter(video => {
+        // Prefer videos with good ratings and views, but don't require thumbnail
+        const rating = video.rating || video.rate || 0;
+        const views = video.views || 0;
+        return rating >= 3.0 || views > 500; // Less strict filter
+      })
+      .slice(0, 8); // Limit to 8 for carousel
+    
+    // Ensure we have videos even if filter is too strict
+    if (newReleasesCarousel.value.length === 0 && epornerVideos.value.length > 0) {
+      newReleasesCarousel.value = epornerVideos.value.slice(0, 8);
+    }
+    
+    // Load trending by category (top 3-5 videos from popular categories)
+    const popularCategories = ['anal', 'milf', 'teen', 'asian', 'latina', 'blonde', 'brunette', 'amateur', 'hardcore', 'lesbian'];
+    for (const category of popularCategories.slice(0, 6)) { // Limit to 6 categories
+      await searchVideos(category, 1, { perPage: 5, order: 'most-popular' });
+      if (epornerVideos.value.length > 0) {
+        trendingByCategory.value[category.charAt(0).toUpperCase() + category.slice(1)] = 
+          epornerVideos.value.slice(0, 5);
+      }
+    }
+    
+    // Load staff picks (curated high-quality content - videos with high ratings and views)
+    await searchVideos('all', 1, { perPage: limit * 3, order: 'top-rated' });
+    staffPicks.value = epornerVideos.value
+      .filter(video => {
+        const rating = video.rating || video.rate || 0;
+        const views = video.views || 0;
+        return rating >= 4.0 && views > 5000 && video.thumbnail;
+      })
+      .sort((a, b) => {
+        // Sort by a combination of rating and views
+        const scoreA = ((a.rating || a.rate || 0) * 1000) + ((a.views || 0) / 100);
+        const scoreB = ((b.rating || b.rate || 0) * 1000) + ((b.views || 0) / 100);
+        return scoreB - scoreA;
+      })
+      .slice(0, limit);
+    
     // Load Indian category videos
     await searchVideos('indian', 1, { perPage: limit * 2, order: 'most-popular' });
     indianVideos.value = epornerVideos.value
@@ -1286,7 +1448,6 @@ async function loadEpornerSections() {
       // Get popular/trending videos and use them as blurred preview
       const allVideos = [
         ...(latestVideos.value || []), 
-        ...(trendingVideos.value || []), 
         ...(recentlyAddedVideos.value || []),
         ...(epornerVideos.value || [])
       ];
@@ -1347,6 +1508,18 @@ onMounted(() => {
   window.addEventListener('sidebarPreferenceChanged', (e) => {
     isSidebarEnabled.value = e.detail.enabled;
   });
+  
+  // Start carousel auto-play if enabled (after videos load)
+  watch(newReleasesCarousel, (newVideos) => {
+    if (newVideos.length > 1 && carouselAutoPlay.value) {
+      startCarouselAutoPlay();
+    }
+  }, { immediate: true });
+});
+
+onBeforeUnmount(() => {
+  // Clean up carousel interval
+  stopCarouselAutoPlay();
 });
 
 watch(
@@ -1578,6 +1751,874 @@ function scrollToSection(section) {
   .actors-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.75rem;
+  }
+}
+
+/* Hero Carousel Styles */
+.hero-carousel-section {
+  margin: 3rem 0;
+  padding: 0 40px;
+}
+
+.carousel-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--dark-lighter);
+}
+
+.carousel-content-wrapper {
+  display: flex;
+  height: 500px;
+  position: relative;
+}
+
+/* Left Panel: Title and Controls */
+.carousel-left-panel {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  background: var(--dark-lighter);
+  z-index: 2;
+  border-radius: 16px 0 0 16px;
+}
+
+.carousel-title-section {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: auto;
+}
+
+.carousel-main-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.carousel-main-title .title-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.carousel-main-title .title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.carousel-main-title .title-line {
+  display: block;
+  line-height: 1.1;
+}
+
+.carousel-controls-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.carousel-nav-btn,
+.carousel-play-pause-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--dark-light);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.carousel-nav-btn:hover,
+.carousel-play-pause-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+}
+
+/* Right Panel: Video Preview */
+.carousel-right-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--dark);
+  min-height: 500px;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  height: 100%;
+}
+
+.carousel-slide {
+  flex-shrink: 0;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-width: 100%;
+}
+
+.carousel-slide-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-video-thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(135deg, var(--dark-lighter) 0%, var(--dark) 100%);
+}
+
+.carousel-video-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--dark);
+}
+
+.carousel-video-thumbnail img[src=""],
+.carousel-video-thumbnail img:not([src]) {
+  background: linear-gradient(135deg, var(--dark-lighter) 0%, var(--dark) 100%);
+}
+
+.carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.carousel-video-info-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px;
+  z-index: 3;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.85) 100%);
+  pointer-events: auto;
+}
+
+.carousel-video-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 12px;
+  line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.carousel-video-description {
+  font-size: 0.95rem;
+  color: #e5e5e5;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.carousel-video-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.carousel-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e5e5e5;
+  font-size: 14px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.carousel-watch-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: var(--primary);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: fit-content;
+}
+
+.carousel-watch-btn:hover {
+  background: var(--gradient-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(230, 57, 70, 0.4);
+}
+
+/* Bottom Indicator Bar */
+.carousel-indicator-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 4;
+}
+
+.carousel-indicator-progress {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium Badge */
+.premium-badge,
+.editor-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--gradient-primary);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  margin-left: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.editor-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Trending by Category Styles */
+.trending-categories-section {
+  margin: 3rem 0;
+  padding: 0 40px;
+}
+
+.category-trending-section {
+  margin-bottom: 3rem;
+}
+
+.category-trending-section:last-child {
+  margin-bottom: 0;
+}
+
+.category-trending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.category-trending-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.category-trending-scroll {
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+.category-trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  max-width: 100%;
+}
+
+.category-trending-grid .youtube-video-card {
+  min-width: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Responsive Styles for Trending by Category */
+@media (max-width: 1440px) {
+  .trending-categories-section {
+    padding: 0 30px;
+  }
+  
+  .category-trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .trending-categories-section {
+    margin: 2.5rem 0;
+    padding: 0 30px;
+  }
+  
+  .category-trending-section {
+    margin-bottom: 2.5rem;
+  }
+  
+  .category-trending-title {
+    font-size: 1.35rem;
+  }
+  
+  .category-trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .trending-categories-section {
+    margin: 2rem 0;
+    padding: 0 20px;
+  }
+  
+  .category-trending-section {
+    margin-bottom: 2rem;
+  }
+  
+  .category-trending-header {
+    margin-bottom: 1.25rem;
+    gap: 0.75rem;
+  }
+  
+  .category-trending-title {
+    font-size: 1.25rem;
+  }
+  
+  .category-trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+  
+  .view-all-link {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .trending-categories-section {
+    margin: 1.5rem 0;
+    padding: 0 16px;
+  }
+  
+  .category-trending-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .category-trending-header {
+    margin-bottom: 1rem;
+  }
+  
+  .category-trending-title {
+    font-size: 1.15rem;
+  }
+  
+  .category-trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trending-categories-section {
+    margin: 1.25rem 0;
+    padding: 0 12px;
+  }
+  
+  .category-trending-section {
+    margin-bottom: 1.25rem;
+  }
+  
+  .category-trending-header {
+    margin-bottom: 0.875rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .category-trending-title {
+    font-size: 1.1rem;
+  }
+  
+  .category-trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .view-all-link {
+    font-size: 0.85rem;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 360px) {
+  .trending-categories-section {
+    padding: 0 8px;
+  }
+  
+  .category-trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.625rem;
+  }
+  
+  .category-trending-title {
+    font-size: 1rem;
+  }
+}
+
+/* Responsive Carousel */
+@media (max-width: 1024px) {
+  .carousel-content-wrapper {
+    height: 400px;
+  }
+  
+  .carousel-left-panel {
+    flex: 0 0 35%;
+    padding: 30px;
+  }
+  
+  .carousel-main-title {
+    font-size: 2rem;
+  }
+  
+  .carousel-main-title .title-text {
+    gap: 0;
+  }
+  
+  .carousel-nav-btn,
+  .carousel-play-pause-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .carousel-video-title {
+    font-size: 1.75rem;
+  }
+  
+  .carousel-video-info-overlay {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-carousel-section {
+    padding: 0 20px;
+    margin: 2rem 0;
+  }
+  
+  .carousel-content-wrapper {
+    flex-direction: column;
+    height: auto;
+    min-height: 400px;
+  }
+  
+  .carousel-left-panel {
+    flex: 0 0 auto;
+    padding: 24px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .carousel-title-section {
+    margin-bottom: 0;
+  }
+  
+  .carousel-main-title {
+    font-size: 1.5rem;
+    margin: 0;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .carousel-main-title .title-text {
+    flex-direction: row;
+    gap: 4px;
+  }
+  
+  .carousel-main-title .title-line {
+    display: inline;
+  }
+  
+  .carousel-controls-panel {
+    margin-top: 0;
+  }
+  
+  .carousel-nav-btn,
+  .carousel-play-pause-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .carousel-right-panel {
+    flex: 1;
+    min-height: 350px;
+  }
+  
+  .carousel-video-info-overlay {
+    padding: 24px;
+  }
+  
+  .carousel-video-title {
+    font-size: 1.5rem;
+  }
+  
+  .carousel-video-description {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+  
+  .carousel-video-meta {
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+  
+  .carousel-meta-item {
+    font-size: 12px;
+  }
+  
+  .carousel-watch-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-carousel-section {
+    padding: 0 16px;
+    margin: 1.5rem 0;
+  }
+  
+  .carousel-content-wrapper {
+    min-height: 350px;
+  }
+  
+  .carousel-left-panel {
+    padding: 16px;
+  }
+  
+  .carousel-main-title {
+    font-size: 1.25rem;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .carousel-main-title .title-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .carousel-main-title .title-text {
+    flex-direction: row;
+    gap: 4px;
+  }
+  
+  .carousel-main-title .title-line {
+    display: inline;
+  }
+  
+  .carousel-nav-btn,
+  .carousel-play-pause-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .carousel-nav-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .carousel-right-panel {
+    min-height: 300px;
+  }
+  
+  .carousel-video-info-overlay {
+    padding: 16px;
+  }
+  
+  .carousel-video-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  
+  .carousel-video-description {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+  
+  .carousel-video-meta {
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+  
+  .carousel-meta-item {
+    font-size: 11px;
+  }
+  
+  .carousel-meta-item svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .carousel-watch-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+  
+  .carousel-watch-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .category-trending-grid .youtube-video-card {
+    min-width: 160px;
+  }
+}
+
+/* Responsive Styles for All Sections (HD/4K Quality, Staff Picks, and Others) */
+@media (max-width: 1440px) {
+  .movies-section {
+    padding: 35px 30px;
+  }
+  
+  .premium-section {
+    margin: 55px 35px;
+  }
+  
+  .section-title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .movies-section {
+    padding: 30px 25px;
+  }
+  
+  .premium-section {
+    margin: 50px 25px;
+    padding: 30px 25px;
+  }
+  
+  .section-header {
+    margin-bottom: 25px;
+    gap: 15px;
+  }
+  
+  .section-title {
+    font-size: 28px;
+  }
+  
+  .section-title .title-icon {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .premium-badge,
+  .editor-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    margin-left: 10px;
+  }
+  
+  .view-all-link {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .movies-section {
+    padding: 24px 20px;
+  }
+  
+  .premium-section {
+    margin: 40px 20px;
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+  
+  .section-header {
+    margin-bottom: 20px;
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .section-title {
+    font-size: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .section-title .title-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .section-description {
+    font-size: 13px;
+  }
+  
+  .premium-badge,
+  .editor-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    margin-left: 8px;
+  }
+  
+  .view-all-link {
+    font-size: 12px;
+    padding: 5px 10px;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  .movies-section {
+    padding: 20px 16px;
+  }
+  
+  .premium-section {
+    margin: 30px 16px;
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+  
+  .section-header {
+    margin-bottom: 16px;
+    gap: 10px;
+  }
+  
+  .section-title {
+    font-size: 22px;
+    gap: 10px;
+  }
+  
+  .section-title .title-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .section-description {
+    font-size: 12px;
+  }
+  
+  .premium-badge,
+  .editor-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    margin-left: 6px;
+  }
+  
+  .view-all-link {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .movies-section {
+    padding: 16px 12px;
+  }
+  
+  .premium-section {
+    margin: 24px 12px;
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+  
+  .section-header {
+    margin-bottom: 14px;
+    gap: 8px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .section-title .title-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .section-description {
+    font-size: 11px;
+  }
+  
+  .premium-badge,
+  .editor-badge {
+    font-size: 8px;
+    padding: 2px 5px;
+    margin-left: 4px;
+    letter-spacing: 0.3px;
+  }
+  
+  .view-all-link {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+  
+  .view-all-link svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .movies-section {
+    padding: 12px 8px;
+  }
+  
+  .premium-section {
+    margin: 20px 8px;
+    padding: 12px 8px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+  }
+  
+  .premium-badge,
+  .editor-badge {
+    font-size: 7px;
+    padding: 2px 4px;
+    margin-left: 4px;
   }
 }
 </style>

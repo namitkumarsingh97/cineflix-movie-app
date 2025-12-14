@@ -243,6 +243,18 @@ watch(() => route.query.page, (newPageParam) => {
   }
 }, { immediate: false });
 
+// Update page title when tag changes
+watch(decodedTag, (newTag) => {
+  if (newTag) {
+    // Capitalize each word in the tag
+    const formattedTag = newTag
+      .split(/[\s-]+/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+    document.title = `${formattedTag} - Cineflix`;
+  }
+}, { immediate: true });
+
 // Load videos on mount
 onMounted(() => {
   loadVideos();

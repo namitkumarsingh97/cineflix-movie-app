@@ -1651,9 +1651,17 @@ function processIframe() {
 // Watch for video changes to process iframe
 watch(() => video.value, () => {
   processIframe();
+  
+  // Update page title when video loads
+  if (video.value && video.value.title) {
+    document.title = `${video.value.title} - Cineflix`;
+  }
 }, { deep: true });
 
 onMounted(async () => {
+  // Set default title while loading
+  document.title = 'Loading... - Cineflix';
+  
   // Scroll to top on initial mount
   window.scrollTo({ top: 0, behavior: 'instant' });
   
@@ -1667,6 +1675,13 @@ onMounted(async () => {
     setTimeout(() => {
       loadTagBasedRecommendations();
     }, 2000); // Delay 2 seconds on slow networks
+  }
+  
+  // Update title if video loaded
+  if (video.value && video.value.title) {
+    document.title = `${video.value.title} - Cineflix`;
+  } else {
+    document.title = 'Video - Cineflix';
   }
 });
 

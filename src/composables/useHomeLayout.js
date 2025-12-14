@@ -10,15 +10,18 @@ export const availableSections = [
   { id: 'mostWatchedToday', label: 'Most Watched Today', icon: 'Eye', defaultEnabled: true, order: 3 },
   { id: 'quickWatch', label: 'Quick Watch', icon: 'Zap', defaultEnabled: true, order: 4 },
   { id: 'topRated', label: 'Top Rated This Week', icon: 'Award', defaultEnabled: true, order: 5 },
-  { id: 'trending', label: 'Trending Now', icon: 'TrendingUp', defaultEnabled: true, order: 6 },
+  { id: 'newReleases', label: 'New Releases', icon: 'Sparkles', defaultEnabled: true, order: 5.5 },
+  { id: 'longestVideos', label: 'Longest Videos', icon: 'Timer', defaultEnabled: true, order: 6 },
+  { id: 'hd4k', label: 'HD/4K Quality', icon: 'Monitor', defaultEnabled: true, order: 7 },
+  { id: 'mostLiked', label: 'Most Liked', icon: 'Heart', defaultEnabled: true, order: 8 },
+  { id: 'staffPicks', label: 'Staff Picks', icon: 'BookMarked', defaultEnabled: true, order: 9 },
+  { id: 'trendingByCategory', label: 'Trending by Category', icon: 'TrendingUp', defaultEnabled: true, order: 10 },
+  { id: 'trending', label: 'Trending Now', icon: 'TrendingUp', defaultEnabled: true, order: 11 },
   { id: 'yourStars', label: 'Your Stars', icon: 'Star', defaultEnabled: true, order: 7 },
   { id: 'indian', label: 'Indian', icon: 'Film', defaultEnabled: true, order: 8 },
   { id: 'pov', label: 'Recent POV Videos', icon: 'Film', defaultEnabled: true, order: 9 },
   { id: 'family', label: 'Recent Family Videos', icon: 'Film', defaultEnabled: true, order: 10 },
   { id: 'premium', label: 'Premium Content', icon: 'Crown', defaultEnabled: true, order: 11 },
-  { id: 'trendingVideos', label: 'Trending Videos', icon: 'TrendingUp', defaultEnabled: true, order: 12 },
-  { id: 'recentlyAddedVideos', label: 'Recently Added Videos', icon: 'Calendar', defaultEnabled: false, order: 13 },
-  { id: 'allMovies', label: 'All Movies', icon: 'Film', defaultEnabled: true, order: 14 },
 ];
 
 // Load preferences from localStorage
