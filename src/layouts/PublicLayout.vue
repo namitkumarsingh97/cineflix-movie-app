@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-to-main" @click.prevent="skipToMain">
       Skip to main content
     </a>
@@ -79,31 +78,6 @@
                   <span>Actors</span>
                 </router-link>
               </li>
-              <!-- Categories temporarily hidden -->
-              <!--
-              <li class="navbar-nav-item">
-                <router-link
-                  to="/categories"
-                  class="navbar-link"
-                  active-class="active"
-                  @click="closeMobileMenu"
-                >
-                  <FolderOpen :size="16" />
-                  <span>Categories</span>
-                </router-link>
-              </li>
-              -->
-              <!-- <li class="navbar-nav-item">
-                <router-link
-                  to="/stories"
-                  class="navbar-link"
-                  active-class="active"
-                  @click="closeMobileMenu"
-                >
-                  <Heart :size="16" />
-                  <span>Stories</span>
-                </router-link>
-              </li> -->
               <li class="navbar-nav-item">
                 <router-link
                   to="/premium"
@@ -302,14 +276,14 @@
             >
               <Settings :size="20" />
             </button>
-            <button
+            <!-- <button
               class="navbar-btn accessibility-btn"
               @click="showAccessibility = true"
               title="Accessibility Settings"
               aria-label="Open accessibility settings"
             >
               <Accessibility :size="20" />
-            </button>
+            </button> -->
             <button
               class="navbar-btn refresh-btn"
               @click="$emit('refresh')"
@@ -390,7 +364,7 @@
             <Film :size="24" />
             <span>MovieHub</span>
           </div>
-          <button class="mobile-menu-close" @click="closeMobileMenu">
+          <button class="mobile-menu-close" @click="closeMobileMenu" aria-label="Close mobile menu">
             <X :size="24" />
           </button>
         </div>
@@ -475,10 +449,10 @@
           <div class="mobile-menu-section">
             <h3 class="mobile-menu-section-header">CATEGORIES</h3>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/double-penetration' }]"
-              @click="navigateToMobileDoublePenetration"
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/hd-4k' }]"
+              @click="navigateToMobileHD4K"
             >
-              <span>Double Penetration</span>
+              <span>4K/HD Only</span>
             </button>
             <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/amateur' }]"
@@ -487,7 +461,7 @@
               <span>Amateur</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/anal' }]"
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/anal' }]"
               @click="navigateToMobileAnal"
             >
               <span>Anal</span>
@@ -497,6 +471,12 @@
               @click="navigateToMobileAsian"
             >
               <span>Asian</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/behind-the-scenes' }]"
+              @click="navigateToMobileBehindTheScenes"
+            >
+              <span>Behind the Scenes</span>
             </button>
             <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bdsm' }]"
@@ -553,6 +533,12 @@
               <span>Bukkake</span>
             </button>
             <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/compilations' }]"
+              @click="navigateToMobileCompilations"
+            >
+              <span>Compilations</span>
+            </button>
+            <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/creampie' }]"
               @click="navigateToMobileCreampie"
             >
@@ -563,6 +549,18 @@
               @click="navigateToMobileCumshot"
             >
               <span>Cumshot</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/documentaries' }]"
+              @click="navigateToMobileDocumentaries"
+            >
+              <span>Documentaries</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/double-penetration' }]"
+              @click="navigateToMobileDoublePenetration"
+            >
+              <span>Double Penetration</span>
             </button>
             <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/ebony' }]"
@@ -625,6 +623,12 @@
               <span>Interracial</span>
             </button>
             <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/interviews' }]"
+              @click="navigateToMobileInterviews"
+            >
+              <span>Interviews</span>
+            </button>
+            <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/latina' }]"
               @click="navigateToMobileLatina"
             >
@@ -635,6 +639,12 @@
               @click="navigateToMobileLesbian"
             >
               <span>Lesbian</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/live-cams' }]"
+              @click="navigateToMobileLiveCams"
+            >
+              <span>Live Cams</span>
             </button>
             <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/massage' }]"
@@ -679,6 +689,12 @@
               <span>Outdoor</span>
             </button>
             <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/parodies' }]"
+              @click="navigateToMobileParodies"
+            >
+              <span>Parodies</span>
+            </button>
+            <button
               :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/pov' }]"
               @click="navigateToMobilePOV"
             >
@@ -714,17 +730,25 @@
             >
               <span>Squirt</span>
             </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/verified-amateur' }]"
+              @click="navigateToMobileVerifiedAmateur"
+            >
+              <span>Verified Amateur</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/vr-360' }]"
+              @click="navigateToMobileVR360"
+            >
+              <span>VR/360° Videos</span>
+            </button>
+            <button
+              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/webcam' }]"
+              @click="navigateToMobileWebcam"
+            >
+              <span>Webcam</span>
+            </button>
           </div>
-
-          <!-- <router-link
-            to="/stories"
-            class="mobile-menu-link"
-            active-class="active"
-            @click="closeMobileMenu"
-          >
-            <Heart :size="20" />
-            <span>Stories</span>
-          </router-link> -->
           <router-link
             v-if="isAdminLoggedIn"
             to="/admin/panel"
@@ -734,15 +758,6 @@
             <Shield :size="20" />
             <span>Admin Panel</span>
           </router-link>
-          <!-- <router-link
-            v-else
-            to="/admin/login"
-            class="mobile-menu-link"
-            @click="closeMobileMenu"
-          >
-            <Shield :size="20" />
-            <span>Admin</span>
-          </router-link> -->
         </nav>
       </div>
 
@@ -889,6 +904,7 @@ import {
   FolderOpen,
   Star,
   Heart,
+  FileText,
   Facebook,
   Twitter,
   Instagram,
@@ -1691,6 +1707,86 @@ function navigateToMobileSquirt() {
   selectedMobileProduction.value = "all";
   selectedMobileTopNav.value = null;
   router.push("/squirt");
+  closeMobileMenu();
+}
+
+function navigateToMobileVR360() {
+  selectedMobileCategory.value = "vr 360";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/vr-360");
+  closeMobileMenu();
+}
+
+function navigateToMobileHD4K() {
+  selectedMobileCategory.value = "4k hd";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hd-4k");
+  closeMobileMenu();
+}
+
+function navigateToMobileVerifiedAmateur() {
+  selectedMobileCategory.value = "verified amateur";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/verified-amateur");
+  closeMobileMenu();
+}
+
+function navigateToMobileLiveCams() {
+  selectedMobileCategory.value = "live cam";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/live-cams");
+  closeMobileMenu();
+}
+
+function navigateToMobileCompilations() {
+  selectedMobileCategory.value = "compilation";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/compilations");
+  closeMobileMenu();
+}
+
+function navigateToMobileBehindTheScenes() {
+  selectedMobileCategory.value = "behind the scenes";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/behind-the-scenes");
+  closeMobileMenu();
+}
+
+function navigateToMobileInterviews() {
+  selectedMobileCategory.value = "interview";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/interviews");
+  closeMobileMenu();
+}
+
+function navigateToMobileParodies() {
+  selectedMobileCategory.value = "parody";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/parodies");
+  closeMobileMenu();
+}
+
+function navigateToMobileDocumentaries() {
+  selectedMobileCategory.value = "documentary";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/documentaries");
+  closeMobileMenu();
+}
+
+function navigateToMobileWebcam() {
+  selectedMobileCategory.value = "webcam";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/webcam");
   closeMobileMenu();
 }
 

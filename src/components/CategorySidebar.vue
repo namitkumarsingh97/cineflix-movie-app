@@ -5,10 +5,10 @@
       <div class="sidebar-section">
         <h3 class="section-header">CATEGORIES</h3>
         <button
-          :class="['sidebar-item', 'featured-item', 'featured-item-divider', { active: route.path === '/double-penetration' }]"
-          @click="navigateToDoublePenetration"
+          :class="['sidebar-item', 'featured-item', 'featured-item-divider', { active: route.path === '/hd-4k' }]"
+          @click="navigateToHD4K"
         >
-          <span class="item-label">Double Penetration</span>
+          <span class="item-label">4K/HD Only</span>
         </button>
         <button
           :class="['sidebar-item', 'featured-item', 'featured-item-divider', { active: route.path === '/amateur' }]"
@@ -27,6 +27,12 @@
           @click="navigateToAsian"
         >
           <span class="item-label">Asian</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/behind-the-scenes' }]"
+          @click="navigateToBehindTheScenes"
+        >
+          <span class="item-label">Behind the Scenes</span>
         </button>
         <button
           :class="['sidebar-item', 'featured-item', { active: route.path === '/bdsm' }]"
@@ -83,6 +89,12 @@
           <span class="item-label">Bukkake</span>
         </button>
         <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/compilations' }]"
+          @click="navigateToCompilations"
+        >
+          <span class="item-label">Compilations</span>
+        </button>
+        <button
           :class="['sidebar-item', 'featured-item', { active: route.path === '/creampie' }]"
           @click="navigateToCreampie"
         >
@@ -93,6 +105,18 @@
           @click="navigateToCumshot"
         >
           <span class="item-label">Cumshot</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/documentaries' }]"
+          @click="navigateToDocumentaries"
+        >
+          <span class="item-label">Documentaries</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/double-penetration' }]"
+          @click="navigateToDoublePenetration"
+        >
+          <span class="item-label">Double Penetration</span>
         </button>
         <button
           :class="['sidebar-item', 'featured-item', { active: route.path === '/ebony' }]"
@@ -155,6 +179,12 @@
           <span class="item-label">Interracial</span>
         </button>
         <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/interviews' }]"
+          @click="navigateToInterviews"
+        >
+          <span class="item-label">Interviews</span>
+        </button>
+        <button
           :class="['sidebar-item', 'featured-item', { active: route.path === '/latina' }]"
           @click="navigateToLatina"
         >
@@ -165,6 +195,12 @@
           @click="navigateToLesbian"
         >
           <span class="item-label">Lesbian</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/live-cams' }]"
+          @click="navigateToLiveCams"
+        >
+          <span class="item-label">Live Cams</span>
         </button>
         <button
           :class="['sidebar-item', 'featured-item', { active: route.path === '/massage' }]"
@@ -209,6 +245,12 @@
           <span class="item-label">Outdoor</span>
         </button>
         <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/parodies' }]"
+          @click="navigateToParodies"
+        >
+          <span class="item-label">Parodies</span>
+        </button>
+        <button
           :class="['sidebar-item', 'featured-item', { active: route.path === '/pov' }]"
           @click="navigateToPOV"
         >
@@ -243,6 +285,24 @@
           @click="navigateToSquirt"
         >
           <span class="item-label">Squirt</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/verified-amateur' }]"
+          @click="navigateToVerifiedAmateur"
+        >
+          <span class="item-label">Verified Amateur</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/vr-360' }]"
+          @click="navigateToVR360"
+        >
+          <span class="item-label">VR/360° Videos</span>
+        </button>
+        <button
+          :class="['sidebar-item', 'featured-item', { active: route.path === '/webcam' }]"
+          @click="navigateToWebcam"
+        >
+          <span class="item-label">Webcam</span>
         </button>
       </div>
     </div>
@@ -730,6 +790,86 @@ function navigateToSquirt() {
   emit("filter-change", { type: "category", value: "squirt" });
 }
 
+function navigateToVR360() {
+  selectedCategory.value = "vr 360";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/vr-360");
+  emit("filter-change", { type: "category", value: "vr 360" });
+}
+
+function navigateToHD4K() {
+  selectedCategory.value = "4k hd";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/hd-4k");
+  emit("filter-change", { type: "category", value: "4k hd" });
+}
+
+function navigateToVerifiedAmateur() {
+  selectedCategory.value = "verified amateur";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/verified-amateur");
+  emit("filter-change", { type: "category", value: "verified amateur" });
+}
+
+function navigateToLiveCams() {
+  selectedCategory.value = "live cam";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/live-cams");
+  emit("filter-change", { type: "category", value: "live cam" });
+}
+
+function navigateToCompilations() {
+  selectedCategory.value = "compilation";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/compilations");
+  emit("filter-change", { type: "category", value: "compilation" });
+}
+
+function navigateToBehindTheScenes() {
+  selectedCategory.value = "behind the scenes";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/behind-the-scenes");
+  emit("filter-change", { type: "category", value: "behind the scenes" });
+}
+
+function navigateToInterviews() {
+  selectedCategory.value = "interview";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/interviews");
+  emit("filter-change", { type: "category", value: "interview" });
+}
+
+function navigateToParodies() {
+  selectedCategory.value = "parody";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/parodies");
+  emit("filter-change", { type: "category", value: "parody" });
+}
+
+function navigateToDocumentaries() {
+  selectedCategory.value = "documentary";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/documentaries");
+  emit("filter-change", { type: "category", value: "documentary" });
+}
+
+function navigateToWebcam() {
+  selectedCategory.value = "webcam";
+  selectedProduction.value = "all";
+  selectedTopNav.value = null;
+  router.push("/webcam");
+  emit("filter-change", { type: "category", value: "webcam" });
+}
+
 // Load initial categories
 onMounted(() => {
   loadCategories(1);
@@ -782,11 +922,11 @@ onMounted(() => {
 }
 
 .section-header {
-  font-size: 12px;
-  font-weight: 700;
-  color: #ffd700;
+  font-size: 13px; /* Larger */
+  font-weight: 800; /* Bolder */
+  color: var(--accent); /* Use CSS variable */
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px; /* More spacing */
   margin-bottom: 12px;
   padding: 0 4px;
 }
@@ -796,7 +936,9 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 16px; /* More padding */
+  font-size: 14px; /* Larger font */
+  font-weight: 500; /* Slightly bolder */
   margin-bottom: 4px;
   background: transparent;
   border: none;
@@ -811,16 +953,22 @@ onMounted(() => {
 
 .sidebar-item:hover {
   background: var(--dark-lighter);
+  color: var(--text-primary);
+  transform: translateX(4px); /* Subtle slide effect */
+  transition: all 0.2s ease;
 }
 
 .sidebar-item.active {
-  background: rgba(255, 69, 0, 0.15);
-  color: #ff4500;
-  font-weight: 600;
+  background: rgba(230, 57, 70, 0.2); /* Use new primary color */
+  color: var(--primary);
+  font-weight: 700; /* Bolder */
+  border-left: 3px solid var(--primary); /* Visual indicator */
+  padding-left: 13px; /* Adjust for border */
 }
 
 .sidebar-item.active .item-count {
-  color: #ff4500;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .sidebar-item svg {
@@ -830,7 +978,8 @@ onMounted(() => {
 
 .sidebar-item.active svg {
   opacity: 1;
-  color: #ff4500;
+  color: var(--primary);
+  transform: scale(1.1);
 }
 
 .featured-item {

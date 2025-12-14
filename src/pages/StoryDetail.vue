@@ -13,6 +13,10 @@
           <span class="story-author-main">by {{ story.author }}</span>
           <span class="story-date">{{ formatDate(story.createdAt) }}</span>
           <span class="story-category">{{ story.category }}</span>
+          <span v-if="story.language" class="story-language">
+            <Languages :size="14" />
+            {{ getLanguageName(story.language) }}
+          </span>
         </div>
         <div class="story-stats">
           <span class="stat-item">
@@ -73,12 +77,13 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, Eye, Heart, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
+import { ArrowLeft, Eye, Heart, ChevronLeft, ChevronRight, AlertCircle, Languages } from 'lucide-vue-next';
+import { useStories } from '../composables/useStories';
 import Loader from '../components/Loader.vue';
 
 const route = useRoute();
 const router = useRouter();
+const { fetchStoryById, languages } = useStories();
 
 const story = ref(null);
 const loading = ref(true);
@@ -135,9 +140,9 @@ onMounted(async () => {
 async function loadStory() {
   loading.value = true;
   try {
-    const response = await apiClient.get(`/stories/${route.params.id}`);
-    if (response.data.success) {
-      story.value = response.data.data;
+    const storyData = await fetchStoryById(route.params.id);
+    if (storyData) {
+      story.value = storyData;
       currentPage.value = 1;
     }
   } catch (error) {
@@ -236,6 +241,11 @@ function formatDate(date) {
 function goBack() {
   router.push('/stories');
 }
+
+function getLanguageName(code) {
+  const lang = languages.value.find(l => l.code === code);
+  return lang ? lang.name : code.toUpperCase();
+}
 </script>
 
 <style scoped>
@@ -313,13 +323,26 @@ function goBack() {
 
 .story-category {
   padding: 4px 12px;
-  background: rgba(255, 69, 0, 0.1);
-  border: 1px solid rgba(255, 69, 0, 0.2);
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid rgba(230, 57, 70, 0.2);
   border-radius: 8px;
   color: var(--primary);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+.story-language {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .story-stats {

@@ -12,34 +12,67 @@ export default defineConfig({
         changeOrigin: true
       }
     },
-    // Enable HTTP/2 (requires https)
-    // https: true,
     headers: {
-      // Enable Brotli compression hints
       'Accept-Encoding': 'br, gzip, deflate',
-      // Cache control for static assets
       'Cache-Control': 'public, max-age=31536000, immutable',
     }
   },
   build: {
-    // Enable Brotli compression in build
+    // Minify and optimize - use esbuild for faster builds
+    minify: 'esbuild', // Faster than terser, good enough for production
+    // Terser is slower but produces smaller bundles - use for final production if needed
+    // minify: 'terser',
+    // terserOptions: {
+    //   compress: {
+    //     drop_console: true,
+    //     drop_debugger: true,
+    //     pure_funcs: ['console.log', 'console.info', 'console.debug'],
+    //   },
+    // },
     rollupOptions: {
       output: {
-        // Code splitting for better caching
-        manualChunks: {
-          'vendor': ['vue', 'vue-router'],
-          'icons': ['lucide-vue-next'],
-        }
+        // Better code splitting for performance
+        manualChunks: (id) => {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            if (id.includes('vue') || id.includes('vue-router')) {
+              return 'vendor-core';
+            }
+            if (id.includes('lucide-vue-next')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('axios')) {
+              return 'vendor-network';
+            }
+            // HLS.js should be lazy loaded, not in vendor chunk
+            // if (id.includes('hls.js')) {
+            //   return 'vendor-hls';
+            // }
+            // Other node_modules
+            return 'vendor-other';
+          }
+        },
+        // Optimize chunk file names
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       }
     },
-    // Optimize chunk size
     chunkSizeWarningLimit: 1000,
-    // Enable source maps for production debugging
     sourcemap: false,
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Optimize asset inlining threshold
+    assetsInlineLimit: 4096, // 4kb
   },
-  // Optimize dependencies
   optimizeDeps: {
     include: ['vue', 'vue-router', 'lucide-vue-next'],
-  }
+    exclude: [],
+  },
+  // Performance optimizations
+  esbuild: {
+    // Drop console and debugger in production
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+  },
 })
 
