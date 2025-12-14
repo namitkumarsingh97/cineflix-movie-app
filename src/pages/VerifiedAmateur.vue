@@ -49,7 +49,12 @@ const visiblePages = computed(() => {
   else { pages.push(1); if (current > 3) pages.push('...'); for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i); if (current < total - 2) pages.push('...'); pages.push(total); }
   return pages;
 });
-function navigateToVideo(video) { router.push(`/watch/${video.id}?source=eporner`); }
+import { generateWatchUrl } from '../utils/slug';
+
+function navigateToVideo(video) { 
+  const url = generateWatchUrl(video, { source: 'eporner' });
+  router.push(url);
+}
 function goToPage(page) { if (page === '...' || page < 1 || page > totalPages.value) return; searchVideos('verified amateur', page, { order: 'most-popular' }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 onMounted(() => { searchVideos('verified amateur', 1, { order: 'most-popular' }); });
 </script>

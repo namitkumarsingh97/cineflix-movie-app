@@ -132,12 +132,13 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { FileText, ChevronRight, Star, ChevronLeft, Languages, Search } from 'lucide-vue-next';
 import { useStories } from '../composables/useStories';
 import Loader from '../components/Loader.vue';
 
 const router = useRouter();
+const route = useRoute();
 const {
   stories,
   loading,
@@ -156,8 +157,33 @@ const {
 const selectedCategory = ref('');
 const searchQuery = ref('');
 
+// Update URL with page parameter
+function updateUrlPage(page) {
+  const query = { ...route.query };
+  
+  if (page === 1) {
+    delete query.page;
+  } else {
+    query.page = page.toString();
+  }
+  
+  router.push({ 
+    path: '/stories',
+    query: query
+  });
+}
+
 onMounted(async () => {
-  await loadStories();
+  // Get page from URL or default to 1
+  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
+  
+  // Load stories with page from URL
+  await fetchStories(page, {
+    limit: 20,
+    category: route.query.category || selectedCategory.value || undefined,
+    search: route.query.search || searchQuery.value || undefined,
+  });
 });
 
 async function loadStories() {
@@ -170,6 +196,16 @@ async function loadStories() {
 }
 
 async function handleSearch() {
+  // Update URL with search query and reset to page 1
+  router.push({ 
+    path: '/stories',
+    query: { 
+      ...route.query,
+      search: searchQuery.value.trim() || undefined,
+      page: undefined // Reset to page 1
+    }
+  });
+  
   if (searchQuery.value.trim()) {
     await fetchStories(1, { search: searchQuery.value.trim() });
   } else {
@@ -178,10 +214,28 @@ async function handleSearch() {
 }
 
 async function handleCategoryChange() {
+  // Update URL with category and reset to page 1
+  router.push({ 
+    path: '/stories',
+    query: { 
+      ...route.query,
+      category: selectedCategory.value || undefined,
+      page: undefined // Reset to page 1
+    }
+  });
   await loadStories();
 }
 
 async function handleLanguageChange() {
+  // Update URL with language and reset to page 1
+  router.push({ 
+    path: '/stories',
+    query: { 
+      ...route.query,
+      language: selectedLanguage.value !== 'all' ? selectedLanguage.value : undefined,
+      page: undefined // Reset to page 1
+    }
+  });
   await filterByLanguage(selectedLanguage.value, 1);
 }
 
@@ -190,8 +244,34 @@ watch(selectedLanguage, () => {
   handleLanguageChange();
 });
 
+// Watch for page parameter changes (browser back/forward)
+watch(() => route.query.page, async (newPageParam) => {
+  if (newPageParam) {
+    const page = parseInt(newPageParam, 10);
+    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+      await fetchStories(page, {
+        limit: 20,
+        category: selectedCategory.value || undefined,
+        search: searchQuery.value || undefined,
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  } else if (currentPage.value !== 1) {
+    // If no page param and we're not on page 1, reset to 1
+    await fetchStories(1, {
+      limit: 20,
+      category: selectedCategory.value || undefined,
+      search: searchQuery.value || undefined,
+    });
+  }
+}, { immediate: false });
+
 async function changePage(page) {
   if (page >= 1 && page <= totalPages.value) {
+    // Update URL first
+    updateUrlPage(page);
+    
+    // Then load stories
     await fetchStories(page, {
       limit: 20,
       category: selectedCategory.value || undefined,

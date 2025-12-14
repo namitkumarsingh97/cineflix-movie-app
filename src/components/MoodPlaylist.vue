@@ -125,13 +125,17 @@ async function refreshPlaylist() {
   await generatePlaylist();
 }
 
+import { generateWatchUrl } from '../utils/slug';
+
 function navigateToVideo(video) {
   const videoId = video.id || video._id;
   const source = video._source || (epornerVideos.value.some(v => v.id === videoId) ? 'eporner' : null);
   
-  if (source === 'eporner') {
-    router.push(`/watch/${videoId}?source=eporner`);
-  } else {
+  const url = generateWatchUrl(video, { source: source || undefined });
+  router.push(url);
+  
+  // Legacy code below (kept for reference but not used)
+  if (false) {
     router.push(`/watch/${videoId}`);
   }
 }

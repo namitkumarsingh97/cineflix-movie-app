@@ -153,9 +153,12 @@ const visiblePages = computed(() => {
   return pages;
 });
 
+import { generateWatchUrl } from '../utils/slug';
+
 // Navigate to video
 function navigateToVideo(video) {
-  router.push(`/watch/${video.id}?source=eporner`);
+  const url = generateWatchUrl(video, { source: 'eporner' });
+  router.push(url);
 }
 
 // Go to page

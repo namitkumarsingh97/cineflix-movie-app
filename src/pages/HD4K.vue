@@ -69,7 +69,12 @@ const visiblePages = computed(() => {
   return pages;
 });
 
-function navigateToVideo(video) { router.push(`/watch/${video.id}?source=eporner`); }
+import { generateWatchUrl } from '../utils/slug';
+
+function navigateToVideo(video) { 
+  const url = generateWatchUrl(video, { source: 'eporner' });
+  router.push(url);
+}
 function goToPage(page) {
   if (page === '...' || page < 1 || page > totalPages.value) return;
   searchVideos('4k hd', page, { order: 'most-popular' });
