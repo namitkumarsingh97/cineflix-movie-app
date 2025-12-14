@@ -249,8 +249,7 @@ onMounted(() => {
 }
 
 .search-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
+  /* Focus indicators disabled */
 }
 
 .search-btn {
@@ -289,7 +288,7 @@ onMounted(() => {
 }
 
 .filter-select:focus {
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .videos-content {

@@ -371,8 +371,7 @@ const handleSubmit = async () => {
 
 .form-input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
+  /* Focus indicators disabled */
 }
 
 .form-input::placeholder {

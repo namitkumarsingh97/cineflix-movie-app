@@ -329,7 +329,15 @@
 
 <script setup>
 import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from 'vue';
-import Hls from 'hls.js';
+// Lazy load HLS.js only when needed (saves 1MB+ on initial load)
+let Hls = null;
+const loadHls = async () => {
+  if (!Hls) {
+    const hlsModule = await import('hls.js');
+    Hls = hlsModule.default;
+  }
+  return Hls;
+};
 import { useRoute, useRouter } from 'vue-router';
 import { videosApi } from '../api/videos';
 import { moviesApi } from '../api/movies';
@@ -552,16 +560,17 @@ async function setupStreaming() {
   }
 
   // HLS playback
-  if (Hls.isSupported()) {
-    hlsInstance.value = new Hls(getHlsConfig());
+  const HlsClass = await loadHls();
+  if (HlsClass.isSupported()) {
+    hlsInstance.value = new HlsClass(getHlsConfig());
     hlsInstance.value.loadSource(video.value.url);
     hlsInstance.value.attachMedia(videoPlayer.value);
-    hlsInstance.value.on(Hls.Events.ERROR, (_event, data) => {
+    hlsInstance.value.on(HlsClass.Events.ERROR, (_event, data) => {
       if (!hlsInstance.value) return;
       if (data.fatal) {
-        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+        if (data.type === HlsClass.ErrorTypes.NETWORK_ERROR) {
           hlsInstance.value.startLoad();
-        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+        } else if (data.type === HlsClass.ErrorTypes.MEDIA_ERROR) {
           hlsInstance.value.recoverMediaError();
         } else {
           destroyHls();
@@ -1227,14 +1236,11 @@ async function downloadDirectVideo(url) {
 
 async function downloadHlsVideo() {
   try {
-    // Check if Hls.js is available
-    if (typeof Hls === 'undefined') {
-      alert('HLS download requires HLS.js library. Please use a direct video URL.');
-      return;
-    }
+    // Load HLS.js if needed
+    const HlsClass = await loadHls();
     
     const hlsUrl = video.value.url;
-    const hls = new Hls();
+    const hls = new HlsClass();
     
     // Load manifest
     const manifestResponse = await fetch(hlsUrl);
@@ -2190,7 +2196,7 @@ onBeforeUnmount(() => {
 
 .comment-author-input:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .comment-text-input {
@@ -2208,7 +2214,7 @@ onBeforeUnmount(() => {
 
 .comment-text-input:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .comment-text-input::placeholder {
@@ -2377,7 +2383,7 @@ onBeforeUnmount(() => {
 .share-input:focus,
 .share-textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 .share-textarea {
@@ -2470,7 +2476,7 @@ onBeforeUnmount(() => {
 
 .speed-select:focus {
   outline: none;
-  border-color: var(--primary);
+  /* Focus indicators disabled */
 }
 
 /* Related Content Section */

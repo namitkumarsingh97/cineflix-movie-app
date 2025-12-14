@@ -4,11 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <meta name="description" content="Stream your favorite movies and videos - Cineflix Movie Hub" />
+    <meta name="keywords" content="movies, videos, streaming, entertainment, cineflix" />
+    <meta name="author" content="Cineflix" />
     <meta name="theme-color" content="#0a0e27" />
     <meta name="color-scheme" content="dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Cineflix" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cineflix - Movie Hub" />
+    <meta property="og:description" content="Stream your favorite movies and videos" />
+    <meta property="og:image" content="/icon-512.png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cineflix - Movie Hub" />
+    <meta name="twitter:description" content="Stream your favorite movies and videos" />
+    <meta name="twitter:image" content="/icon-512.png" />
     
     <!-- Permissions Policy to suppress XR warnings -->
     <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(), geolocation=(), camera=(), microphone=()" />
@@ -16,18 +30,20 @@
     <!-- CDN and Performance Optimizations -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
-    <!-- Icons are loaded via manifest.json, no need to preload -->
+    <link rel="dns-prefetch" href="https://www.eporner.com" />
     
     <!-- Resource hints for CDN -->
     <meta http-equiv="x-dns-prefetch-control" content="on" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/icon-192.png" as="image" />
     
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     
-    <!-- Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Google Sign-In - Only load when needed (saves 88.9 KiB on initial load) -->
+    <!-- Script will be loaded dynamically when user clicks sign-in -->
     
     <title>Cineflix - Movie Hub</title>
   </head>

@@ -10,8 +10,21 @@
     <div class="actors-content">
       <div class="actors-page">
         <div class="page-header">
-          <h1 class="page-title">Actors</h1>
-          <p class="page-subtitle">Browse all actors and performers</p>
+          <div class="header-content">
+            <div>
+              <h1 class="page-title">Actors</h1>
+              <p class="page-subtitle">Browse all actors and performers</p>
+            </div>
+            <button 
+              class="refresh-actresses-btn"
+              @click="refreshActresses"
+              :disabled="extracting || loading"
+              title="Refresh actresses list from API"
+            >
+              <RefreshCw :size="18" :class="{ spinning: extracting || loading }" />
+              <span>{{ extracting || loading ? 'Extracting...' : 'Refresh' }}</span>
+            </button>
+          </div>
         </div>
 
         <div v-if="displayedActors.length > 0" class="actors-content-section">
@@ -48,10 +61,6 @@
                 </div>
                 <div class="actor-name-wrapper">
                   <h3 class="actor-name">{{ actor.name }}</h3>
-                  <div class="actor-card-badge">
-                    <Star :size="12" />
-                    <span>Featured</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -105,21 +114,26 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CategorySidebar from '../components/CategorySidebar.vue';
-import { Star, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { Star, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-vue-next';
+import { useActresses } from '../composables/useActresses';
 
 const router = useRouter();
 
 const sidebarOpen = ref(true);
 const currentPage = ref(1);
 const actorsPerPage = 24; // 4 columns x 6 rows
+const extracting = ref(false);
+
+const { actresses, loading, extractAllActresses, loadFromStorage, getActressImage } = useActresses();
 
 function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
 }
 
+// Start with hardcoded actresses, then merge with extracted ones
 const allActors = ref([
   { name: 'Abella Danger', image: 'https://cdni.pornpics.com/models/a/abella_danger.jpg' },
   { name: 'AJ Applegate', image: 'https://cdni.pornpics.com/models/a/aj_applegate.jpg' },
@@ -148,6 +162,116 @@ const allActors = ref([
   { name: 'Alexa Flexy', image: null },
   { name: 'Alexa Grace', image: null },
 ]);
+
+// Validate actress name (strict validation)
+function isValidActressName(name) {
+  if (!name || typeof name !== 'string') return false;
+  
+  const trimmed = name.trim();
+  
+  // Must be at least 2 words (first name + last name)
+  const words = trimmed.split(/\s+/);
+  if (words.length < 2 || words.length > 4) return false;
+  
+  // Each word should start with capital letter and be reasonable length
+  if (!words.every(word => /^[A-Z][a-z]{1,20}$/.test(word))) return false;
+  
+  // Should not contain multiple hyphens (likely a tag like "bokep-indo-tante")
+  if ((trimmed.match(/-/g) || []).length > 1) return false;
+  
+  // Should not contain special characters that indicate it's not a name
+  if (trimmed.includes('/') || trimmed.startsWith('-') || 
+      trimmed.startsWith('an ') || trimmed.startsWith('a ') ||
+      trimmed.startsWith('the ')) return false;
+  
+  // Should not be too short or too long
+  if (trimmed.length < 4 || trimmed.length > 50) return false;
+  
+  // Should not be all caps (likely a tag/category)
+  if (trimmed === trimmed.toUpperCase() && trimmed.length > 5) return false;
+  
+  // Should not be all lowercase (likely a tag)
+  if (trimmed === trimmed.toLowerCase() && trimmed.length > 10) return false;
+  
+  // Filter out common tag words
+  const lowerName = trimmed.toLowerCase();
+  const tagWords = ['bokep', 'indo', 'indonesia', 'tante', 'hijab', 'montok', 
+                    'diewe', 'ponakan', 'jilbab', 'janda', 'mahasiswi', 'abg'];
+  if (tagWords.some(tag => lowerName.includes(tag))) return false;
+  
+  // Each word should be a reasonable name (2-20 characters, only letters)
+  if (!words.every(word => word.length >= 2 && word.length <= 20 && /^[A-Za-z]+$/.test(word))) return false;
+  
+  return true;
+}
+
+// Clean up invalid names from the list
+function cleanupInvalidNames() {
+  allActors.value = allActors.value.filter(actor => 
+    isValidActressName(actor.name)
+  );
+  // Sort alphabetically after cleanup
+  allActors.value.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Merge extracted actresses with existing ones
+function mergeActresses() {
+  // First, clean up existing actors - remove invalid names
+  cleanupInvalidNames();
+  
+  const existingNames = new Set(allActors.value.map(a => a.name.toLowerCase()));
+  const merged = [...allActors.value];
+  
+  actresses.value.forEach(actress => {
+    // Only add if it's a valid name and not already in the list
+    if (isValidActressName(actress.name) && !existingNames.has(actress.name.toLowerCase())) {
+      merged.push({
+        name: actress.name,
+        image: actress.image || getActressImage(actress.name),
+      });
+    }
+  });
+  
+  // Sort alphabetically
+  merged.sort((a, b) => a.name.localeCompare(b.name));
+  allActors.value = merged;
+}
+
+// Load actresses on mount
+onMounted(async () => {
+  // Clean up any invalid names that might already be in the list
+  cleanupInvalidNames();
+  // First, try to load from localStorage
+  const stored = loadFromStorage();
+  if (stored && stored.length > 0) {
+    actresses.value = stored;
+    mergeActresses();
+  }
+  
+  // Then extract from API in background (non-blocking)
+  extracting.value = true;
+  try {
+    await extractAllActresses();
+    mergeActresses();
+  } catch (error) {
+    console.error('Error extracting actresses:', error);
+  } finally {
+    extracting.value = false;
+  }
+});
+
+// Function to manually refresh actresses
+async function refreshActresses() {
+  extracting.value = true;
+  try {
+    await extractAllActresses();
+    mergeActresses();
+  } catch (error) {
+    console.error('Error refreshing actresses:', error);
+  } finally {
+    extracting.value = false;
+  }
+}
 
 // Computed for total actors count
 const totalActorsCount = computed(() => allActors.value.length);
@@ -337,6 +461,49 @@ function goToPage(page) {
 
 .page-header {
   margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.refresh-actresses-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--dark-lighter);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refresh-actresses-btn:hover:not(:disabled) {
+  background: var(--dark-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.refresh-actresses-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refresh-actresses-btn .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .page-title {
@@ -616,28 +783,6 @@ function goToPage(page) {
   width: 100%;
 }
 
-.actor-card-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  background: rgba(255, 69, 0, 0.15);
-  border: 1px solid rgba(255, 69, 0, 0.3);
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--primary, #ff4500);
-  opacity: 0;
-  transform: translateY(5px);
-  transition: all 0.3s ease 0.1s;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.actor-card:hover .actor-card-badge {
-  opacity: 1;
-  transform: translateY(0);
-}
 
 .actor-card-with-thumbnail .actor-name {
   color: white;
@@ -1027,11 +1172,6 @@ function goToPage(page) {
   
   .actor-name {
     font-size: 12px;
-  }
-  
-  .actor-card-badge {
-    font-size: 8px;
-    padding: 3px 8px;
   }
 
   .actor-card-with-thumbnail {
