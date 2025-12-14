@@ -107,8 +107,21 @@ const personalizedThumbnail = computed(() => {
   
   try {
     const defaultThumb = props.video.thumbnail || getDefaultThumbnail();
+    
+    // On small screens or slow networks, use default thumbnail directly to avoid optimization delays
+    if (window.innerWidth < 768 || networkQuality.value === '2g' || networkQuality.value === 'slow-2g') {
+      return defaultThumb;
+    }
+    
     const optimized = getOptimizedThumbnail(props.video, defaultThumb, networkQuality.value);
-    return optimized?.url || defaultThumb;
+    const thumbnailUrl = optimized?.url || defaultThumb;
+    
+    // Ensure we always return a valid URL
+    if (!thumbnailUrl || thumbnailUrl === 'undefined' || thumbnailUrl === 'null') {
+      return defaultThumb;
+    }
+    
+    return thumbnailUrl;
   } catch (error) {
     console.error('Error getting personalized thumbnail:', error);
     return props.video.thumbnail || getDefaultThumbnail();

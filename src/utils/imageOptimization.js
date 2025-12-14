@@ -192,6 +192,18 @@ export const preloadImage = (url, format = null) => {
   document.head.appendChild(link);
 };
 
+// Check if element is in viewport
+const isInViewport = (element) => {
+  if (!element) return false;
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+};
+
 // Lazy load image with intersection observer
 export const setupLazyImage = (imgElement, src, srcset = null, placeholder = null) => {
   if (!imgElement || !src) return;
@@ -201,6 +213,33 @@ export const setupLazyImage = (imgElement, src, srcset = null, placeholder = nul
     imgElement.src = placeholder;
     imgElement.style.filter = 'blur(10px)';
     imgElement.style.transition = 'filter 0.3s';
+    imgElement.style.opacity = '0.7';
+  }
+  
+  // Check if image is already in viewport - load immediately
+  const loadImage = () => {
+    if (srcset) {
+      imgElement.srcset = srcset;
+    }
+    imgElement.src = src;
+    
+    // Remove blur and restore opacity when loaded
+    imgElement.addEventListener('load', () => {
+      imgElement.style.filter = 'none';
+      imgElement.style.opacity = '1';
+    }, { once: true });
+    
+    // Fallback: remove blur even if load event doesn't fire (for cached images)
+    if (imgElement.complete && imgElement.naturalHeight !== 0) {
+      imgElement.style.filter = 'none';
+      imgElement.style.opacity = '1';
+    }
+  };
+  
+  // If already in viewport, load immediately
+  if (isInViewport(imgElement)) {
+    loadImage();
+    return;
   }
   
   // Use Intersection Observer for lazy loading
@@ -208,33 +247,26 @@ export const setupLazyImage = (imgElement, src, srcset = null, placeholder = nul
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const img = entry.target;
-          
-          // Load the actual image
-          if (srcset) {
-            img.srcset = srcset;
-          }
-          img.src = src;
-          
-          // Remove blur when loaded
-          img.addEventListener('load', () => {
-            img.style.filter = 'none';
-          }, { once: true });
-          
-          observer.unobserve(img);
+          loadImage();
+          observer.unobserve(entry.target);
         }
       });
     }, {
-      rootMargin: '50px' // Start loading 50px before entering viewport
+      rootMargin: '100px' // Increased from 50px to 100px for better small screen support
     });
     
     observer.observe(imgElement);
+    
+    // Fallback timeout: if observer doesn't trigger within 1 second, load anyway
+    setTimeout(() => {
+      if (imgElement.src === placeholder || imgElement.src === '') {
+        loadImage();
+        observer.unobserve(imgElement);
+      }
+    }, 1000);
   } else {
     // Fallback for browsers without IntersectionObserver
-    imgElement.src = src;
-    if (srcset) {
-      imgElement.srcset = srcset;
-    }
+    loadImage();
   }
 };
 
