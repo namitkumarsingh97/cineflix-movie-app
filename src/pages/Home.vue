@@ -658,60 +658,59 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, inject, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useMovies } from "../composables/useMovies";
-import { usePagination } from "../composables/usePagination";
-import { useWatchHistory, useFavorites } from "../composables/useWatchHistory";
-import { usePreferences } from "../composables/usePreferences";
-import Loader from "../components/Loader.vue";
-import SkeletonSection from "../components/SkeletonSection.vue";
-import MovieCard from "../components/MovieCard.vue";
-import AdvancedSearch from "../components/AdvancedSearch.vue";
-import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
-import CategorySidebar from "../components/CategorySidebar.vue";
-import { useHomeLayout } from "../composables/useHomeLayout";
-import { useWatchLater } from "../composables/useWatchLater";
-import { useStarFollows } from "../composables/useStarFollows";
-import { useNotifications } from "../composables/useNotifications";
-import { useVideos } from "../composables/useVideos";
-import { useNetworkQuality } from "../composables/useNetworkQuality";
-import { useRecommendations } from "../composables/useRecommendations";
-import { useSubscription } from "../composables/useSubscription";
-
 import {
-  Film,
-  Grid3x3,
-  List,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  TrendingUp,
-  Calendar,
-  Shuffle,
-  Filter,
-  Layout,
-  Star,
-  Play,
-  Crown,
-  Lock,
-  Sparkles,
-  Zap,
-  Award,
-  Timer,
-  Eye,
-  Heart,
-  Monitor,
-  Users,
-  BookMarked,
-  ArrowLeft,
-  ArrowRight,
+	ArrowLeft,
+	ArrowRight,
+	Award,
+	BookMarked,
+	Calendar,
+	ChevronLeft,
+	ChevronRight,
+	Clock,
+	Crown,
+	Eye,
+	Film,
+	Filter,
+	Grid3x3,
+	Heart,
+	Layout,
+	List,
+	Lock,
+	Monitor,
+	Play,
+	Shuffle,
+	Sparkles,
+	Star,
+	Timer,
+	TrendingUp,
+	Users,
+	Zap,
 } from "lucide-vue-next";
-import { useEporner } from "../composables/useEporner";
-import VideoCard from "../components/VideoCard.vue";
-import PremiumVideoCard from "../components/PremiumVideoCard.vue";
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import AdvancedSearch from "../components/AdvancedSearch.vue";
+import CategorySidebar from "../components/CategorySidebar.vue";
+import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
+import Loader from "../components/Loader.vue";
+import MovieCard from "../components/MovieCard.vue";
 import OptimizedImage from "../components/OptimizedImage.vue";
-import { formatViews, formatDuration } from "../utils/date";
+import PremiumVideoCard from "../components/PremiumVideoCard.vue";
+import SkeletonSection from "../components/SkeletonSection.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { useEporner } from "../composables/useEporner";
+import { useHomeLayout } from "../composables/useHomeLayout";
+import { useMovies } from "../composables/useMovies";
+import { useNetworkQuality } from "../composables/useNetworkQuality";
+import { useNotifications } from "../composables/useNotifications";
+import { usePagination } from "../composables/usePagination";
+import { usePreferences } from "../composables/usePreferences";
+import { useRecommendations } from "../composables/useRecommendations";
+import { useStarFollows } from "../composables/useStarFollows";
+import { useSubscription } from "../composables/useSubscription";
+import { useVideos } from "../composables/useVideos";
+import { useFavorites, useWatchHistory } from "../composables/useWatchHistory";
+import { useWatchLater } from "../composables/useWatchLater";
+import { formatDuration, formatViews } from "../utils/date";
 
 const router = useRouter();
 const route = useRoute();
@@ -722,9 +721,10 @@ const refreshTrigger = inject("refreshTrigger", ref(0));
 
 // Use composables
 const { movies, sortBy, loading, featuredMovie, loadMovies } =
-  useMovies(searchQuery);
+	useMovies(searchQuery);
 
-const { getContinueWatching, clearHistory, getWatchHistory } = useWatchHistory();
+const { getContinueWatching, clearHistory, getWatchHistory } =
+	useWatchHistory();
 const { getPreferredCategories } = usePreferences();
 const { isSectionEnabled } = useHomeLayout();
 const { items: watchLaterItems } = useWatchLater();
@@ -733,18 +733,19 @@ const { notify, requestPermission } = useNotifications();
 
 // Eporner videos
 const {
-  videos: epornerVideos,
-  loading: epornerLoading,
-  getPopularVideos,
-  loadVideos: loadEpornerVideos,
-  searchVideos,
+	videos: epornerVideos,
+	loading: epornerLoading,
+	getPopularVideos,
+	loadVideos: loadEpornerVideos,
+	searchVideos,
 } = useEporner();
 
 // Regular videos (from backend)
 const { videos, loadVideos: loadBackendVideos } = useVideos();
 
 // Network quality detection
-const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } = useNetworkQuality();
+const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } =
+	useNetworkQuality();
 
 // Smart recommendations
 const { getTrendingByContext, getPersonalized } = useRecommendations();
@@ -782,769 +783,828 @@ const isSidebarEnabled = ref(true);
 
 // Load sidebar preference
 function loadSidebarPreference() {
-  const sidebarPref = localStorage.getItem('categorySidebarEnabled');
-  isSidebarEnabled.value = sidebarPref !== null ? sidebarPref === 'true' : true;
+	const sidebarPref = localStorage.getItem("categorySidebarEnabled");
+	isSidebarEnabled.value = sidebarPref !== null ? sidebarPref === "true" : true;
 }
 
 function handleFilterChange(filter) {
-  console.log('Filter changed:', filter);
-  // Handle filter changes if needed
+	console.log("Filter changed:", filter);
+	// Handle filter changes if needed
 }
-const lastNotifiedAtKey = 'cineflix_last_content_notified';
+const lastNotifiedAtKey = "cineflix_last_content_notified";
 
 // Local state
 const viewMode = ref("grid");
 const showAdvancedFilters = ref(false);
 const activeFilters = ref({
-  category: '',
-  star: '',
-  sortBy: 'date',
-  dateRange: ''
+	category: "",
+	star: "",
+	sortBy: "date",
+	dateRange: "",
 });
 
 // Enhanced filtered movies with category filter and preferences
 const filteredMovies = computed(() => {
-  let filtered = movies.value;
-  const preferredCategories = getPreferredCategories();
+	let filtered = movies.value;
+	const preferredCategories = getPreferredCategories();
 
-  // Apply category preferences if set (show preferred categories first, then others)
-  if (preferredCategories.length > 0 && !activeFilters.value.category) {
-    // Sort: preferred categories first
-    filtered = [...filtered].sort((a, b) => {
-      const aPreferred = preferredCategories.includes(a.category || '');
-      const bPreferred = preferredCategories.includes(b.category || '');
-      if (aPreferred && !bPreferred) return -1;
-      if (!aPreferred && bPreferred) return 1;
-      return 0;
-    });
-  }
+	// Apply category preferences if set (show preferred categories first, then others)
+	if (preferredCategories.length > 0 && !activeFilters.value.category) {
+		// Sort: preferred categories first
+		filtered = [...filtered].sort((a, b) => {
+			const aPreferred = preferredCategories.includes(a.category || "");
+			const bPreferred = preferredCategories.includes(b.category || "");
+			if (aPreferred && !bPreferred) return -1;
+			if (!aPreferred && bPreferred) return 1;
+			return 0;
+		});
+	}
 
-  // Search filter
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter((movie) =>
-      movie.title.toLowerCase().includes(query)
-    );
-  }
+	// Search filter
+	if (searchQuery.value.trim()) {
+		const query = searchQuery.value.toLowerCase();
+		filtered = filtered.filter((movie) =>
+			movie.title.toLowerCase().includes(query),
+		);
+	}
 
-  // Category filter from AdvancedSearch
-  if (activeFilters.value.category) {
-    filtered = filtered.filter((movie) => 
-      movie.category === activeFilters.value.category
-    );
-  }
+	// Category filter from AdvancedSearch
+	if (activeFilters.value.category) {
+		filtered = filtered.filter(
+			(movie) => movie.category === activeFilters.value.category,
+		);
+	}
 
-  // Star filter from AdvancedSearch
-  if (activeFilters.value.star) {
-    filtered = filtered.filter((movie) => 
-      movie.stars && movie.stars.some(star => 
-        star.toLowerCase().includes(activeFilters.value.star.toLowerCase())
-      )
-    );
-  }
+	// Star filter from AdvancedSearch
+	if (activeFilters.value.star) {
+		filtered = filtered.filter(
+			(movie) =>
+				movie.stars &&
+				movie.stars.some((star) =>
+					star.toLowerCase().includes(activeFilters.value.star.toLowerCase()),
+				),
+		);
+	}
 
-  // Date range filter
-  if (activeFilters.value.dateRange) {
-    const now = new Date();
-    const filterDate = new Date();
-    
-    switch (activeFilters.value.dateRange) {
-      case 'today':
-        filterDate.setHours(0, 0, 0, 0);
-        break;
-      case 'week':
-        filterDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        filterDate.setMonth(now.getMonth() - 1);
-        break;
-      case 'year':
-        filterDate.setFullYear(now.getFullYear() - 1);
-        break;
-    }
-    
-    filtered = filtered.filter((movie) => {
-      const movieDate = new Date(movie.createdAt || movie.uploadedAt || 0);
-      return movieDate >= filterDate;
-    });
-  }
+	// Date range filter
+	if (activeFilters.value.dateRange) {
+		const now = new Date();
+		const filterDate = new Date();
 
-  // Sort (handled by useMovies, but we apply here if needed)
-  if (sortBy.value === 'title') {
-    filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
-  } else if (sortBy.value === 'date') {
-    filtered = [...filtered].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-  } else if (sortBy.value === 'popular') {
-    filtered = [...filtered].sort((a, b) => {
-      const aScore = (a.views || 0) + (a.likes || 0) * 2;
-      const bScore = (b.views || 0) + (b.likes || 0) * 2;
-      return bScore - aScore;
-    });
-  }
+		switch (activeFilters.value.dateRange) {
+			case "today":
+				filterDate.setHours(0, 0, 0, 0);
+				break;
+			case "week":
+				filterDate.setDate(now.getDate() - 7);
+				break;
+			case "month":
+				filterDate.setMonth(now.getMonth() - 1);
+				break;
+			case "year":
+				filterDate.setFullYear(now.getFullYear() - 1);
+				break;
+		}
 
-  return filtered;
+		filtered = filtered.filter((movie) => {
+			const movieDate = new Date(movie.createdAt || movie.uploadedAt || 0);
+			return movieDate >= filterDate;
+		});
+	}
+
+	// Sort (handled by useMovies, but we apply here if needed)
+	if (sortBy.value === "title") {
+		filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+	} else if (sortBy.value === "date") {
+		filtered = [...filtered].sort(
+			(a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+		);
+	} else if (sortBy.value === "popular") {
+		filtered = [...filtered].sort((a, b) => {
+			const aScore = (a.views || 0) + (a.likes || 0) * 2;
+			const bScore = (b.views || 0) + (b.likes || 0) * 2;
+			return bScore - aScore;
+		});
+	}
+
+	return filtered;
 });
 
 // Watch for refresh trigger
 watch(refreshTrigger, () => {
-  loadMovies();
+	loadMovies();
 });
 
 // Continue watching
 const continueWatching = computed(() => {
-  return getContinueWatching();
+	return getContinueWatching();
 });
 
 const watchLaterMovies = computed(() =>
-  watchLaterItems.value
-    .filter((item) => item.type === 'movie')
-    .map((saved) => movies.value.find((m) => m._id === saved.id))
-    .filter(Boolean)
+	watchLaterItems.value
+		.filter((item) => item.type === "movie")
+		.map((saved) => movies.value.find((m) => m._id === saved.id))
+		.filter(Boolean),
 );
 
 const watchLaterVideos = computed(() =>
-  watchLaterItems.value
-    .filter((item) => item.type === 'eporner' || item.type === 'video')
-    .map((saved) => {
-      // Try eporner videos first
-      const epornerVideo = epornerVideos.value.find((v) => v.id === saved.id);
-      if (epornerVideo) return epornerVideo;
-      // Then try backend videos
-      if (videos.value && Array.isArray(videos.value)) {
-        return videos.value.find((v) => v.id === saved.id || v._id === saved.id);
-      }
-      return null;
-    })
-    .filter(Boolean)
+	watchLaterItems.value
+		.filter((item) => item.type === "eporner" || item.type === "video")
+		.map((saved) => {
+			// Try eporner videos first
+			const epornerVideo = epornerVideos.value.find((v) => v.id === saved.id);
+			if (epornerVideo) return epornerVideo;
+			// Then try backend videos
+			if (videos.value && Array.isArray(videos.value)) {
+				return videos.value.find(
+					(v) => v.id === saved.id || v._id === saved.id,
+				);
+			}
+			return null;
+		})
+		.filter(Boolean),
 );
 
 // Trending movies (most viewed/liked) - network-aware limit with smart recommendations
 const trendingMovies = computed(() => {
-  const allMovies = [...filteredMovies.value];
-  const limit = Math.min(maxThumbnailsPerPage.value, 12);
-  
-  // Use smart recommendations for trending
-  const smartTrending = getTrendingByContext(allMovies, limit);
-  if (smartTrending.length > 0) {
-    return smartTrending;
-  }
-  
-  // Fallback to simple sorting
-  return allMovies
-    .sort((a, b) => {
-      const aScore = (a.views || 0) + (a.likes || 0) * 2;
-      const bScore = (b.views || 0) + (b.likes || 0) * 2;
-      return bScore - aScore;
-    })
-    .slice(0, limit);
+	const allMovies = [...filteredMovies.value];
+	const limit = Math.min(maxThumbnailsPerPage.value, 12);
+
+	// Use smart recommendations for trending
+	const smartTrending = getTrendingByContext(allMovies, limit);
+	if (smartTrending.length > 0) {
+		return smartTrending;
+	}
+
+	// Fallback to simple sorting
+	return allMovies
+		.sort((a, b) => {
+			const aScore = (a.views || 0) + (a.likes || 0) * 2;
+			const bScore = (b.views || 0) + (b.likes || 0) * 2;
+			return bScore - aScore;
+		})
+		.slice(0, limit);
 });
 
 // Recently added movies - network-aware limit
 const recentlyAdded = computed(() => {
-  const allMovies = [...filteredMovies.value];
-  const limit = Math.min(maxThumbnailsPerPage.value, 12);
-  return allMovies
-    .sort((a, b) => {
-      const dateA = new Date(a.createdAt || a.uploadedAt || 0);
-      const dateB = new Date(b.createdAt || b.uploadedAt || 0);
-      return dateB - dateA;
-    })
-    .slice(0, limit);
+	const allMovies = [...filteredMovies.value];
+	const limit = Math.min(maxThumbnailsPerPage.value, 12);
+	return allMovies
+		.sort((a, b) => {
+			const dateA = new Date(a.createdAt || a.uploadedAt || 0);
+			const dateB = new Date(b.createdAt || b.uploadedAt || 0);
+			return dateB - dateA;
+		})
+		.slice(0, limit);
 });
 
 // Pagination - network-aware items per page
 const {
-  currentPage,
-  totalPages,
-  paginatedItems,
-  visiblePages,
-  goToPage,
-  nextPage,
-  prevPage,
+	currentPage,
+	totalPages,
+	paginatedItems,
+	visiblePages,
+	goToPage,
+	nextPage,
+	prevPage,
 } = usePagination(filteredMovies, maxThumbnailsPerPage);
 
 // Reset to page 1 when filteredMovies changes (search/filter)
 watch(filteredMovies, () => {
-  if (currentPage.value > 1) {
-    currentPage.value = 1;
-  }
+	if (currentPage.value > 1) {
+		currentPage.value = 1;
+	}
 });
 
 // Unique categories for filter dropdown
 const uniqueCategories = computed(() => {
-  const categories = new Set();
-  movies.value.forEach(movie => {
-    if (movie.category) {
-      categories.add(movie.category);
-    }
-  });
-  return Array.from(categories).sort();
+	const categories = new Set();
+	movies.value.forEach((movie) => {
+		if (movie.category) {
+			categories.add(movie.category);
+		}
+	});
+	return Array.from(categories).sort();
 });
 
 // Unique stars for filter dropdown
 const uniqueStars = computed(() => {
-  const starsSet = new Set();
-  movies.value.forEach(movie => {
-    if (movie.stars && Array.isArray(movie.stars)) {
-      movie.stars.forEach(star => {
-        if (star && star.trim()) {
-          starsSet.add(star.trim());
-        }
-      });
-    }
-  });
-  return Array.from(starsSet).sort();
+	const starsSet = new Set();
+	movies.value.forEach((movie) => {
+		if (movie.stars && Array.isArray(movie.stars)) {
+			movie.stars.forEach((star) => {
+				if (star && star.trim()) {
+					starsSet.add(star.trim());
+				}
+			});
+		}
+	});
+	return Array.from(starsSet).sort();
 });
 
 // Personalized movies based on followed stars
 // Personalized by followed stars - enhanced with smart recommendations
 const personalizedByStars = computed(() => {
-  const allItems = [
-    ...movies.value,
-    ...epornerVideos.value,
-    ...(videos.value || [])
-  ];
-  
-  // Use smart personalized recommendations
-  const smartPersonalized = getPersonalized(allItems, 12);
-  if (smartPersonalized.length > 0) {
-    return smartPersonalized;
-  }
-  
-  // Fallback to simple star filtering
-  if (!followedStars.value.length) return [];
-  return movies.value
-    .filter(
-      (movie) =>
-        Array.isArray(movie.stars) &&
-        movie.stars.some((star) => followedStars.value.includes(star))
-    )
-    .slice(0, 12);
+	const allItems = [
+		...movies.value,
+		...epornerVideos.value,
+		...(videos.value || []),
+	];
+
+	// Use smart personalized recommendations
+	const smartPersonalized = getPersonalized(allItems, 12);
+	if (smartPersonalized.length > 0) {
+		return smartPersonalized;
+	}
+
+	// Fallback to simple star filtering
+	if (!followedStars.value.length) return [];
+	return movies.value
+		.filter(
+			(movie) =>
+				Array.isArray(movie.stars) &&
+				movie.stars.some((star) => followedStars.value.includes(star)),
+		)
+		.slice(0, 12);
 });
 
 // Apply filters from AdvancedSearch component
 function handleFilter(filters) {
-  activeFilters.value = { ...filters };
-  // Update sortBy if changed
-  if (filters.sortBy) {
-    sortBy.value = filters.sortBy;
-  }
+	activeFilters.value = { ...filters };
+	// Update sortBy if changed
+	if (filters.sortBy) {
+		sortBy.value = filters.sortBy;
+	}
 }
 
 // Methods
 function sortMovies() {
-  // Sorting is handled by computed property
+	// Sorting is handled by computed property
 }
 
 function navigateToMovie(movie) {
-  // Navigate to watch page with movie ID
-  router.push(`/watch/${movie._id}`);
+	// Navigate to watch page with movie ID
+	router.push(`/watch/${movie._id}`);
 }
 
-import { generateWatchUrl } from '../utils/slug';
+import { generateWatchUrl } from "../utils/slug";
 
 function navigateToVideo(video) {
-  // Navigate to watch page with slug-based URL
-  const url = generateWatchUrl(video, { source: 'eporner' });
-  router.push(url);
+	// Navigate to watch page with slug-based URL
+	const url = generateWatchUrl(video, { source: "eporner" });
+	router.push(url);
 }
 
 function navigateToActor(actorName) {
-  if (!actorName) return;
-  const encodedName = encodeURIComponent(actorName.toLowerCase().replace(/\s+/g, '-'));
-  router.push(`/${encodedName}`);
+	if (!actorName) return;
+	const encodedName = encodeURIComponent(
+		actorName.toLowerCase().replace(/\s+/g, "-"),
+	);
+	router.push(`/${encodedName}`);
 }
 
 function handlePremiumVideoClick(video, event) {
-  // ALWAYS prevent default behavior and stop all propagation
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-  }
-  
-  // FORCE redirect to premium page - NO other navigation allowed in this section
-  console.log('Premium section: All clicks blocked, redirecting to /premium');
-  router.push('/premium').catch(() => {});
-  return false;
+	// ALWAYS prevent default behavior and stop all propagation
+	if (event) {
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+	}
+
+	// FORCE redirect to premium page - NO other navigation allowed in this section
+	console.log("Premium section: All clicks blocked, redirecting to /premium");
+	router.push("/premium").catch(() => {});
+	return false;
 }
 
 function getDefaultThumbnail(video) {
-  return video?.thumbnail || 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video';
+	return (
+		video?.thumbnail ||
+		"https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video"
+	);
 }
 
-
 function getStartIndex() {
-  const perPage = maxThumbnailsPerPage.value || 12;
-  return (currentPage.value - 1) * perPage + 1;
+	const perPage = maxThumbnailsPerPage.value || 12;
+	return (currentPage.value - 1) * perPage + 1;
 }
 
 function getEndIndex() {
-  const perPage = maxThumbnailsPerPage.value || 12;
-  return Math.min(currentPage.value * perPage, filteredMovies.value.length);
+	const perPage = maxThumbnailsPerPage.value || 12;
+	return Math.min(currentPage.value * perPage, filteredMovies.value.length);
 }
 
 function getMovieById(id) {
-  return movies.value.find(m => m._id === id) || {};
+	return movies.value.find((m) => m._id === id) || {};
 }
 
 function clearContinueWatching() {
-  if (confirm('Clear continue watching history?')) {
-    const history = getContinueWatching();
-    history.forEach(item => {
-      // Reset progress to 0 or remove from history
-      // For now, we'll just clear all history
-    });
-    clearHistory();
-  }
+	if (confirm("Clear continue watching history?")) {
+		const history = getContinueWatching();
+		history.forEach((item) => {
+			// Reset progress to 0 or remove from history
+			// For now, we'll just clear all history
+		});
+		clearHistory();
+	}
 }
 
 // Carousel functions
 function nextCarouselSlide() {
-  if (newReleasesCarousel.value.length === 0) return;
-  currentCarouselIndex.value = (currentCarouselIndex.value + 1) % newReleasesCarousel.value.length;
+	if (newReleasesCarousel.value.length === 0) return;
+	currentCarouselIndex.value =
+		(currentCarouselIndex.value + 1) % newReleasesCarousel.value.length;
 }
 
 function previousCarouselSlide() {
-  if (newReleasesCarousel.value.length === 0) return;
-  currentCarouselIndex.value = currentCarouselIndex.value === 0 
-    ? newReleasesCarousel.value.length - 1 
-    : currentCarouselIndex.value - 1;
+	if (newReleasesCarousel.value.length === 0) return;
+	currentCarouselIndex.value =
+		currentCarouselIndex.value === 0
+			? newReleasesCarousel.value.length - 1
+			: currentCarouselIndex.value - 1;
 }
 
 function goToCarouselSlide(index) {
-  if (index >= 0 && index < newReleasesCarousel.value.length) {
-    currentCarouselIndex.value = index;
-  }
+	if (index >= 0 && index < newReleasesCarousel.value.length) {
+		currentCarouselIndex.value = index;
+	}
 }
 
 function toggleCarouselAutoPlay() {
-  carouselAutoPlay.value = !carouselAutoPlay.value;
-  if (carouselAutoPlay.value) {
-    startCarouselAutoPlay();
-  } else {
-    stopCarouselAutoPlay();
-  }
+	carouselAutoPlay.value = !carouselAutoPlay.value;
+	if (carouselAutoPlay.value) {
+		startCarouselAutoPlay();
+	} else {
+		stopCarouselAutoPlay();
+	}
 }
 
 function startCarouselAutoPlay() {
-  stopCarouselAutoPlay(); // Clear any existing interval
-  if (newReleasesCarousel.value.length > 1) {
-    carouselInterval.value = setInterval(() => {
-      nextCarouselSlide();
-    }, 5000); // Change slide every 5 seconds
-  }
+	stopCarouselAutoPlay(); // Clear any existing interval
+	if (newReleasesCarousel.value.length > 1) {
+		carouselInterval.value = setInterval(() => {
+			nextCarouselSlide();
+		}, 5000); // Change slide every 5 seconds
+	}
 }
 
 function stopCarouselAutoPlay() {
-  if (carouselInterval.value) {
-    clearInterval(carouselInterval.value);
-    carouselInterval.value = null;
-  }
+	if (carouselInterval.value) {
+		clearInterval(carouselInterval.value);
+		carouselInterval.value = null;
+	}
 }
 
 function pauseCarousel() {
-  stopCarouselAutoPlay();
+	stopCarouselAutoPlay();
 }
 
 function resumeCarousel() {
-  if (carouselAutoPlay.value) {
-    startCarouselAutoPlay();
-  }
+	if (carouselAutoPlay.value) {
+		startCarouselAutoPlay();
+	}
 }
 
 // Helper functions
 function truncateText(text, maxLength) {
-  if (!text) return '';
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength).trim() + '...';
+	if (!text) return "";
+	if (text.length <= maxLength) return text;
+	return text.substring(0, maxLength).trim() + "...";
 }
 
 function handleThumbnailError(event) {
-  event.target.src = 'https://via.placeholder.com/1280x720/1a1a2e/ffffff?text=Video';
+	event.target.src =
+		"https://via.placeholder.com/1280x720/1a1a2e/ffffff?text=Video";
 }
 
 function pickRandom() {
-  if (filteredMovies.value.length === 0) return;
-  const randomIndex = Math.floor(Math.random() * filteredMovies.value.length);
-  const randomMovie = filteredMovies.value[randomIndex];
-  navigateToMovie(randomMovie);
+	if (filteredMovies.value.length === 0) return;
+	const randomIndex = Math.floor(Math.random() * filteredMovies.value.length);
+	const randomMovie = filteredMovies.value[randomIndex];
+	navigateToMovie(randomMovie);
 }
 
 // Pick random video from all available videos (fetches from API, not just loaded videos)
 async function pickRandomVideo() {
-  try {
-    // First, try to get a random video from Eporner API
-    // Pick a random page (between 1 and 100 for variety)
-    const randomPage = Math.floor(Math.random() * 100) + 1;
-    
-    // Fetch videos from a random page
-    await searchVideos('all', randomPage, { 
-      order: 'most-popular',
-      perPage: 50 // Get more videos to choose from
-    });
-    
-    if (epornerVideos.value && epornerVideos.value.length > 0) {
-      // Pick a random video from the fetched results
-      const randomIndex = Math.floor(Math.random() * epornerVideos.value.length);
-      const randomVideo = epornerVideos.value[randomIndex];
-      navigateToVideo(randomVideo);
-      return;
-    }
-    
-    // Fallback 1: Try latest videos
-    await searchVideos('all', 1, { order: 'latest', perPage: 50 });
-    if (epornerVideos.value && epornerVideos.value.length > 0) {
-      const randomIndex = Math.floor(Math.random() * epornerVideos.value.length);
-      navigateToVideo(epornerVideos.value[randomIndex]);
-      return;
-    }
-    
-    // Fallback 2: Use already loaded videos if available
-    const allLoadedVideos = [
-      ...epornerVideos.value,
-      ...(videos.value || []),
-      ...movies.value.map(m => ({ ...m, id: m._id }))
-    ];
-    
-    if (allLoadedVideos.length > 0) {
-      const randomIndex = Math.floor(Math.random() * allLoadedVideos.length);
-      const randomVideo = allLoadedVideos[randomIndex];
-      
-      if (randomVideo._id) {
-        navigateToMovie(randomVideo);
-      } else {
-        navigateToVideo(randomVideo);
-      }
-      return;
-    }
-    
-    // Final fallback: Use movies
-    if (filteredMovies.value.length > 0) {
-      pickRandom();
-    }
-  } catch (error) {
-    console.error('Error picking random video:', error);
-    // Fallback to movies if API fails
-    if (filteredMovies.value.length > 0) {
-      pickRandom();
-    }
-  }
+	try {
+		// First, try to get a random video from Eporner API
+		// Pick a random page (between 1 and 100 for variety)
+		const randomPage = Math.floor(Math.random() * 100) + 1;
+
+		// Fetch videos from a random page
+		await searchVideos("all", randomPage, {
+			order: "most-popular",
+			perPage: 50, // Get more videos to choose from
+		});
+
+		if (epornerVideos.value && epornerVideos.value.length > 0) {
+			// Pick a random video from the fetched results
+			const randomIndex = Math.floor(
+				Math.random() * epornerVideos.value.length,
+			);
+			const randomVideo = epornerVideos.value[randomIndex];
+			navigateToVideo(randomVideo);
+			return;
+		}
+
+		// Fallback 1: Try latest videos
+		await searchVideos("all", 1, { order: "latest", perPage: 50 });
+		if (epornerVideos.value && epornerVideos.value.length > 0) {
+			const randomIndex = Math.floor(
+				Math.random() * epornerVideos.value.length,
+			);
+			navigateToVideo(epornerVideos.value[randomIndex]);
+			return;
+		}
+
+		// Fallback 2: Use already loaded videos if available
+		const allLoadedVideos = [
+			...epornerVideos.value,
+			...(videos.value || []),
+			...movies.value.map((m) => ({ ...m, id: m._id })),
+		];
+
+		if (allLoadedVideos.length > 0) {
+			const randomIndex = Math.floor(Math.random() * allLoadedVideos.length);
+			const randomVideo = allLoadedVideos[randomIndex];
+
+			if (randomVideo._id) {
+				navigateToMovie(randomVideo);
+			} else {
+				navigateToVideo(randomVideo);
+			}
+			return;
+		}
+
+		// Final fallback: Use movies
+		if (filteredMovies.value.length > 0) {
+			pickRandom();
+		}
+	} catch (error) {
+		console.error("Error picking random video:", error);
+		// Fallback to movies if API fails
+		if (filteredMovies.value.length > 0) {
+			pickRandom();
+		}
+	}
 }
 
 // Load Eporner videos - network-aware limits
 async function loadEpornerSections() {
-  try {
-    const limit = Math.min(maxThumbnailsPerPage.value, 12);
-    
-    // Load recently added videos (Latest) - last 24-48 hours
-    await searchVideos('all', 1, { perPage: limit * 2, order: 'latest' });
-    recentlyAddedVideos.value = epornerVideos.value
-      .filter(video => {
-        // Filter videos uploaded in last 48 hours
-        if (video.added || video.date) {
-          try {
-            const videoDate = new Date(video.added || video.date);
-            if (isNaN(videoDate.getTime())) return true; // Include if date is invalid
-            const now = new Date();
-            const hoursDiff = (now - videoDate) / (1000 * 60 * 60);
-            return hoursDiff <= 48;
-          } catch {
-            return true; // Include if date parsing fails
-          }
-        }
-        // If no date, include it (assume recent)
-        return true;
-      })
-      .slice(0, limit);
-    
-    // If not enough recent videos, use latest videos
-    if (recentlyAddedVideos.value.length < limit) {
-      recentlyAddedVideos.value = epornerVideos.value.slice(0, limit);
-    }
-    
-    // Load most watched today (highest views in last 24 hours)
-    await searchVideos('all', 1, { perPage: limit * 2, order: 'most-popular' });
-    mostWatchedToday.value = epornerVideos.value
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
-      .slice(0, limit);
-    
-    // Load quick watch videos (under 10 minutes)
-    await searchVideos('all', 1, { perPage: limit * 3, order: 'latest' });
-    quickWatchVideos.value = epornerVideos.value
-      .filter(video => {
-        // Try multiple duration fields
-        const duration = video.length_sec || video.duration || video.length || 0;
-        // Convert to seconds if in minutes
-        const durationInSeconds = duration < 1000 ? duration : Math.floor(duration / 60);
-        return durationInSeconds > 0 && durationInSeconds < 600; // Under 10 minutes (600 seconds)
-      })
-      .slice(0, limit);
-    
-    // Load top rated this week
-    await searchVideos('all', 1, { perPage: limit * 2, order: 'top-rated' });
-    topRatedThisWeek.value = epornerVideos.value
-      .filter(video => {
-        // Filter videos with ratings (prefer 4+ star, but include 3+ if not enough)
-        const rating = video.rating || video.rate || 0;
-        if (rating < 3) return false; // Minimum 3 star rating
-        
-        // Try to filter by date if available
-        if (video.added || video.date) {
-          try {
-            const videoDate = new Date(video.added || video.date);
-            if (!isNaN(videoDate.getTime())) {
-              const now = new Date();
-              const daysDiff = (now - videoDate) / (1000 * 60 * 60 * 24);
-              return daysDiff <= 7;
-            }
-          } catch {
-            // If date parsing fails, include it
-          }
-        }
-        return true; // Include if no date but has rating
-      })
-      .sort((a, b) => {
-        const ratingA = a.rating || a.rate || 0;
-        const ratingB = b.rating || b.rate || 0;
-        return ratingB - ratingA;
-      })
-      .slice(0, limit);
-    
-    // Load latest videos for "Trending Now" section
-    await searchVideos('all', 1, { perPage: limit, order: 'latest' });
-    latestVideos.value = epornerVideos.value.slice(0, limit);
-    
-    // Load longest videos (30+ minutes)
-    await searchVideos('all', 1, { perPage: limit * 3, order: 'longest' });
-    longestVideos.value = epornerVideos.value
-      .filter(video => {
-        const duration = video.length_sec || video.duration || video.length || 0;
-        const durationInSeconds = duration < 1000 ? duration : Math.floor(duration / 60);
-        return durationInSeconds >= 1800; // 30 minutes = 1800 seconds
-      })
-      .sort((a, b) => {
-        const durationA = a.length_sec || a.duration || a.length || 0;
-        const durationB = b.length_sec || b.duration || b.length || 0;
-        return durationB - durationA; // Longest first
-      })
-      .slice(0, limit);
-    
-    // Load HD/4K quality videos
-    await searchVideos('4k hd', 1, { perPage: limit * 2, order: 'most-popular' });
-    hd4kVideos.value = epornerVideos.value
-      .filter(video => {
-        const title = (video.title || '').toLowerCase();
-        const categories = (video.categories || []).map(c => c.toLowerCase());
-        const tags = (video.tags || []).map(t => t.toLowerCase());
-        return title.includes('4k') || title.includes('hd') || 
-               title.includes('1080p') || title.includes('2160p') ||
-               categories.some(c => c.includes('4k') || c.includes('hd')) ||
-               tags.some(t => t.includes('4k') || t.includes('hd'));
-      })
-      .slice(0, limit);
-    
-    // Load most liked videos (highest like counts)
-    await searchVideos('all', 1, { perPage: limit * 2, order: 'most-popular' });
-    mostLikedVideos.value = epornerVideos.value
-      .filter(video => (video.likes || 0) > 0)
-      .sort((a, b) => (b.likes || 0) - (a.likes || 0))
-      .slice(0, limit);
-    
-    // Load new releases for carousel (latest high-quality videos)
-    await searchVideos('all', 1, { perPage: 20, order: 'latest' });
-    newReleasesCarousel.value = epornerVideos.value
-      .filter(video => {
-        // Prefer videos with good ratings and views, but don't require thumbnail
-        const rating = video.rating || video.rate || 0;
-        const views = video.views || 0;
-        return rating >= 3.0 || views > 500; // Less strict filter
-      })
-      .slice(0, 8); // Limit to 8 for carousel
-    
-    // Ensure we have videos even if filter is too strict
-    if (newReleasesCarousel.value.length === 0 && epornerVideos.value.length > 0) {
-      newReleasesCarousel.value = epornerVideos.value.slice(0, 8);
-    }
-    
-    // Load trending by category (top 3-5 videos from popular categories)
-    const popularCategories = ['anal', 'milf', 'teen', 'asian', 'latina', 'blonde', 'brunette', 'amateur', 'hardcore', 'lesbian'];
-    for (const category of popularCategories.slice(0, 6)) { // Limit to 6 categories
-      await searchVideos(category, 1, { perPage: 5, order: 'most-popular' });
-      if (epornerVideos.value.length > 0) {
-        trendingByCategory.value[category.charAt(0).toUpperCase() + category.slice(1)] = 
-          epornerVideos.value.slice(0, 5);
-      }
-    }
-    
-    // Load staff picks (curated high-quality content - videos with high ratings and views)
-    await searchVideos('all', 1, { perPage: limit * 3, order: 'top-rated' });
-    staffPicks.value = epornerVideos.value
-      .filter(video => {
-        const rating = video.rating || video.rate || 0;
-        const views = video.views || 0;
-        return rating >= 4.0 && views > 5000 && video.thumbnail;
-      })
-      .sort((a, b) => {
-        // Sort by a combination of rating and views
-        const scoreA = ((a.rating || a.rate || 0) * 1000) + ((a.views || 0) / 100);
-        const scoreB = ((b.rating || b.rate || 0) * 1000) + ((b.views || 0) / 100);
-        return scoreB - scoreA;
-      })
-      .slice(0, limit);
-    
-    // Load Indian category videos
-    await searchVideos('indian', 1, { perPage: limit * 2, order: 'most-popular' });
-    indianVideos.value = epornerVideos.value
-      .filter(video => {
-        // Check if video has "indian" in categories, title, or tags
-        const categories = video.categories || [];
-        const title = (video.title || '').toLowerCase();
-        const tags = (video.tags || []).map(t => t.toLowerCase());
-        return categories.some(cat => cat.toLowerCase().includes('indian')) ||
-               title.includes('indian') ||
-               tags.some(tag => tag.includes('indian'));
-      })
-      .slice(0, limit);
-    
-    // Load POV category videos (recent)
-    await searchVideos('pov', 1, { perPage: limit * 2, order: 'latest' });
-    povVideos.value = epornerVideos.value
-      .filter(video => {
-        // Check if video has "pov" in categories, title, or tags
-        const categories = video.categories || [];
-        const title = (video.title || '').toLowerCase();
-        const tags = (video.tags || []).map(t => t.toLowerCase());
-        return categories.some(cat => cat.toLowerCase().includes('pov')) ||
-               title.includes('pov') ||
-               tags.some(tag => tag.includes('pov'));
-      })
-      .slice(0, limit);
-    
-    // Load Family category videos (recent)
-    await searchVideos('family', 1, { perPage: limit * 2, order: 'latest' });
-    familyVideos.value = epornerVideos.value
-      .filter(video => {
-        // Check if video has "family" in categories, title, or tags
-        const categories = video.categories || [];
-        const title = (video.title || '').toLowerCase();
-        const tags = (video.tags || []).map(t => t.toLowerCase());
-        return categories.some(cat => cat.toLowerCase().includes('family')) ||
-               title.includes('family') ||
-               tags.some(tag => tag.includes('family'));
-      })
-      .slice(0, limit);
-    
-    // Load Premium preview videos (blurred for non-premium users)
-    await searchVideos('premium', 1, { perPage: limit, order: 'most-popular' });
-    premiumPreviewVideos.value = epornerVideos.value
-      .filter(video => video.isPremium || video.tags?.includes('premium'))
-      .slice(0, limit);
-    
-    // If no premium videos, use regular videos with blur effect for hype
-    if (!premiumPreviewVideos.value || premiumPreviewVideos.value.length === 0) {
-      // Get popular/trending videos and use them as blurred preview
-      const allVideos = [
-        ...(latestVideos.value || []), 
-        ...(recentlyAddedVideos.value || []),
-        ...(epornerVideos.value || [])
-      ];
-      // Remove duplicates and get unique videos
-      const uniqueVideos = Array.from(
-        new Map(allVideos.filter(v => v && v.id).map(v => [v.id, v])).values()
-      );
-      blurredPreviewVideos.value = uniqueVideos
-        .filter(video => video && video.thumbnail && video.title)
-        .slice(0, 12); // Show 12 blurred videos
-    } else {
-      // Clear blurred videos if premium videos are available
-      blurredPreviewVideos.value = [];
-    }
-  } catch (error) {
-    console.error('Error loading Eporner videos:', error);
-  }
+	try {
+		const limit = Math.min(maxThumbnailsPerPage.value, 12);
+
+		// Load recently added videos (Latest) - last 24-48 hours
+		await searchVideos("all", 1, { perPage: limit * 2, order: "latest" });
+		recentlyAddedVideos.value = epornerVideos.value
+			.filter((video) => {
+				// Filter videos uploaded in last 48 hours
+				if (video.added || video.date) {
+					try {
+						const videoDate = new Date(video.added || video.date);
+						if (isNaN(videoDate.getTime())) return true; // Include if date is invalid
+						const now = new Date();
+						const hoursDiff = (now - videoDate) / (1000 * 60 * 60);
+						return hoursDiff <= 48;
+					} catch {
+						return true; // Include if date parsing fails
+					}
+				}
+				// If no date, include it (assume recent)
+				return true;
+			})
+			.slice(0, limit);
+
+		// If not enough recent videos, use latest videos
+		if (recentlyAddedVideos.value.length < limit) {
+			recentlyAddedVideos.value = epornerVideos.value.slice(0, limit);
+		}
+
+		// Load most watched today (highest views in last 24 hours)
+		await searchVideos("all", 1, { perPage: limit * 2, order: "most-popular" });
+		mostWatchedToday.value = epornerVideos.value
+			.sort((a, b) => (b.views || 0) - (a.views || 0))
+			.slice(0, limit);
+
+		// Load quick watch videos (under 10 minutes)
+		await searchVideos("all", 1, { perPage: limit * 3, order: "latest" });
+		quickWatchVideos.value = epornerVideos.value
+			.filter((video) => {
+				// Try multiple duration fields
+				const duration =
+					video.length_sec || video.duration || video.length || 0;
+				// Convert to seconds if in minutes
+				const durationInSeconds =
+					duration < 1000 ? duration : Math.floor(duration / 60);
+				return durationInSeconds > 0 && durationInSeconds < 600; // Under 10 minutes (600 seconds)
+			})
+			.slice(0, limit);
+
+		// Load top rated this week
+		await searchVideos("all", 1, { perPage: limit * 2, order: "top-rated" });
+		topRatedThisWeek.value = epornerVideos.value
+			.filter((video) => {
+				// Filter videos with ratings (prefer 4+ star, but include 3+ if not enough)
+				const rating = video.rating || video.rate || 0;
+				if (rating < 3) return false; // Minimum 3 star rating
+
+				// Try to filter by date if available
+				if (video.added || video.date) {
+					try {
+						const videoDate = new Date(video.added || video.date);
+						if (!isNaN(videoDate.getTime())) {
+							const now = new Date();
+							const daysDiff = (now - videoDate) / (1000 * 60 * 60 * 24);
+							return daysDiff <= 7;
+						}
+					} catch {
+						// If date parsing fails, include it
+					}
+				}
+				return true; // Include if no date but has rating
+			})
+			.sort((a, b) => {
+				const ratingA = a.rating || a.rate || 0;
+				const ratingB = b.rating || b.rate || 0;
+				return ratingB - ratingA;
+			})
+			.slice(0, limit);
+
+		// Load latest videos for "Trending Now" section
+		await searchVideos("all", 1, { perPage: limit, order: "latest" });
+		latestVideos.value = epornerVideos.value.slice(0, limit);
+
+		// Load longest videos (30+ minutes)
+		await searchVideos("all", 1, { perPage: limit * 3, order: "longest" });
+		longestVideos.value = epornerVideos.value
+			.filter((video) => {
+				const duration =
+					video.length_sec || video.duration || video.length || 0;
+				const durationInSeconds =
+					duration < 1000 ? duration : Math.floor(duration / 60);
+				return durationInSeconds >= 1800; // 30 minutes = 1800 seconds
+			})
+			.sort((a, b) => {
+				const durationA = a.length_sec || a.duration || a.length || 0;
+				const durationB = b.length_sec || b.duration || b.length || 0;
+				return durationB - durationA; // Longest first
+			})
+			.slice(0, limit);
+
+		// Load HD/4K quality videos
+		await searchVideos("4k hd", 1, {
+			perPage: limit * 2,
+			order: "most-popular",
+		});
+		hd4kVideos.value = epornerVideos.value
+			.filter((video) => {
+				const title = (video.title || "").toLowerCase();
+				const categories = (video.categories || []).map((c) => c.toLowerCase());
+				const tags = (video.tags || []).map((t) => t.toLowerCase());
+				return (
+					title.includes("4k") ||
+					title.includes("hd") ||
+					title.includes("1080p") ||
+					title.includes("2160p") ||
+					categories.some((c) => c.includes("4k") || c.includes("hd")) ||
+					tags.some((t) => t.includes("4k") || t.includes("hd"))
+				);
+			})
+			.slice(0, limit);
+
+		// Load most liked videos (highest like counts)
+		await searchVideos("all", 1, { perPage: limit * 2, order: "most-popular" });
+		mostLikedVideos.value = epornerVideos.value
+			.filter((video) => (video.likes || 0) > 0)
+			.sort((a, b) => (b.likes || 0) - (a.likes || 0))
+			.slice(0, limit);
+
+		// Load new releases for carousel (latest high-quality videos)
+		await searchVideos("all", 1, { perPage: 20, order: "latest" });
+		newReleasesCarousel.value = epornerVideos.value
+			.filter((video) => {
+				// Prefer videos with good ratings and views, but don't require thumbnail
+				const rating = video.rating || video.rate || 0;
+				const views = video.views || 0;
+				return rating >= 3.0 || views > 500; // Less strict filter
+			})
+			.slice(0, 8); // Limit to 8 for carousel
+
+		// Ensure we have videos even if filter is too strict
+		if (
+			newReleasesCarousel.value.length === 0 &&
+			epornerVideos.value.length > 0
+		) {
+			newReleasesCarousel.value = epornerVideos.value.slice(0, 8);
+		}
+
+		// Load trending by category (top 3-5 videos from popular categories)
+		const popularCategories = [
+			"anal",
+			"milf",
+			"teen",
+			"asian",
+			"latina",
+			"blonde",
+			"brunette",
+			"amateur",
+			"hardcore",
+			"lesbian",
+		];
+		for (const category of popularCategories.slice(0, 6)) {
+			// Limit to 6 categories
+			await searchVideos(category, 1, { perPage: 5, order: "most-popular" });
+			if (epornerVideos.value.length > 0) {
+				trendingByCategory.value[
+					category.charAt(0).toUpperCase() + category.slice(1)
+				] = epornerVideos.value.slice(0, 5);
+			}
+		}
+
+		// Load staff picks (curated high-quality content - videos with high ratings and views)
+		await searchVideos("all", 1, { perPage: limit * 3, order: "top-rated" });
+		staffPicks.value = epornerVideos.value
+			.filter((video) => {
+				const rating = video.rating || video.rate || 0;
+				const views = video.views || 0;
+				return rating >= 4.0 && views > 5000 && video.thumbnail;
+			})
+			.sort((a, b) => {
+				// Sort by a combination of rating and views
+				const scoreA = (a.rating || a.rate || 0) * 1000 + (a.views || 0) / 100;
+				const scoreB = (b.rating || b.rate || 0) * 1000 + (b.views || 0) / 100;
+				return scoreB - scoreA;
+			})
+			.slice(0, limit);
+
+		// Load Indian category videos
+		await searchVideos("indian", 1, {
+			perPage: limit * 2,
+			order: "most-popular",
+		});
+		indianVideos.value = epornerVideos.value
+			.filter((video) => {
+				// Check if video has "indian" in categories, title, or tags
+				const categories = video.categories || [];
+				const title = (video.title || "").toLowerCase();
+				const tags = (video.tags || []).map((t) => t.toLowerCase());
+				return (
+					categories.some((cat) => cat.toLowerCase().includes("indian")) ||
+					title.includes("indian") ||
+					tags.some((tag) => tag.includes("indian"))
+				);
+			})
+			.slice(0, limit);
+
+		// Load POV category videos (recent)
+		await searchVideos("pov", 1, { perPage: limit * 2, order: "latest" });
+		povVideos.value = epornerVideos.value
+			.filter((video) => {
+				// Check if video has "pov" in categories, title, or tags
+				const categories = video.categories || [];
+				const title = (video.title || "").toLowerCase();
+				const tags = (video.tags || []).map((t) => t.toLowerCase());
+				return (
+					categories.some((cat) => cat.toLowerCase().includes("pov")) ||
+					title.includes("pov") ||
+					tags.some((tag) => tag.includes("pov"))
+				);
+			})
+			.slice(0, limit);
+
+		// Load Family category videos (recent)
+		await searchVideos("family", 1, { perPage: limit * 2, order: "latest" });
+		familyVideos.value = epornerVideos.value
+			.filter((video) => {
+				// Check if video has "family" in categories, title, or tags
+				const categories = video.categories || [];
+				const title = (video.title || "").toLowerCase();
+				const tags = (video.tags || []).map((t) => t.toLowerCase());
+				return (
+					categories.some((cat) => cat.toLowerCase().includes("family")) ||
+					title.includes("family") ||
+					tags.some((tag) => tag.includes("family"))
+				);
+			})
+			.slice(0, limit);
+
+		// Load Premium preview videos (blurred for non-premium users)
+		await searchVideos("premium", 1, { perPage: limit, order: "most-popular" });
+		premiumPreviewVideos.value = epornerVideos.value
+			.filter((video) => video.isPremium || video.tags?.includes("premium"))
+			.slice(0, limit);
+
+		// If no premium videos, use regular videos with blur effect for hype
+		if (
+			!premiumPreviewVideos.value ||
+			premiumPreviewVideos.value.length === 0
+		) {
+			// Get popular/trending videos and use them as blurred preview
+			const allVideos = [
+				...(latestVideos.value || []),
+				...(recentlyAddedVideos.value || []),
+				...(epornerVideos.value || []),
+			];
+			// Remove duplicates and get unique videos
+			const uniqueVideos = Array.from(
+				new Map(
+					allVideos.filter((v) => v && v.id).map((v) => [v.id, v]),
+				).values(),
+			);
+			blurredPreviewVideos.value = uniqueVideos
+				.filter((video) => video && video.thumbnail && video.title)
+				.slice(0, 12); // Show 12 blurred videos
+		} else {
+			// Clear blurred videos if premium videos are available
+			blurredPreviewVideos.value = [];
+		}
+	} catch (error) {
+		console.error("Error loading Eporner videos:", error);
+	}
 }
 
 function latestContentTimestamp() {
-  const movieNewest = movies.value[0]?.createdAt
-    ? new Date(movies.value[0].createdAt).getTime()
-    : 0;
-  const epornerNewest = latestVideos.value[0]?.added
-    ? new Date(latestVideos.value[0].added).getTime()
-    : 0;
-  return Math.max(movieNewest, epornerNewest);
+	const movieNewest = movies.value[0]?.createdAt
+		? new Date(movies.value[0].createdAt).getTime()
+		: 0;
+	const epornerNewest = latestVideos.value[0]?.added
+		? new Date(latestVideos.value[0].added).getTime()
+		: 0;
+	return Math.max(movieNewest, epornerNewest);
 }
 
 async function maybeNotifyNewContent() {
-  const lastSeen = Number(localStorage.getItem(lastNotifiedAtKey) || 0);
-  const newest = latestContentTimestamp();
-  if (!newest || newest <= lastSeen) return;
-  const permission = await requestPermission();
-  if (permission !== 'granted') return;
-  await notify('New videos just dropped', {
-    body: 'Tap to open the latest additions.',
-  });
-  localStorage.setItem(lastNotifiedAtKey, String(newest));
+	const lastSeen = Number(localStorage.getItem(lastNotifiedAtKey) || 0);
+	const newest = latestContentTimestamp();
+	if (!newest || newest <= lastSeen) return;
+	const permission = await requestPermission();
+	if (permission !== "granted") return;
+	await notify("New videos just dropped", {
+		body: "Tap to open the latest additions.",
+	});
+	localStorage.setItem(lastNotifiedAtKey, String(newest));
 }
 
-
 onMounted(() => {
-  loadSidebarPreference();
-  loadMovies();
-  loadBackendVideos();
-  loadEpornerSections();
-  maybeNotifyNewContent();
-  checkPremiumStatus();
-  checkPremiumStatus();
+	loadSidebarPreference();
+	loadMovies();
+	loadBackendVideos();
+	loadEpornerSections();
+	maybeNotifyNewContent();
+	checkPremiumStatus();
+	checkPremiumStatus();
 
-  const section = route.query.section;
-  if (section) {
-    scrollToSection(section);
-  }
+	const section = route.query.section;
+	if (section) {
+		scrollToSection(section);
+	}
 
-  // Listen for preference changes
-  window.addEventListener('sidebarPreferenceChanged', (e) => {
-    isSidebarEnabled.value = e.detail.enabled;
-  });
-  
-  // Start carousel auto-play if enabled (after videos load)
-  watch(newReleasesCarousel, (newVideos) => {
-    if (newVideos.length > 1 && carouselAutoPlay.value) {
-      startCarouselAutoPlay();
-    }
-  }, { immediate: true });
+	// Listen for preference changes
+	window.addEventListener("sidebarPreferenceChanged", (e) => {
+		isSidebarEnabled.value = e.detail.enabled;
+	});
+
+	// Start carousel auto-play if enabled (after videos load)
+	watch(
+		newReleasesCarousel,
+		(newVideos) => {
+			if (newVideos.length > 1 && carouselAutoPlay.value) {
+				startCarouselAutoPlay();
+			}
+		},
+		{ immediate: true },
+	);
 });
 
 onBeforeUnmount(() => {
-  // Clean up carousel interval
-  stopCarouselAutoPlay();
+	// Clean up carousel interval
+	stopCarouselAutoPlay();
 });
 
 watch(
-  () => route.query.section,
-  (section) => {
-    if (section) {
-      scrollToSection(section);
-    }
-  }
+	() => route.query.section,
+	(section) => {
+		if (section) {
+			scrollToSection(section);
+		}
+	},
 );
 
 function scrollToSection(section) {
-  const id =
-    section === "watch-later"
-      ? "watch-later-section"
-      : section === "followed-stars"
-      ? "followed-stars-section"
-      : "";
-  if (!id) return;
-  requestAnimationFrame(() => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  });
+	const id =
+		section === "watch-later"
+			? "watch-later-section"
+			: section === "followed-stars"
+				? "followed-stars-section"
+				: "";
+	if (!id) return;
+	requestAnimationFrame(() => {
+		const el = document.getElementById(id);
+		if (el) {
+			el.scrollIntoView({ behavior: "smooth", block: "start" });
+		}
+	});
 }
 </script>
 

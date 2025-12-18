@@ -9,21 +9,21 @@
 </template>
 
 <script setup>
-import SkeletonGrid from './SkeletonGrid.vue';
+import SkeletonGrid from "./SkeletonGrid.vue";
 
 defineProps({
-  count: {
-    type: Number,
-    default: 12,
-  },
-  columns: {
-    type: Number,
-    default: 4,
-  },
-  showHeader: {
-    type: Boolean,
-    default: true,
-  },
+	count: {
+		type: Number,
+		default: 12,
+	},
+	columns: {
+		type: Number,
+		default: 4,
+	},
+	showHeader: {
+		type: Boolean,
+		default: true,
+	},
 });
 </script>
 

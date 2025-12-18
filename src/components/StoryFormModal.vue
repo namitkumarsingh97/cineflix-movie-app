@@ -228,58 +228,58 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
 import {
-  FileText,
-  X,
-  Type,
-  Tag,
-  User,
-  Save,
-  Globe,
-  AlertCircle,
-  Loader2,
-  Image,
-  Link,
-  Upload,
+	AlertCircle,
+	FileText,
+	Globe,
+	Image,
+	Link,
+	Loader2,
+	Save,
+	Tag,
+	Type,
+	Upload,
+	User,
+	X,
 } from "lucide-vue-next";
+import { onMounted, ref, watch } from "vue";
 import apiClient from "../plugins/axios";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  story: {
-    type: Object,
-    default: null,
-  },
+	show: {
+		type: Boolean,
+		default: false,
+	},
+	story: {
+		type: Object,
+		default: null,
+	},
 });
 
 const emit = defineEmits(["close", "saved"]);
 
 const formData = ref({
-  title: "",
-  content: "",
-  category: "",
-  status: "draft",
-  author: "",
+	title: "",
+	content: "",
+	category: "",
+	status: "draft",
+	author: "",
 });
 
 const customCategory = ref("");
 const storyCategories = ref([
-  "Custom",
-  "Dangerous Attraction",
-  "Dark Romance",
-  "Dark Temptation",
-  "Fantasy Escape",
-  "Forbidden Desire",
-  "Obsession",
-  "Power Dynamics",
-  "Secret Affairs",
-  "Seduction",
-  "Taboo Fiction",
-  "Thriller",
+	"Custom",
+	"Dangerous Attraction",
+	"Dark Romance",
+	"Dark Temptation",
+	"Fantasy Escape",
+	"Forbidden Desire",
+	"Obsession",
+	"Power Dynamics",
+	"Secret Affairs",
+	"Seduction",
+	"Taboo Fiction",
+	"Thriller",
 ]);
 const saving = ref(false);
 const error = ref("");
@@ -293,194 +293,209 @@ const imagePreview = ref(true);
 
 // Content size warning (approximately 3.5MB to warn before 4MB limit)
 const contentSizeWarning = computed(() => {
-  // Rough estimate: 1 character ≈ 1 byte, but with UTF-8 encoding it can be more
-  // Warning at ~3.5MB (3,500,000 characters) to give buffer before 4MB limit
-  return formData.value.content.length > 3500000;
+	// Rough estimate: 1 character ≈ 1 byte, but with UTF-8 encoding it can be more
+	// Warning at ~3.5MB (3,500,000 characters) to give buffer before 4MB limit
+	return formData.value.content.length > 3500000;
 });
 
 watch(
-  () => props.story,
-  (newStory) => {
-    if (newStory) {
-      formData.value = {
-        title: newStory.title || "",
-        content: newStory.content || "",
-        category: newStory.category || "General",
-        status: newStory.status || "draft",
-        author: newStory.author || "",
-      };
-    } else {
-      formData.value = {
-        title: "",
-        content: "",
-        category: "General",
-        status: "draft",
-        author: "",
-      };
-    }
-    error.value = "";
-  },
-  { immediate: true }
+	() => props.story,
+	(newStory) => {
+		if (newStory) {
+			formData.value = {
+				title: newStory.title || "",
+				content: newStory.content || "",
+				category: newStory.category || "General",
+				status: newStory.status || "draft",
+				author: newStory.author || "",
+			};
+		} else {
+			formData.value = {
+				title: "",
+				content: "",
+				category: "General",
+				status: "draft",
+				author: "",
+			};
+		}
+		error.value = "";
+	},
+	{ immediate: true },
 );
 
 onMounted(async () => {
-  await loadCategories();
+	await loadCategories();
 });
 
 async function loadCategories() {
-  try {
-    const response = await apiClient.get("/stories/categories");
-    if (response.data.success) {
-      const existingCategories = response.data.data || [];
-      storyCategories.value = [
-        ...new Set([...storyCategories.value, ...existingCategories]),
-      ]
-        .filter((cat) => cat !== "custom")
-        .sort();
-      storyCategories.value.push("custom");
-    }
-  } catch (error) {
-    console.error("Failed to load categories:", error);
-  }
+	try {
+		const response = await apiClient.get("/stories/categories");
+		if (response.data.success) {
+			const existingCategories = response.data.data || [];
+			storyCategories.value = [
+				...new Set([...storyCategories.value, ...existingCategories]),
+			]
+				.filter((cat) => cat !== "custom")
+				.sort();
+			storyCategories.value.push("custom");
+		}
+	} catch (error) {
+		console.error("Failed to load categories:", error);
+	}
 }
 
 function close() {
-  emit("close");
-  error.value = "";
-  showImageModal.value = false;
-  imageUrl.value = "";
-  imageFile.value = null;
-  imageFilePreview.value = null;
+	emit("close");
+	error.value = "";
+	showImageModal.value = false;
+	imageUrl.value = "";
+	imageFile.value = null;
+	imageFilePreview.value = null;
 }
 
 function handleImageUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 10 * 1024 * 1024) {
-      error.value = "Image size should be less than 10MB";
-      return;
-    }
-    imageFile.value = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageFilePreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    error.value = "";
-  }
+	const file = event.target.files[0];
+	if (file) {
+		if (file.size > 10 * 1024 * 1024) {
+			error.value = "Image size should be less than 10MB";
+			return;
+		}
+		imageFile.value = file;
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			imageFilePreview.value = e.target.result;
+		};
+		reader.readAsDataURL(file);
+		error.value = "";
+	}
 }
 
 function insertImage() {
-  let imageToInsert = "";
-  
-  if (imageType.value === "url" && imageUrl.value.trim()) {
-    imageToInsert = `[IMAGE:${imageUrl.value.trim()}]`;
-  } else if (imageType.value === "upload" && imageFile.value) {
-    // For uploaded images, we'll need to upload first and get URL
-    // For now, show error that upload needs to be handled separately
-    error.value = "Please upload the image first, then insert the URL";
-    return;
-  } else {
-    error.value = "Please provide an image URL or upload an image";
-    return;
-  }
+	let imageToInsert = "";
 
-  // Insert at cursor position or at the end
-  const textarea = contentTextarea.value;
-  if (textarea) {
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = formData.value.content;
-    const before = text.substring(0, start);
-    const after = text.substring(end);
-    
-    // Insert with spacing
-    const insertText = before + (before && !before.endsWith('\n\n') ? '\n\n' : '') + imageToInsert + (after && !after.startsWith('\n\n') ? '\n\n' : '') + after;
-    formData.value.content = insertText;
-    
-    // Set cursor position after inserted image
-    setTimeout(() => {
-      const newPos = start + imageToInsert.length + (before && !before.endsWith('\n\n') ? 2 : 0) + (after && !after.startsWith('\n\n') ? 2 : 0);
-      textarea.setSelectionRange(newPos, newPos);
-      textarea.focus();
-    }, 0);
-  } else {
-    // Fallback: append to end
-    formData.value.content += (formData.value.content ? '\n\n' : '') + imageToInsert + '\n\n';
-  }
+	if (imageType.value === "url" && imageUrl.value.trim()) {
+		imageToInsert = `[IMAGE:${imageUrl.value.trim()}]`;
+	} else if (imageType.value === "upload" && imageFile.value) {
+		// For uploaded images, we'll need to upload first and get URL
+		// For now, show error that upload needs to be handled separately
+		error.value = "Please upload the image first, then insert the URL";
+		return;
+	} else {
+		error.value = "Please provide an image URL or upload an image";
+		return;
+	}
 
-  // Reset image modal
-  showImageModal.value = false;
-  imageUrl.value = "";
-  imageFile.value = null;
-  imageFilePreview.value = null;
-  error.value = "";
+	// Insert at cursor position or at the end
+	const textarea = contentTextarea.value;
+	if (textarea) {
+		const start = textarea.selectionStart;
+		const end = textarea.selectionEnd;
+		const text = formData.value.content;
+		const before = text.substring(0, start);
+		const after = text.substring(end);
+
+		// Insert with spacing
+		const insertText =
+			before +
+			(before && !before.endsWith("\n\n") ? "\n\n" : "") +
+			imageToInsert +
+			(after && !after.startsWith("\n\n") ? "\n\n" : "") +
+			after;
+		formData.value.content = insertText;
+
+		// Set cursor position after inserted image
+		setTimeout(() => {
+			const newPos =
+				start +
+				imageToInsert.length +
+				(before && !before.endsWith("\n\n") ? 2 : 0) +
+				(after && !after.startsWith("\n\n") ? 2 : 0);
+			textarea.setSelectionRange(newPos, newPos);
+			textarea.focus();
+		}, 0);
+	} else {
+		// Fallback: append to end
+		formData.value.content +=
+			(formData.value.content ? "\n\n" : "") + imageToInsert + "\n\n";
+	}
+
+	// Reset image modal
+	showImageModal.value = false;
+	imageUrl.value = "";
+	imageFile.value = null;
+	imageFilePreview.value = null;
+	error.value = "";
 }
 
 async function handleSave() {
-  error.value = "";
+	error.value = "";
 
-  if (!formData.value.title.trim()) {
-    error.value = "Please enter a story title";
-    return;
-  }
+	if (!formData.value.title.trim()) {
+		error.value = "Please enter a story title";
+		return;
+	}
 
-  if (!formData.value.content.trim()) {
-    error.value = "Please enter story content";
-    return;
-  }
+	if (!formData.value.content.trim()) {
+		error.value = "Please enter story content";
+		return;
+	}
 
-  if (!formData.value.category || formData.value.category === "custom") {
-    if (!customCategory.value.trim()) {
-      error.value = "Please select or enter a category";
-      return;
-    }
-    formData.value.category = customCategory.value.trim();
-  }
+	if (!formData.value.category || formData.value.category === "custom") {
+		if (!customCategory.value.trim()) {
+			error.value = "Please select or enter a category";
+			return;
+		}
+		formData.value.category = customCategory.value.trim();
+	}
 
-  saving.value = true;
+	saving.value = true;
 
-  try {
-    // Extract images from content using [IMAGE:url] markers
-    const imageMatches = formData.value.content.match(/\[(IMAGE|IMG):(.+?)\]/gi);
-    const images = imageMatches ? imageMatches.map(match => {
-      const url = match.replace(/\[(IMAGE|IMG):/i, '').replace(/\]/, '');
-      return {
-        url: url.trim(),
-        position: formData.value.content.indexOf(match),
-        caption: ''
-      };
-    }) : [];
+	try {
+		// Extract images from content using [IMAGE:url] markers
+		const imageMatches = formData.value.content.match(
+			/\[(IMAGE|IMG):(.+?)\]/gi,
+		);
+		const images = imageMatches
+			? imageMatches.map((match) => {
+					const url = match.replace(/\[(IMAGE|IMG):/i, "").replace(/\]/, "");
+					return {
+						url: url.trim(),
+						position: formData.value.content.indexOf(match),
+						caption: "",
+					};
+				})
+			: [];
 
-    const payload = {
-      title: formData.value.title.trim(),
-      content: formData.value.content.trim(),
-      category: formData.value.category,
-      status: formData.value.status,
-      author: formData.value.author.trim() || "Admin",
-      images: images
-    };
+		const payload = {
+			title: formData.value.title.trim(),
+			content: formData.value.content.trim(),
+			category: formData.value.category,
+			status: formData.value.status,
+			author: formData.value.author.trim() || "Admin",
+			images: images,
+		};
 
-    if (props.story) {
-      await apiClient.put(`/stories/${props.story._id}`, payload);
-    } else {
-      await apiClient.post("/stories", payload);
-    }
+		if (props.story) {
+			await apiClient.put(`/stories/${props.story._id}`, payload);
+		} else {
+			await apiClient.post("/stories", payload);
+		}
 
-    emit("saved");
-    close();
-  } catch (err) {
-    if (err.response?.status === 413) {
-      error.value = "Story content is too large. Please reduce the content size or split it into multiple parts. Maximum size is approximately 4MB.";
-    } else {
-      error.value =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        "Failed to save story. Please try again.";
-    }
-  } finally {
-    saving.value = false;
-  }
+		emit("saved");
+		close();
+	} catch (err) {
+		if (err.response?.status === 413) {
+			error.value =
+				"Story content is too large. Please reduce the content size or split it into multiple parts. Maximum size is approximately 4MB.";
+		} else {
+			error.value =
+				err.response?.data?.error ||
+				err.response?.data?.message ||
+				"Failed to save story. Please try again.";
+		}
+	} finally {
+		saving.value = false;
+	}
 }
 </script>
 

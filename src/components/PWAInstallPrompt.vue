@@ -21,40 +21,40 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { Download } from 'lucide-vue-next';
-import { usePWA } from '../composables/usePWA';
+import { Download } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { usePWA } from "../composables/usePWA";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: true
-  }
+	show: {
+		type: Boolean,
+		default: true,
+	},
 });
 
 const { isInstallable, isInstalled, showInstallPrompt } = usePWA();
 const dismissed = ref(false);
 
 function handleInstall() {
-  showInstallPrompt();
-  dismissed.value = true;
+	showInstallPrompt();
+	dismissed.value = true;
 }
 
 function dismiss() {
-  dismissed.value = true;
-  localStorage.setItem('pwaInstallDismissed', 'true');
+	dismissed.value = true;
+	localStorage.setItem("pwaInstallDismissed", "true");
 }
 
 onMounted(() => {
-  // Check if user previously dismissed
-  const wasDismissed = localStorage.getItem('pwaInstallDismissed');
-  if (wasDismissed) {
-    dismissed.value = true;
-  }
+	// Check if user previously dismissed
+	const wasDismissed = localStorage.getItem("pwaInstallDismissed");
+	if (wasDismissed) {
+		dismissed.value = true;
+	}
 });
 
 const shouldShow = computed(() => {
-  return props.show && !dismissed.value;
+	return props.show && !dismissed.value;
 });
 </script>
 

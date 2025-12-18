@@ -147,332 +147,392 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useEporner } from '../composables/useEporner';
-import { useNetworkQuality } from '../composables/useNetworkQuality';
-import Loader from '../components/Loader.vue';
-import SkeletonSection from '../components/SkeletonSection.vue';
-import VideoCard from '../components/VideoCard.vue';
-import { Video, Search, ChevronLeft, ChevronRight, Shuffle } from 'lucide-vue-next';
+import {
+	ChevronLeft,
+	ChevronRight,
+	Search,
+	Shuffle,
+	Video,
+} from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Loader from "../components/Loader.vue";
+import SkeletonSection from "../components/SkeletonSection.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { useEporner } from "../composables/useEporner";
+import { useNetworkQuality } from "../composables/useNetworkQuality";
 
 const router = useRouter();
 const route = useRoute();
 const {
-  videos,
-  loading,
-  error,
-  currentPage,
-  totalPages,
-  totalCount,
-  searchQuery,
-  sortOrder,
-  thumbSize,
-  searchVideos,
-  loadVideos,
-  getPopularVideos,
-  setSortOrder,
-  setThumbSize,
+	videos,
+	loading,
+	error,
+	currentPage,
+	totalPages,
+	totalCount,
+	searchQuery,
+	sortOrder,
+	thumbSize,
+	searchVideos,
+	loadVideos,
+	getPopularVideos,
+	setSortOrder,
+	setThumbSize,
 } = useEporner();
 
-const searchInput = ref('');
-const selectedCategory = ref('');
+const searchInput = ref("");
+const selectedCategory = ref("");
 const popularCategories = [
-  'teen','milf','anal','blonde','brunette','asian','latina','amateur','big tits','big ass',
-  'threesome','hardcore','creampie','facial','public','lesbian','bj','bbw','gangbang','mature'
+	"teen",
+	"milf",
+	"anal",
+	"blonde",
+	"brunette",
+	"asian",
+	"latina",
+	"amateur",
+	"big tits",
+	"big ass",
+	"threesome",
+	"hardcore",
+	"creampie",
+	"facial",
+	"public",
+	"lesbian",
+	"bj",
+	"bbw",
+	"gangbang",
+	"mature",
 ];
 
 // Computed for display total pages (capped at 1000)
 const displayTotalPages = computed(() => {
-  const total = totalPages.value;
-  if (total > 1000) {
-    return '1000+';
-  }
-  return total.toString();
+	const total = totalPages.value;
+	if (total > 1000) {
+		return "1000+";
+	}
+	return total.toString();
 });
 
 // Extract unique categories from videos
 const availableCategories = computed(() => {
-  const categoriesSet = new Set();
-  videos.value.forEach(video => {
-    if (video.categories && Array.isArray(video.categories)) {
-      video.categories.forEach(cat => {
-        if (cat && cat.trim()) {
-          categoriesSet.add(cat.trim());
-        }
-      });
-    }
-  });
-  return Array.from(categoriesSet).sort().slice(0, 20); // Limit to 20 categories
+	const categoriesSet = new Set();
+	videos.value.forEach((video) => {
+		if (video.categories && Array.isArray(video.categories)) {
+			video.categories.forEach((cat) => {
+				if (cat && cat.trim()) {
+					categoriesSet.add(cat.trim());
+				}
+			});
+		}
+	});
+	return Array.from(categoriesSet).sort().slice(0, 20); // Limit to 20 categories
 });
 
 // Calculate visible pages for pagination
 const visiblePages = computed(() => {
-  const pages = [];
-  const total = Math.min(totalPages.value, 1000); // Cap at 1000 for display
-  const current = currentPage.value;
+	const pages = [];
+	const total = Math.min(totalPages.value, 1000); // Cap at 1000 for display
+	const current = currentPage.value;
 
-  // If total is unreasonably large, limit display
-  if (total > 1000) {
-    // Show first page
-    pages.push(1);
-    
-    if (current > 3) {
-      pages.push('...');
-    }
+	// If total is unreasonably large, limit display
+	if (total > 1000) {
+		// Show first page
+		pages.push(1);
 
-    // Show pages around current (max 5 pages around)
-    const start = Math.max(2, current - 2);
-    const end = Math.min(1000, current + 2);
+		if (current > 3) {
+			pages.push("...");
+		}
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+		// Show pages around current (max 5 pages around)
+		const start = Math.max(2, current - 2);
+		const end = Math.min(1000, current + 2);
 
-    if (current < 998) {
-      pages.push('...');
-      pages.push(1000);
-    }
-  } else if (total <= 7) {
-    // Show all pages if 7 or fewer
-    for (let i = 1; i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    // Show first page
-    pages.push(1);
+		for (let i = start; i <= end; i++) {
+			pages.push(i);
+		}
 
-    if (current > 3) {
-      pages.push('...');
-    }
+		if (current < 998) {
+			pages.push("...");
+			pages.push(1000);
+		}
+	} else if (total <= 7) {
+		// Show all pages if 7 or fewer
+		for (let i = 1; i <= total; i++) {
+			pages.push(i);
+		}
+	} else {
+		// Show first page
+		pages.push(1);
 
-    // Show pages around current
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
+		if (current > 3) {
+			pages.push("...");
+		}
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+		// Show pages around current
+		const start = Math.max(2, current - 1);
+		const end = Math.min(total - 1, current + 1);
 
-    if (current < total - 2) {
-      pages.push('...');
-    }
+		for (let i = start; i <= end; i++) {
+			pages.push(i);
+		}
 
-    // Show last page
-    pages.push(total);
-  }
+		if (current < total - 2) {
+			pages.push("...");
+		}
 
-  return pages;
+		// Show last page
+		pages.push(total);
+	}
+
+	return pages;
 });
 
 // Handle search
 function handleSearch() {
-  const query = searchInput.value.trim() || 'all';
-  selectedCategory.value = '';
-  // Update URL with search query and reset to page 1
-  router.push({ 
-    path: '/videos',
-    query: { 
-      ...route.query,
-      q: query !== 'all' ? query : undefined,
-      page: undefined // Reset to page 1
-    }
-  });
-  searchVideos(query, 1, { order: sortOrder.value });
+	const query = searchInput.value.trim() || "all";
+	selectedCategory.value = "";
+	// Update URL with search query and reset to page 1
+	router.push({
+		path: "/videos",
+		query: {
+			...route.query,
+			q: query !== "all" ? query : undefined,
+			page: undefined, // Reset to page 1
+		},
+	});
+	searchVideos(query, 1, { order: sortOrder.value });
 }
 
 // Handle sort change
 function handleSortChange() {
-  setSortOrder(sortOrder.value);
-  const query = searchQuery.value || searchInput.value.trim() || 'all';
-  // Update URL with sort order and reset to page 1
-  router.push({ 
-    path: '/videos',
-    query: { 
-      ...route.query,
-      order: sortOrder.value,
-      page: undefined // Reset to page 1
-    }
-  });
-  searchVideos(query, 1, { order: sortOrder.value });
+	setSortOrder(sortOrder.value);
+	const query = searchQuery.value || searchInput.value.trim() || "all";
+	// Update URL with sort order and reset to page 1
+	router.push({
+		path: "/videos",
+		query: {
+			...route.query,
+			order: sortOrder.value,
+			page: undefined, // Reset to page 1
+		},
+	});
+	searchVideos(query, 1, { order: sortOrder.value });
 }
 
 // Handle thumb size change
 function handleThumbSizeChange() {
-  setThumbSize(thumbSize.value);
-  const query = searchQuery.value || searchInput.value.trim() || 'all';
-  searchVideos(query, currentPage.value, {
-    order: sortOrder.value,
-    thumbsize: thumbSize.value,
-  });
+	setThumbSize(thumbSize.value);
+	const query = searchQuery.value || searchInput.value.trim() || "all";
+	searchVideos(query, currentPage.value, {
+		order: sortOrder.value,
+		thumbsize: thumbSize.value,
+	});
 }
 
 // Select category
 function selectCategory(category) {
-  selectedCategory.value = category;
-  // Update URL with category and reset to page 1
-  router.push({ 
-    path: '/videos',
-    query: { 
-      ...route.query,
-      category: category || undefined,
-      page: undefined // Reset to page 1
-    }
-  });
-  searchVideos(category, 1, { order: sortOrder.value });
+	selectedCategory.value = category;
+	// Update URL with category and reset to page 1
+	router.push({
+		path: "/videos",
+		query: {
+			...route.query,
+			category: category || undefined,
+			page: undefined, // Reset to page 1
+		},
+	});
+	searchVideos(category, 1, { order: sortOrder.value });
 }
 
 // Clear category filter
 function clearCategory() {
-  selectedCategory.value = '';
-  searchInput.value = '';
-  loadVideos(1);
+	selectedCategory.value = "";
+	searchInput.value = "";
+	loadVideos(1);
 }
 
 // Select a popular tag
 function selectPopularTag(tag) {
-  searchInput.value = tag;
-  selectedCategory.value = '';
-  searchVideos(tag, 1, { order: sortOrder.value });
+	searchInput.value = tag;
+	selectedCategory.value = "";
+	searchVideos(tag, 1, { order: sortOrder.value });
 }
 
 // Navigate to video
 // Pick random video from all available videos
 async function pickRandomVideo() {
-  try {
-    // Fetch a random page (between 1 and 100 to get variety)
-    const randomPage = Math.floor(Math.random() * 100) + 1;
-    
-    // Search for all videos on a random page
-    await searchVideos('all', randomPage, { 
-      order: 'most-popular',
-      perPage: 50 // Get more videos to choose from
-    });
-    
-    if (videos.value && videos.value.length > 0) {
-      // Pick a random video from the fetched results
-      const randomIndex = Math.floor(Math.random() * videos.value.length);
-      const randomVideo = videos.value[randomIndex];
-      navigateToVideo(randomVideo);
-    } else {
-      // Fallback: try latest videos
-      await searchVideos('all', 1, { order: 'latest', perPage: 50 });
-      if (videos.value && videos.value.length > 0) {
-        const randomIndex = Math.floor(Math.random() * videos.value.length);
-        navigateToVideo(videos.value[randomIndex]);
-      }
-    }
-  } catch (error) {
-    console.error('Error picking random video:', error);
-    // Fallback to first video if available
-    if (videos.value && videos.value.length > 0) {
-      navigateToVideo(videos.value[0]);
-    }
-  }
+	try {
+		// Fetch a random page (between 1 and 100 to get variety)
+		const randomPage = Math.floor(Math.random() * 100) + 1;
+
+		// Search for all videos on a random page
+		await searchVideos("all", randomPage, {
+			order: "most-popular",
+			perPage: 50, // Get more videos to choose from
+		});
+
+		if (videos.value && videos.value.length > 0) {
+			// Pick a random video from the fetched results
+			const randomIndex = Math.floor(Math.random() * videos.value.length);
+			const randomVideo = videos.value[randomIndex];
+			navigateToVideo(randomVideo);
+		} else {
+			// Fallback: try latest videos
+			await searchVideos("all", 1, { order: "latest", perPage: 50 });
+			if (videos.value && videos.value.length > 0) {
+				const randomIndex = Math.floor(Math.random() * videos.value.length);
+				navigateToVideo(videos.value[randomIndex]);
+			}
+		}
+	} catch (error) {
+		console.error("Error picking random video:", error);
+		// Fallback to first video if available
+		if (videos.value && videos.value.length > 0) {
+			navigateToVideo(videos.value[0]);
+		}
+	}
 }
 
-import { generateWatchUrl } from '../utils/slug';
+import { generateWatchUrl } from "../utils/slug";
 
 function navigateToVideo(video) {
-  const url = generateWatchUrl(video, { source: 'eporner' });
-  router.push(url);
+	const url = generateWatchUrl(video, { source: "eporner" });
+	router.push(url);
 }
 
 // Update URL with page parameter
 function updateUrlPage(page) {
-  const query = { ...route.query };
-  
-  if (page === 1) {
-    delete query.page;
-  } else {
-    query.page = page.toString();
-  }
-  
-  router.push({ 
-    path: '/videos',
-    query: query
-  });
+	const query = { ...route.query };
+
+	if (page === 1) {
+		delete query.page;
+	} else {
+		query.page = page.toString();
+	}
+
+	router.push({
+		path: "/videos",
+		query: query,
+	});
 }
 
 // Go to page
 function goToPage(page) {
-  if (page === '...' || page < 1 || page > totalPages.value) return;
-  
-  // Update URL first
-  updateUrlPage(page);
-  
-  // Then load videos
-  const query = searchQuery.value || searchInput.value.trim() || 'all';
-  searchVideos(query, page, { order: sortOrder.value });
+	if (page === "..." || page < 1 || page > totalPages.value) return;
+
+	// Update URL first
+	updateUrlPage(page);
+
+	// Then load videos
+	const query = searchQuery.value || searchInput.value.trim() || "all";
+	searchVideos(query, page, { order: sortOrder.value });
 }
 
 // Load videos on mount with default sort (Most Popular) or search query
 onMounted(() => {
-  // Get page from URL or default to 1
-  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
-  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
-  
-  // Check if there's an order parameter from URL (e.g., from "View All" link)
-  const urlOrder = route.query.order;
-  if (urlOrder && ['latest', 'most-popular', 'top-weekly', 'top-monthly', 'top-rated', 'longest', 'shortest'].includes(urlOrder)) {
-    setSortOrder(urlOrder);
-    sortOrder.value = urlOrder;
-    // Load videos with the specified order and page
-    searchVideos('all', page, { order: urlOrder });
-    return;
-  }
-  
-  // Check if there's a search query from URL
-  const urlQuery = route.query.q;
-  if (urlQuery && urlQuery.trim()) {
-    // Set search input and perform search with page
-    searchInput.value = urlQuery.trim();
-    searchVideos(urlQuery.trim(), page, { order: sortOrder.value });
-  } else {
-    // Set default sort to most-popular and load with page
-    setSortOrder('most-popular');
-    if (page > 1) {
-      getPopularVideos(page);
-    } else {
-      getPopularVideos(1);
-    }
-  }
+	// Get page from URL or default to 1
+	const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+	const page = urlPage > 0 && !isNaN(urlPage) ? urlPage : 1;
+
+	// Check if there's an order parameter from URL (e.g., from "View All" link)
+	const urlOrder = route.query.order;
+	if (
+		urlOrder &&
+		[
+			"latest",
+			"most-popular",
+			"top-weekly",
+			"top-monthly",
+			"top-rated",
+			"longest",
+			"shortest",
+		].includes(urlOrder)
+	) {
+		setSortOrder(urlOrder);
+		sortOrder.value = urlOrder;
+		// Load videos with the specified order and page
+		searchVideos("all", page, { order: urlOrder });
+		return;
+	}
+
+	// Check if there's a search query from URL
+	const urlQuery = route.query.q;
+	if (urlQuery && urlQuery.trim()) {
+		// Set search input and perform search with page
+		searchInput.value = urlQuery.trim();
+		searchVideos(urlQuery.trim(), page, { order: sortOrder.value });
+	} else {
+		// Set default sort to most-popular and load with page
+		setSortOrder("most-popular");
+		if (page > 1) {
+			getPopularVideos(page);
+		} else {
+			getPopularVideos(1);
+		}
+	}
 });
 
 // Watch for route query changes
-watch(() => route.query.q, (newQuery) => {
-  if (newQuery && newQuery.trim()) {
-    searchInput.value = newQuery.trim();
-    const page = route.query.page ? parseInt(route.query.page, 10) : 1;
-    searchVideos(newQuery.trim(), page > 0 && !isNaN(page) ? page : 1, { order: sortOrder.value });
-  }
-});
+watch(
+	() => route.query.q,
+	(newQuery) => {
+		if (newQuery && newQuery.trim()) {
+			searchInput.value = newQuery.trim();
+			const page = route.query.page ? parseInt(route.query.page, 10) : 1;
+			searchVideos(newQuery.trim(), page > 0 && !isNaN(page) ? page : 1, {
+				order: sortOrder.value,
+			});
+		}
+	},
+);
 
 // Watch for order parameter changes
-watch(() => route.query.order, (newOrder) => {
-  if (newOrder && ['latest', 'most-popular', 'top-weekly', 'top-monthly', 'top-rated', 'longest', 'shortest'].includes(newOrder)) {
-    setSortOrder(newOrder);
-    sortOrder.value = newOrder;
-    const page = route.query.page ? parseInt(route.query.page, 10) : 1;
-    searchVideos('all', page > 0 && !isNaN(page) ? page : 1, { order: newOrder });
-  }
-});
+watch(
+	() => route.query.order,
+	(newOrder) => {
+		if (
+			newOrder &&
+			[
+				"latest",
+				"most-popular",
+				"top-weekly",
+				"top-monthly",
+				"top-rated",
+				"longest",
+				"shortest",
+			].includes(newOrder)
+		) {
+			setSortOrder(newOrder);
+			sortOrder.value = newOrder;
+			const page = route.query.page ? parseInt(route.query.page, 10) : 1;
+			searchVideos("all", page > 0 && !isNaN(page) ? page : 1, {
+				order: newOrder,
+			});
+		}
+	},
+);
 
 // Watch for page parameter changes (browser back/forward)
-watch(() => route.query.page, (newPageParam) => {
-  if (newPageParam) {
-    const page = parseInt(newPageParam, 10);
-    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
-      const query = searchQuery.value || searchInput.value.trim() || 'all';
-      searchVideos(query, page, { order: sortOrder.value });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  } else if (currentPage.value !== 1) {
-    // If no page param and we're not on page 1, reset to 1
-    const query = searchQuery.value || searchInput.value.trim() || 'all';
-    searchVideos(query, 1, { order: sortOrder.value });
-  }
-}, { immediate: false });
+watch(
+	() => route.query.page,
+	(newPageParam) => {
+		if (newPageParam) {
+			const page = parseInt(newPageParam, 10);
+			if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+				const query = searchQuery.value || searchInput.value.trim() || "all";
+				searchVideos(query, page, { order: sortOrder.value });
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			}
+		} else if (currentPage.value !== 1) {
+			// If no page param and we're not on page 1, reset to 1
+			const query = searchQuery.value || searchInput.value.trim() || "all";
+			searchVideos(query, 1, { order: sortOrder.value });
+		}
+	},
+	{ immediate: false },
+);
 </script>
 
 <style scoped>

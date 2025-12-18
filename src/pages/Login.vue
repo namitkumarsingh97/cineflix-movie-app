@@ -95,49 +95,49 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { Film, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-vue-next';
-import { useAuth } from '../composables/useAuth';
+import { AlertCircle, Eye, EyeOff, Film, Loader2 } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
 const { login, loginWithGoogle, loading, error } = useAuth();
 
 const formData = ref({
-  email: '',
-  password: '',
+	email: "",
+	password: "",
 });
 
 const showPassword = ref(false);
 const rememberMe = ref(false);
 
 async function handleLogin() {
-  const result = await login(formData.value);
-  if (result.success) {
-    router.push('/dashboard');
-  }
+	const result = await login(formData.value);
+	if (result.success) {
+		router.push("/dashboard");
+	}
 }
 
 async function handleGoogleLogin() {
-  const result = await loginWithGoogle();
-  if (result && result.success) {
-    router.push('/dashboard');
-  }
+	const result = await loginWithGoogle();
+	if (result && result.success) {
+		router.push("/dashboard");
+	}
 }
 
 onMounted(() => {
-  // Wait for Google Sign-In library to load
-  const checkGoogleLoaded = setInterval(() => {
-    if (window.google && window.google.accounts) {
-      clearInterval(checkGoogleLoaded);
-      // Library is loaded, button will work on click
-    }
-  }, 100);
+	// Wait for Google Sign-In library to load
+	const checkGoogleLoaded = setInterval(() => {
+		if (window.google && window.google.accounts) {
+			clearInterval(checkGoogleLoaded);
+			// Library is loaded, button will work on click
+		}
+	}, 100);
 
-  // Clear interval after 10 seconds
-  setTimeout(() => {
-    clearInterval(checkGoogleLoaded);
-  }, 10000);
+	// Clear interval after 10 seconds
+	setTimeout(() => {
+		clearInterval(checkGoogleLoaded);
+	}, 10000);
 });
 </script>
 

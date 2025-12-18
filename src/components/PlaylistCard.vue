@@ -32,34 +32,37 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { Music } from 'lucide-vue-next';
+import { Music } from "lucide-vue-next";
+import { computed } from "vue";
 
 const props = defineProps({
-  playlist: {
-    type: Object,
-    required: true,
-  },
+	playlist: {
+		type: Object,
+		required: true,
+	},
 });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits(["click"]);
 
 const displayThumbnails = computed(() => {
-  return props.playlist.items.slice(0, 4);
+	return props.playlist.items.slice(0, 4);
 });
 
 const getThumbnail = (item) => {
-  return item.thumbnail || 'https://via.placeholder.com/160x90/1a1a2e/ffffff?text=Video';
+	return (
+		item.thumbnail ||
+		"https://via.placeholder.com/160x90/1a1a2e/ffffff?text=Video"
+	);
 };
 
 const formatDate = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+	if (!date) return "";
+	const d = new Date(date);
+	return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
 const handleClick = () => {
-  emit('click', props.playlist);
+	emit("click", props.playlist);
 };
 </script>
 

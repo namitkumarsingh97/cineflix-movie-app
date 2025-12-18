@@ -115,18 +115,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
 import {
-  FolderOpen,
-  Plus,
-  Edit,
-  Trash2,
-  X,
-  Tag,
-  Save,
-  Loader2,
-  AlertCircle,
+	AlertCircle,
+	Edit,
+	FolderOpen,
+	Loader2,
+	Plus,
+	Save,
+	Tag,
+	Trash2,
+	X,
 } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
 import apiClient from "../plugins/axios";
 import Loader from "./Loader.vue";
 
@@ -138,182 +138,182 @@ const saving = ref(false);
 const error = ref("");
 
 const categoryForm = ref({
-  name: "",
+	name: "",
 });
 
 const predefinedCategories = [
-  "Adventure",
-  "Amateur",
-  "Anal",
-  "Asian",
-  "BDSM",
-  "Big Ass",
-  "Desi",
-  "Blowjob",
-  "Compilation",
-  "Cartoon",
-  "Cosplay",
-  "Cuckold",
-  "Ebony",
-  "Fantasy",
-  "Family",
-  "Fetish",
-  "Foot Fetish",
-  "Gangbang",
-  "Housewife",
-  "Japanese",
-  "MILF",
-  "Massage",
-  "Mature",
-  "Romance",
-  "Teen",
-  "Threesome",
-  "Other",
+	"Adventure",
+	"Amateur",
+	"Anal",
+	"Asian",
+	"BDSM",
+	"Big Ass",
+	"Desi",
+	"Blowjob",
+	"Compilation",
+	"Cartoon",
+	"Cosplay",
+	"Cuckold",
+	"Ebony",
+	"Fantasy",
+	"Family",
+	"Fetish",
+	"Foot Fetish",
+	"Gangbang",
+	"Housewife",
+	"Japanese",
+	"MILF",
+	"Massage",
+	"Mature",
+	"Romance",
+	"Teen",
+	"Threesome",
+	"Other",
 ];
 
 onMounted(async () => {
-  await loadCategories();
+	await loadCategories();
 });
 
 async function loadCategories() {
-  loading.value = true;
-  try {
-    const response = await apiClient.get("/movies");
-    if (response.data.success) {
-      const movies = response.data.data || [];
+	loading.value = true;
+	try {
+		const response = await apiClient.get("/movies");
+		if (response.data.success) {
+			const movies = response.data.data || [];
 
-      // Count movies per category
-      const categoryMap = {};
-      movies.forEach((movie) => {
-        const category = movie.category || "Uncategorized";
-        categoryMap[category] = (categoryMap[category] || 0) + 1;
-      });
+			// Count movies per category
+			const categoryMap = {};
+			movies.forEach((movie) => {
+				const category = movie.category || "Uncategorized";
+				categoryMap[category] = (categoryMap[category] || 0) + 1;
+			});
 
-      // Combine predefined and custom categories
-      const allCategories = new Set([...predefinedCategories]);
-      Object.keys(categoryMap).forEach((cat) => {
-        if (cat && cat !== "Uncategorized") {
-          allCategories.add(cat);
-        }
-      });
+			// Combine predefined and custom categories
+			const allCategories = new Set([...predefinedCategories]);
+			Object.keys(categoryMap).forEach((cat) => {
+				if (cat && cat !== "Uncategorized") {
+					allCategories.add(cat);
+				}
+			});
 
-      categories.value = Array.from(allCategories)
-        .map((name) => ({
-          name,
-          count: categoryMap[name] || 0,
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name));
-    }
-  } catch (error) {
-    console.error("Failed to load categories:", error);
-  } finally {
-    loading.value = false;
-  }
+			categories.value = Array.from(allCategories)
+				.map((name) => ({
+					name,
+					count: categoryMap[name] || 0,
+				}))
+				.sort((a, b) => a.name.localeCompare(b.name));
+		}
+	} catch (error) {
+		console.error("Failed to load categories:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function editCategory(category) {
-  editingCategory.value = category;
-  categoryForm.value.name = category.name;
-  showAddModal.value = true;
+	editingCategory.value = category;
+	categoryForm.value.name = category.name;
+	showAddModal.value = true;
 }
 
 function closeModal() {
-  showAddModal.value = false;
-  editingCategory.value = null;
-  categoryForm.value.name = "";
-  error.value = "";
+	showAddModal.value = false;
+	editingCategory.value = null;
+	categoryForm.value.name = "";
+	error.value = "";
 }
 
 async function saveCategory() {
-  error.value = "";
+	error.value = "";
 
-  if (!categoryForm.value.name.trim()) {
-    error.value = "Please enter a category name";
-    return;
-  }
+	if (!categoryForm.value.name.trim()) {
+		error.value = "Please enter a category name";
+		return;
+	}
 
-  const categoryName = categoryForm.value.name.trim();
+	const categoryName = categoryForm.value.name.trim();
 
-  // Validate category name
-  if (categoryName.length < 2) {
-    error.value = "Category name must be at least 2 characters";
-    return;
-  }
+	// Validate category name
+	if (categoryName.length < 2) {
+		error.value = "Category name must be at least 2 characters";
+		return;
+	}
 
-  if (categoryName.length > 50) {
-    error.value = "Category name must be less than 50 characters";
-    return;
-  }
+	if (categoryName.length > 50) {
+		error.value = "Category name must be less than 50 characters";
+		return;
+	}
 
-  saving.value = true;
+	saving.value = true;
 
-  try {
-    if (editingCategory.value) {
-      // Update movies with old category to new category
-      const response = await apiClient.get("/movies");
-      if (response.data.success) {
-        const movies = response.data.data || [];
-        const moviesToUpdate = movies.filter(
-          (m) => m.category === editingCategory.value.name
-        );
+	try {
+		if (editingCategory.value) {
+			// Update movies with old category to new category
+			const response = await apiClient.get("/movies");
+			if (response.data.success) {
+				const movies = response.data.data || [];
+				const moviesToUpdate = movies.filter(
+					(m) => m.category === editingCategory.value.name,
+				);
 
-        // Update each movie
-        for (const movie of moviesToUpdate) {
-          await apiClient.put(`/movies/${movie._id}`, {
-            title: movie.title,
-            category: categoryName,
-            iframe: movie.iframe,
-            iframeSrc: movie.iframeSrc,
-            thumbnail: movie.thumbnail,
-          });
-        }
-      }
-    }
+				// Update each movie
+				for (const movie of moviesToUpdate) {
+					await apiClient.put(`/movies/${movie._id}`, {
+						title: movie.title,
+						category: categoryName,
+						iframe: movie.iframe,
+						iframeSrc: movie.iframeSrc,
+						thumbnail: movie.thumbnail,
+					});
+				}
+			}
+		}
 
-    await loadCategories();
-    closeModal();
-  } catch (err) {
-    error.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      "Failed to save category. Please try again.";
-  } finally {
-    saving.value = false;
-  }
+		await loadCategories();
+		closeModal();
+	} catch (err) {
+		error.value =
+			err.response?.data?.error ||
+			err.response?.data?.message ||
+			"Failed to save category. Please try again.";
+	} finally {
+		saving.value = false;
+	}
 }
 
 async function deleteCategory(categoryName) {
-  if (
-    !confirm(
-      `Are you sure you want to delete "${categoryName}"? This will remove the category from all movies.`
-    )
-  ) {
-    return;
-  }
+	if (
+		!confirm(
+			`Are you sure you want to delete "${categoryName}"? This will remove the category from all movies.`,
+		)
+	) {
+		return;
+	}
 
-  try {
-    // Get all movies with this category
-    const response = await apiClient.get("/movies");
-    if (response.data.success) {
-      const movies = response.data.data || [];
-      const moviesToUpdate = movies.filter((m) => m.category === categoryName);
+	try {
+		// Get all movies with this category
+		const response = await apiClient.get("/movies");
+		if (response.data.success) {
+			const movies = response.data.data || [];
+			const moviesToUpdate = movies.filter((m) => m.category === categoryName);
 
-      // Remove category from movies (set to null)
-      for (const movie of moviesToUpdate) {
-        await apiClient.put(`/movies/${movie._id}`, {
-          title: movie.title,
-          category: null,
-          iframe: movie.iframe,
-          iframeSrc: movie.iframeSrc,
-          thumbnail: movie.thumbnail,
-        });
-      }
-    }
+			// Remove category from movies (set to null)
+			for (const movie of moviesToUpdate) {
+				await apiClient.put(`/movies/${movie._id}`, {
+					title: movie.title,
+					category: null,
+					iframe: movie.iframe,
+					iframeSrc: movie.iframeSrc,
+					thumbnail: movie.thumbnail,
+				});
+			}
+		}
 
-    await loadCategories();
-  } catch (error) {
-    alert("Failed to delete category. Please try again.");
-  }
+		await loadCategories();
+	} catch (error) {
+		alert("Failed to delete category. Please try again.");
+	}
 }
 </script>
 

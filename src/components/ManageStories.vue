@@ -117,160 +117,167 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
-import { FileText, Plus, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
-import Loader from './Loader.vue';
-import StoryFormModal from './StoryFormModal.vue';
+import {
+	ChevronLeft,
+	ChevronRight,
+	Edit,
+	FileText,
+	Plus,
+	Trash2,
+} from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
+import apiClient from "../plugins/axios";
+import Loader from "./Loader.vue";
+import StoryFormModal from "./StoryFormModal.vue";
 
 const stories = ref([]);
 const categories = ref([]);
 const loading = ref(true);
-const searchQuery = ref('');
-const selectedCategory = ref('');
-const selectedStatus = ref('');
+const searchQuery = ref("");
+const selectedCategory = ref("");
+const selectedStatus = ref("");
 const showAddModal = ref(false);
 const editingStory = ref(null);
 const pagination = ref({
-  page: 1,
-  limit: 10,
-  total: 0,
-  pages: 0,
+	page: 1,
+	limit: 10,
+	total: 0,
+	pages: 0,
 });
 
 onMounted(async () => {
-  await Promise.all([loadCategories(), loadStories()]);
+	await Promise.all([loadCategories(), loadStories()]);
 });
 
 watch([searchQuery, selectedCategory, selectedStatus], () => {
-  pagination.value.page = 1;
-  loadStories();
+	pagination.value.page = 1;
+	loadStories();
 });
 
 async function loadCategories() {
-  try {
-    const response = await apiClient.get('/stories/categories');
-    if (response.data.success) {
-      categories.value = response.data.data || [];
-    }
-  } catch (error) {
-    console.error('Failed to load categories:', error);
-  }
+	try {
+		const response = await apiClient.get("/stories/categories");
+		if (response.data.success) {
+			categories.value = response.data.data || [];
+		}
+	} catch (error) {
+		console.error("Failed to load categories:", error);
+	}
 }
 
 async function loadStories() {
-  loading.value = true;
-  try {
-    const params = {
-      page: pagination.value.page,
-      limit: pagination.value.limit,
-    };
-    if (selectedCategory.value) {
-      params.category = selectedCategory.value;
-    }
-    if (selectedStatus.value) {
-      params.status = selectedStatus.value;
-    }
-    if (searchQuery.value) {
-      params.search = searchQuery.value;
-    }
+	loading.value = true;
+	try {
+		const params = {
+			page: pagination.value.page,
+			limit: pagination.value.limit,
+		};
+		if (selectedCategory.value) {
+			params.category = selectedCategory.value;
+		}
+		if (selectedStatus.value) {
+			params.status = selectedStatus.value;
+		}
+		if (searchQuery.value) {
+			params.search = searchQuery.value;
+		}
 
-    const response = await apiClient.get('/stories', { params });
-    if (response.data.success) {
-      stories.value = response.data.data || [];
-      pagination.value = response.data.pagination || pagination.value;
-    }
-  } catch (error) {
-    console.error('Failed to load stories:', error);
-  } finally {
-    loading.value = false;
-  }
+		const response = await apiClient.get("/stories", { params });
+		if (response.data.success) {
+			stories.value = response.data.data || [];
+			pagination.value = response.data.pagination || pagination.value;
+		}
+	} catch (error) {
+		console.error("Failed to load stories:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function changePage(page) {
-  if (page >= 1 && page <= pagination.value.pages) {
-    pagination.value.page = page;
-    loadStories();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+	if (page >= 1 && page <= pagination.value.pages) {
+		pagination.value.page = page;
+		loadStories();
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	}
 }
 
 const visiblePages = computed(() => {
-  const current = pagination.value.page;
-  const total = pagination.value.pages;
-  const pages = [];
-  
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    if (current <= 3) {
-      for (let i = 1; i <= 5; i++) pages.push(i);
-      pages.push('...');
-      pages.push(total);
-    } else if (current >= total - 2) {
-      pages.push(1);
-      pages.push('...');
-      for (let i = total - 4; i <= total; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push('...');
-      for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-      pages.push('...');
-      pages.push(total);
-    }
-  }
-  
-  return pages;
+	const current = pagination.value.page;
+	const total = pagination.value.pages;
+	const pages = [];
+
+	if (total <= 7) {
+		for (let i = 1; i <= total; i++) {
+			pages.push(i);
+		}
+	} else {
+		if (current <= 3) {
+			for (let i = 1; i <= 5; i++) pages.push(i);
+			pages.push("...");
+			pages.push(total);
+		} else if (current >= total - 2) {
+			pages.push(1);
+			pages.push("...");
+			for (let i = total - 4; i <= total; i++) pages.push(i);
+		} else {
+			pages.push(1);
+			pages.push("...");
+			for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+			pages.push("...");
+			pages.push(total);
+		}
+	}
+
+	return pages;
 });
 
 function editStory(story) {
-  editingStory.value = { ...story };
-  showAddModal.value = true;
+	editingStory.value = { ...story };
+	showAddModal.value = true;
 }
 
 function closeModal() {
-  showAddModal.value = false;
-  editingStory.value = null;
+	showAddModal.value = false;
+	editingStory.value = null;
 }
 
 function handleStorySaved() {
-  closeModal();
-  loadStories();
-  loadCategories();
+	closeModal();
+	loadStories();
+	loadCategories();
 }
 
 async function deleteStory(id) {
-  if (!confirm('Are you sure you want to delete this story?')) {
-    return;
-  }
+	if (!confirm("Are you sure you want to delete this story?")) {
+		return;
+	}
 
-  try {
-    await apiClient.delete(`/stories/${id}`);
-    await loadStories();
-  } catch (error) {
-    alert('Failed to delete story. Please try again.');
-  }
+	try {
+		await apiClient.delete(`/stories/${id}`);
+		await loadStories();
+	} catch (error) {
+		alert("Failed to delete story. Please try again.");
+	}
 }
 
 function formatNumber(num) {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K';
-  }
-  return num.toString();
+	if (num >= 1000000) {
+		return (num / 1000000).toFixed(1) + "M";
+	}
+	if (num >= 1000) {
+		return (num / 1000).toFixed(1) + "K";
+	}
+	return num.toString();
 }
 
 function formatDate(date) {
-  if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+	if (!date) return "N/A";
+	return new Date(date).toLocaleDateString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
 }
 </script>
 

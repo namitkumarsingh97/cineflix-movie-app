@@ -93,24 +93,24 @@
 </template>
 
 <script setup>
-import { Accessibility, X } from 'lucide-vue-next';
-import { useAccessibility } from '../composables/useAccessibility';
+import { Accessibility, X } from "lucide-vue-next";
+import { useAccessibility } from "../composables/useAccessibility";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false
-  }
+	show: {
+		type: Boolean,
+		default: false,
+	},
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const {
-  preferences,
-  toggleReducedMotion,
-  toggleHighContrast,
-  toggleLargeText,
-  toggleFocusVisible
+	preferences,
+	toggleReducedMotion,
+	toggleHighContrast,
+	toggleLargeText,
+	toggleFocusVisible,
 } = useAccessibility();
 </script>
 

@@ -115,106 +115,118 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, Star, Film, Edit, Diamond, ThumbsUp, ThumbsDown } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
-import { starsApi } from '../api/stars';
-import MovieCard from '../components/MovieCard.vue';
-import Loader from '../components/Loader.vue';
-import EditStarModal from '../components/EditStarModal.vue';
+import {
+	ArrowLeft,
+	Diamond,
+	Edit,
+	Film,
+	Star,
+	ThumbsDown,
+	ThumbsUp,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { starsApi } from "../api/stars";
+import EditStarModal from "../components/EditStarModal.vue";
+import Loader from "../components/Loader.vue";
+import MovieCard from "../components/MovieCard.vue";
+import apiClient from "../plugins/axios";
 
 const route = useRoute();
 const router = useRouter();
 
-const starName = computed(() => decodeURIComponent(route.params.star || ''));
+const starName = computed(() => decodeURIComponent(route.params.star || ""));
 const movies = ref([]);
 const starProfile = ref(null);
 const loading = ref(true);
 const showEditModal = ref(false);
-const isAdmin = computed(() => !!localStorage.getItem('adminToken'));
+const isAdmin = computed(() => !!localStorage.getItem("adminToken"));
 
 onMounted(async () => {
-  await Promise.all([loadStarProfile(), loadMovies()]);
-  // Increment view count
-  if (starProfile.value) {
-    try {
-      await starsApi.incrementView(starName.value);
-    } catch (e) {
-      console.log('Failed to increment view');
-    }
-  }
+	await Promise.all([loadStarProfile(), loadMovies()]);
+	// Increment view count
+	if (starProfile.value) {
+		try {
+			await starsApi.incrementView(starName.value);
+		} catch (e) {
+			console.log("Failed to increment view");
+		}
+	}
 });
 
 async function loadStarProfile() {
-  try {
-    const response = await starsApi.getProfile(starName.value);
-    if (response.data.success) {
-      starProfile.value = response.data.data;
-    }
-  } catch (error) {
-    console.error('Failed to load star profile:', error);
-  }
+	try {
+		const response = await starsApi.getProfile(starName.value);
+		if (response.data.success) {
+			starProfile.value = response.data.data;
+		}
+	} catch (error) {
+		console.error("Failed to load star profile:", error);
+	}
 }
 
 async function loadMovies() {
-  loading.value = true;
-  try {
-    const response = await apiClient.get('/movies', {
-      params: {
-        star: starName.value
-      }
-    });
-    if (response.data.success) {
-      movies.value = response.data.data || [];
-    }
-  } catch (error) {
-    console.error('Failed to load movies:', error);
-  } finally {
-    loading.value = false;
-  }
+	loading.value = true;
+	try {
+		const response = await apiClient.get("/movies", {
+			params: {
+				star: starName.value,
+			},
+		});
+		if (response.data.success) {
+			movies.value = response.data.data || [];
+		}
+	} catch (error) {
+		console.error("Failed to load movies:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function navigateToMovie(movieId) {
-  router.push(`/watch/${movieId}`);
+	router.push(`/watch/${movieId}`);
 }
 
 function goBack() {
-  router.push('/stars');
+	router.push("/stars");
 }
 
 function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function formatViews(count) {
-  if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'M';
-  } else if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'K';
-  }
-  return count.toString();
+	if (count >= 1000000) {
+		return (count / 1000000).toFixed(1) + "M";
+	} else if (count >= 1000) {
+		return (count / 1000).toFixed(1) + "K";
+	}
+	return count.toString();
 }
 
 function formatDate(date) {
-  if (!date) return '';
-  const d = new Date(date);
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+	if (!date) return "";
+	const d = new Date(date);
+	return d.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 }
 
 async function handleLike() {
-  // TODO: Implement like functionality
-  console.log('Like star');
+	// TODO: Implement like functionality
+	console.log("Like star");
 }
 
 async function handleDislike() {
-  // TODO: Implement dislike functionality
-  console.log('Dislike star');
+	// TODO: Implement dislike functionality
+	console.log("Dislike star");
 }
 
 async function handleProfileSaved() {
-  await loadStarProfile();
-  showEditModal.value = false;
+	await loadStarProfile();
+	showEditModal.value = false;
 }
 </script>
 

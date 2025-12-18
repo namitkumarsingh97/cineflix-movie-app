@@ -222,86 +222,92 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
 import {
-  Palette,
-  Eye,
-  Heart,
-  Users,
-  DollarSign,
-  BarChart3,
-  MessageSquare,
-  TrendingUp,
-  Lightbulb,
-  Mail,
-  Wallet,
-} from 'lucide-vue-next';
-import { useCreatorStudio } from '../composables/useCreatorStudio';
+	BarChart3,
+	DollarSign,
+	Eye,
+	Heart,
+	Lightbulb,
+	Mail,
+	MessageSquare,
+	Palette,
+	TrendingUp,
+	Users,
+	Wallet,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useCreatorStudio } from "../composables/useCreatorStudio";
 
-const { getAnalytics, getContentSuggestions, getFanMessages, getRevenueBreakdown, sendFanMessage } = useCreatorStudio();
+const {
+	getAnalytics,
+	getContentSuggestions,
+	getFanMessages,
+	getRevenueBreakdown,
+	sendFanMessage,
+} = useCreatorStudio();
 
-const activeTab = ref('analytics');
+const activeTab = ref("analytics");
 const tabs = [
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { id: 'suggestions', label: 'AI Suggestions', icon: Lightbulb },
-  { id: 'messages', label: 'Fan Messages', icon: Mail },
-  { id: 'revenue', label: 'Revenue', icon: Wallet },
+	{ id: "analytics", label: "Analytics", icon: BarChart3 },
+	{ id: "suggestions", label: "AI Suggestions", icon: Lightbulb },
+	{ id: "messages", label: "Fan Messages", icon: Mail },
+	{ id: "revenue", label: "Revenue", icon: Wallet },
 ];
 
-const analytics = computed(() => getAnalytics('30d'));
+const analytics = computed(() => getAnalytics("30d"));
 const contentSuggestions = computed(() => getContentSuggestions());
 const fanMessages = computed(() => getFanMessages());
 const revenue = computed(() => getRevenueBreakdown());
 const topContent = computed(() => {
-  // Mock top content - in production, would come from API
-  return [
-    { id: '1', title: 'Sample Video 1', views: 12500, likes: 850 },
-    { id: '2', title: 'Sample Video 2', views: 9800, likes: 720 },
-    { id: '3', title: 'Sample Video 3', views: 7600, likes: 580 },
-  ];
+	// Mock top content - in production, would come from API
+	return [
+		{ id: "1", title: "Sample Video 1", views: 12500, likes: 850 },
+		{ id: "2", title: "Sample Video 2", views: 9800, likes: 720 },
+		{ id: "3", title: "Sample Video 3", views: 7600, likes: 580 },
+	];
 });
 
 function formatNumber(num) {
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-  return num.toString();
+	if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+	if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+	return num.toString();
 }
 
 function formatTimeAgo(timestamp) {
-  if (!timestamp) return '';
-  const now = new Date();
-  const date = new Date(timestamp);
-  const diffInSeconds = Math.floor((now - date) / 1000);
-  
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  return `${Math.floor(diffInSeconds / 86400)}d ago`;
+	if (!timestamp) return "";
+	const now = new Date();
+	const date = new Date(timestamp);
+	const diffInSeconds = Math.floor((now - date) / 1000);
+
+	if (diffInSeconds < 60) return "just now";
+	if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+	if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+	return `${Math.floor(diffInSeconds / 86400)}d ago`;
 }
 
 function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+	if (!name) return "?";
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 }
 
 function replyToFan(message) {
-  const reply = prompt(`Reply to ${message.fanName}:`);
-  if (reply) {
-    sendFanMessage(message.fanId, reply);
-  }
+	const reply = prompt(`Reply to ${message.fanName}:`);
+	if (reply) {
+		sendFanMessage(message.fanId, reply);
+	}
 }
 
 onMounted(() => {
-  // Load initial data
-  getAnalytics('30d');
-  getContentSuggestions();
-  getFanMessages();
-  getRevenueBreakdown();
+	// Load initial data
+	getAnalytics("30d");
+	getContentSuggestions();
+	getFanMessages();
+	getRevenueBreakdown();
 });
 </script>
 

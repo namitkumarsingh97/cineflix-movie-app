@@ -211,206 +211,211 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
 import {
-  Shield,
-  Plus,
-  Film,
-  BarChart3,
-  LogOut,
-  TrendingUp,
-  FolderOpen,
-  Calendar,
-  Menu,
-  X,
-  User,
-  ChevronDown,
-  Home,
-  FileText,
-  CreditCard,
-} from 'lucide-vue-next';
-import AddMovieForm from '../components/AddMovieForm.vue';
-import ManageMovies from '../components/ManageMovies.vue';
-import CategoryManagement from '../components/CategoryManagement.vue';
-import ManageStories from '../components/ManageStories.vue';
-import AnalyticsChart from '../components/AnalyticsChart.vue';
-import PaymentVerificationReview from '../components/PaymentVerificationReview.vue';
-import apiClient from '../plugins/axios';
+	BarChart3,
+	Calendar,
+	ChevronDown,
+	CreditCard,
+	FileText,
+	Film,
+	FolderOpen,
+	Home,
+	LogOut,
+	Menu,
+	Plus,
+	Shield,
+	TrendingUp,
+	User,
+	X,
+} from "lucide-vue-next";
+import { onMounted, onUnmounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import AddMovieForm from "../components/AddMovieForm.vue";
+import AnalyticsChart from "../components/AnalyticsChart.vue";
+import CategoryManagement from "../components/CategoryManagement.vue";
+import ManageMovies from "../components/ManageMovies.vue";
+import ManageStories from "../components/ManageStories.vue";
+import PaymentVerificationReview from "../components/PaymentVerificationReview.vue";
+import apiClient from "../plugins/axios";
 
 const router = useRouter();
 
-const activeSection = ref('dashboard');
+const activeSection = ref("dashboard");
 const sidebarOpen = ref(false);
-const adminName = ref('');
+const adminName = ref("");
 const stats = ref({
-  totalMovies: 0,
-  recentMovies: 0,
-  thisMonth: 0,
-  totalCategories: 0,
-  categoryBreakdown: [],
-  monthlyData: [],
+	totalMovies: 0,
+	recentMovies: 0,
+	thisMonth: 0,
+	totalCategories: 0,
+	categoryBreakdown: [],
+	monthlyData: [],
 });
 
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value;
-  if (sidebarOpen.value) {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = '';
-  }
+	sidebarOpen.value = !sidebarOpen.value;
+	if (sidebarOpen.value) {
+		document.body.style.overflow = "hidden";
+	} else {
+		document.body.style.overflow = "";
+	}
 }
 
 function closeSidebar() {
-  sidebarOpen.value = false;
-  document.body.style.overflow = '';
+	sidebarOpen.value = false;
+	document.body.style.overflow = "";
 }
 
 // Close sidebar when section changes on mobile
 function changeSection(sectionId) {
-  activeSection.value = sectionId;
-  if (window.innerWidth <= 1024) {
-    closeSidebar();
-  }
+	activeSection.value = sectionId;
+	if (window.innerWidth <= 1024) {
+		closeSidebar();
+	}
 }
 
 function handleHomeClick() {
-  // Close sidebar on mobile/tablet when navigating home
-  if (window.innerWidth <= 1024) {
-    closeSidebar();
-  }
+	// Close sidebar on mobile/tablet when navigating home
+	if (window.innerWidth <= 1024) {
+		closeSidebar();
+	}
 }
 
 function getPageTitle() {
-  const item = navItems.find(item => item.id === activeSection.value);
-  return item ? item.label : 'Dashboard';
+	const item = navItems.find((item) => item.id === activeSection.value);
+	return item ? item.label : "Dashboard";
 }
 
-
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-  { id: 'add-movie', label: 'Add Movie', icon: Plus },
-  { id: 'manage-movies', label: 'Manage Movies', icon: Film },
-  { id: 'categories', label: 'Categories', icon: FolderOpen },
-  { id: 'stories', label: 'Stories', icon: FileText },
-  { id: 'payment-verifications', label: 'Payment Verifications', icon: CreditCard },
+	{ id: "dashboard", label: "Dashboard", icon: BarChart3 },
+	{ id: "add-movie", label: "Add Movie", icon: Plus },
+	{ id: "manage-movies", label: "Manage Movies", icon: Film },
+	{ id: "categories", label: "Categories", icon: FolderOpen },
+	{ id: "stories", label: "Stories", icon: FileText },
+	{
+		id: "payment-verifications",
+		label: "Payment Verifications",
+		icon: CreditCard,
+	},
 ];
 
 onMounted(async () => {
-  // Check if admin is logged in
-  const token = localStorage.getItem('adminToken');
-  const adminId = localStorage.getItem('adminId');
-  if (!token) {
-    router.push('/admin/login');
-    return;
-  }
+	// Check if admin is logged in
+	const token = localStorage.getItem("adminToken");
+	const adminId = localStorage.getItem("adminId");
+	if (!token) {
+		router.push("/admin/login");
+		return;
+	}
 
-  // Set admin name
-  adminName.value = adminId || 'Admin';
+	// Set admin name
+	adminName.value = adminId || "Admin";
 
-  // Load stats
-  await loadStats();
+	// Load stats
+	await loadStats();
 
-  // Handle window resize
-  const handleResize = () => {
-    if (window.innerWidth > 768 && sidebarOpen.value) {
-      closeSidebar();
-    }
-  };
+	// Handle window resize
+	const handleResize = () => {
+		if (window.innerWidth > 768 && sidebarOpen.value) {
+			closeSidebar();
+		}
+	};
 
-  window.addEventListener('resize', handleResize);
-  
-  // Store cleanup function
-  window._adminPanelResizeHandler = handleResize;
+	window.addEventListener("resize", handleResize);
 
+	// Store cleanup function
+	window._adminPanelResizeHandler = handleResize;
 });
 
 onUnmounted(() => {
-  // Cleanup
-  document.body.style.overflow = '';
-  if (window._adminPanelResizeHandler) {
-    window.removeEventListener('resize', window._adminPanelResizeHandler);
-    delete window._adminPanelResizeHandler;
-  }
+	// Cleanup
+	document.body.style.overflow = "";
+	if (window._adminPanelResizeHandler) {
+		window.removeEventListener("resize", window._adminPanelResizeHandler);
+		delete window._adminPanelResizeHandler;
+	}
 });
 
 async function loadStats() {
-  try {
-    const response = await apiClient.get('/movies');
-    if (response.data.success) {
-      const movies = response.data.data || [];
-      stats.value.totalMovies = movies.length;
-      
-      // Count movies added in last 7 days
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      stats.value.recentMovies = movies.filter(movie => {
-        const movieDate = new Date(movie.createdAt);
-        return movieDate >= weekAgo;
-      }).length;
+	try {
+		const response = await apiClient.get("/movies");
+		if (response.data.success) {
+			const movies = response.data.data || [];
+			stats.value.totalMovies = movies.length;
 
-      // Count movies added this month
-      const monthAgo = new Date();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-      stats.value.thisMonth = movies.filter(movie => {
-        const movieDate = new Date(movie.createdAt);
-        return movieDate >= monthAgo;
-      }).length;
+			// Count movies added in last 7 days
+			const weekAgo = new Date();
+			weekAgo.setDate(weekAgo.getDate() - 7);
+			stats.value.recentMovies = movies.filter((movie) => {
+				const movieDate = new Date(movie.createdAt);
+				return movieDate >= weekAgo;
+			}).length;
 
-      // Category breakdown
-      const categoryMap = {};
-      movies.forEach(movie => {
-        const category = movie.category || 'Uncategorized';
-        categoryMap[category] = (categoryMap[category] || 0) + 1;
-      });
+			// Count movies added this month
+			const monthAgo = new Date();
+			monthAgo.setMonth(monthAgo.getMonth() - 1);
+			stats.value.thisMonth = movies.filter((movie) => {
+				const movieDate = new Date(movie.createdAt);
+				return movieDate >= monthAgo;
+			}).length;
 
-      stats.value.categoryBreakdown = Object.entries(categoryMap)
-        .map(([category, count]) => ({ category, count }))
-        .sort((a, b) => b.count - a.count);
+			// Category breakdown
+			const categoryMap = {};
+			movies.forEach((movie) => {
+				const category = movie.category || "Uncategorized";
+				categoryMap[category] = (categoryMap[category] || 0) + 1;
+			});
 
-      stats.value.totalCategories = Object.keys(categoryMap).length;
+			stats.value.categoryBreakdown = Object.entries(categoryMap)
+				.map(([category, count]) => ({ category, count }))
+				.sort((a, b) => b.count - a.count);
 
-      // Monthly data for chart
-      const monthlyMap = {};
-      movies.forEach(movie => {
-        const date = new Date(movie.createdAt);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + 1;
-      });
+			stats.value.totalCategories = Object.keys(categoryMap).length;
 
-      // Get last 12 months
-      const monthlyData = [];
-      for (let i = 11; i >= 0; i--) {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-        monthlyData.push({
-          label: monthName,
-          value: monthlyMap[monthKey] || 0,
-        });
-      }
-      stats.value.monthlyData = monthlyData;
-    }
-  } catch (error) {
-    console.error('Failed to load stats:', error);
-  }
+			// Monthly data for chart
+			const monthlyMap = {};
+			movies.forEach((movie) => {
+				const date = new Date(movie.createdAt);
+				const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+				monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + 1;
+			});
+
+			// Get last 12 months
+			const monthlyData = [];
+			for (let i = 11; i >= 0; i--) {
+				const date = new Date();
+				date.setMonth(date.getMonth() - i);
+				const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+				const monthName = date.toLocaleDateString("en-US", {
+					month: "short",
+					year: "numeric",
+				});
+				monthlyData.push({
+					label: monthName,
+					value: monthlyMap[monthKey] || 0,
+				});
+			}
+			stats.value.monthlyData = monthlyData;
+		}
+	} catch (error) {
+		console.error("Failed to load stats:", error);
+	}
 }
 
 function handlePeriodChange(period) {
-  // Reload stats with different period
-  loadStats();
+	// Reload stats with different period
+	loadStats();
 }
 
 function handleLogout() {
-  localStorage.removeItem('adminToken');
-  localStorage.removeItem('adminId');
-  router.push('/admin/login');
+	localStorage.removeItem("adminToken");
+	localStorage.removeItem("adminId");
+	router.push("/admin/login");
 }
 
 function handleMovieSaved() {
-  loadStats();
-  activeSection.value = 'manage-movies';
+	loadStats();
+	activeSection.value = "manage-movies";
 }
 </script>
 

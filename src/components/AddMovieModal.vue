@@ -140,67 +140,67 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
-import { movieService } from "../services/movieService";
 import {
-  Film,
-  Plus,
-  X,
-  Video,
-  Sparkles,
-  Loader2,
-  FolderOpen,
-  Image,
-  Upload,
-  Link,
+	Film,
+	FolderOpen,
+	Image,
+	Link,
+	Loader2,
+	Plus,
+	Sparkles,
+	Upload,
+	Video,
+	X,
 } from "lucide-vue-next";
+import { ref, watch } from "vue";
 import apiClient from "../plugins/axios";
+import { movieService } from "../services/movieService";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
+	show: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 const emit = defineEmits(["close", "saved"]);
 
 const categories = [
-  "Adventure",
-  "Amateur",
-  "Anal",
-  "Asian",
-  "BDSM",
-  "Big Ass",
-  "Desi",
-  "Blowjob",
-  "Compilation",
-  "Cartoon",
-  "Cosplay",
-  "Cuckold",
-  "Ebony",
-  "Fantasy",
-  "Family",
-  "Fetish",
-  "Foot Fetish",
-  "Gangbang",
-  "Housewife",
-  "Japanese",
-  "MILF",
-  "Massage",
-  "Mature",
-  "Romance",
-  "Teen",
-  "Threesome",
-  "Other",
+	"Adventure",
+	"Amateur",
+	"Anal",
+	"Asian",
+	"BDSM",
+	"Big Ass",
+	"Desi",
+	"Blowjob",
+	"Compilation",
+	"Cartoon",
+	"Cosplay",
+	"Cuckold",
+	"Ebony",
+	"Fantasy",
+	"Family",
+	"Fetish",
+	"Foot Fetish",
+	"Gangbang",
+	"Housewife",
+	"Japanese",
+	"MILF",
+	"Massage",
+	"Mature",
+	"Romance",
+	"Teen",
+	"Threesome",
+	"Other",
 ];
 
 const movieData = ref({
-  title: "",
-  category: "",
-  iframeCode: "",
-  thumbnailFile: null,
-  thumbnailUrl: "",
+	title: "",
+	category: "",
+	iframeCode: "",
+	thumbnailFile: null,
+	thumbnailUrl: "",
 });
 
 const thumbnailType = ref("upload"); // 'upload' or 'url'
@@ -209,96 +209,96 @@ const urlPreview = ref(true);
 const saving = ref(false);
 
 watch(
-  () => props.show,
-  (newVal) => {
-    if (!newVal) {
-      // Reset form when modal closes
-      movieData.value = {
-        title: "",
-        category: "",
-        iframeCode: "",
-        thumbnailFile: null,
-        thumbnailUrl: "",
-      };
-      thumbnailType.value = "upload";
-      thumbnailPreview.value = null;
-      urlPreview.value = true;
-      const fileInput = document.getElementById("thumbnail");
-      if (fileInput) fileInput.value = "";
-    }
-  }
+	() => props.show,
+	(newVal) => {
+		if (!newVal) {
+			// Reset form when modal closes
+			movieData.value = {
+				title: "",
+				category: "",
+				iframeCode: "",
+				thumbnailFile: null,
+				thumbnailUrl: "",
+			};
+			thumbnailType.value = "upload";
+			thumbnailPreview.value = null;
+			urlPreview.value = true;
+			const fileInput = document.getElementById("thumbnail");
+			if (fileInput) fileInput.value = "";
+		}
+	},
 );
 
 function handleThumbnailChange(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Thumbnail size should be less than 5MB");
-      return;
-    }
-    movieData.value.thumbnailFile = file;
+	const file = event.target.files[0];
+	if (file) {
+		if (file.size > 5 * 1024 * 1024) {
+			alert("Thumbnail size should be less than 5MB");
+			return;
+		}
+		movieData.value.thumbnailFile = file;
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      thumbnailPreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
+		// Create preview
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			thumbnailPreview.value = e.target.result;
+		};
+		reader.readAsDataURL(file);
+	}
 }
 
 function removeThumbnail() {
-  movieData.value.thumbnailFile = null;
-  thumbnailPreview.value = null;
-  const fileInput = document.getElementById("thumbnail");
-  if (fileInput) fileInput.value = "";
+	movieData.value.thumbnailFile = null;
+	thumbnailPreview.value = null;
+	const fileInput = document.getElementById("thumbnail");
+	if (fileInput) fileInput.value = "";
 }
 
 function handleUrlChange() {
-  urlPreview.value = true;
-  if (movieData.value.thumbnailUrl) {
-    // Validate URL format
-    try {
-      new URL(movieData.value.thumbnailUrl);
-    } catch (e) {
-      // Invalid URL, but let user continue typing
-    }
-  }
+	urlPreview.value = true;
+	if (movieData.value.thumbnailUrl) {
+		// Validate URL format
+		try {
+			new URL(movieData.value.thumbnailUrl);
+		} catch (e) {
+			// Invalid URL, but let user continue typing
+		}
+	}
 }
 
 async function handleSave() {
-  if (!movieData.value.title.trim()) {
-    alert("Please enter a movie title");
-    return;
-  }
+	if (!movieData.value.title.trim()) {
+		alert("Please enter a movie title");
+		return;
+	}
 
-  if (!movieData.value.iframeCode.trim()) {
-    alert("Please enter iframe code");
-    return;
-  }
+	if (!movieData.value.iframeCode.trim()) {
+		alert("Please enter iframe code");
+		return;
+	}
 
-  saving.value = true;
-  try {
-    // Parse iframe code
-    let iframeSrc = movieData.value.iframeCode.trim();
-    let iframeWidth = "100%";
-    let iframeHeight = "100%";
+	saving.value = true;
+	try {
+		// Parse iframe code
+		let iframeSrc = movieData.value.iframeCode.trim();
+		let iframeWidth = "100%";
+		let iframeHeight = "100%";
 
-    const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
-    if (iframeMatch) {
-      iframeSrc = iframeMatch[1];
-    }
+		const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
+		if (iframeMatch) {
+			iframeSrc = iframeMatch[1];
+		}
 
-    const widthMatch = movieData.value.iframeCode.match(
-      /width=["']([^"']+)["']/
-    );
-    const heightMatch = movieData.value.iframeCode.match(
-      /height=["']([^"']+)["']/
-    );
-    if (widthMatch) iframeWidth = widthMatch[1];
-    if (heightMatch) iframeHeight = heightMatch[1];
+		const widthMatch = movieData.value.iframeCode.match(
+			/width=["']([^"']+)["']/,
+		);
+		const heightMatch = movieData.value.iframeCode.match(
+			/height=["']([^"']+)["']/,
+		);
+		if (widthMatch) iframeWidth = widthMatch[1];
+		if (heightMatch) iframeHeight = heightMatch[1];
 
-    const iframeHtml = `<iframe 
+		const iframeHtml = `<iframe 
       width="${iframeWidth}" 
       height="${iframeHeight}" 
       src="${iframeSrc}" 
@@ -309,61 +309,61 @@ async function handleSave() {
       style="border: none;"
     ></iframe>`;
 
-    // Handle thumbnail - upload or URL
-    if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
-      // Upload file
-      const formData = new FormData();
-      formData.append("title", movieData.value.title.trim());
-      if (movieData.value.category) {
-        formData.append("category", movieData.value.category);
-      }
-      formData.append("iframe", iframeHtml);
-      formData.append("iframeSrc", iframeSrc);
-      formData.append("thumbnail", movieData.value.thumbnailFile);
+		// Handle thumbnail - upload or URL
+		if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
+			// Upload file
+			const formData = new FormData();
+			formData.append("title", movieData.value.title.trim());
+			if (movieData.value.category) {
+				formData.append("category", movieData.value.category);
+			}
+			formData.append("iframe", iframeHtml);
+			formData.append("iframeSrc", iframeSrc);
+			formData.append("thumbnail", movieData.value.thumbnailFile);
 
-      await apiClient.post("/movies", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-    } else if (
-      thumbnailType.value === "url" &&
-      movieData.value.thumbnailUrl.trim()
-    ) {
-      // Use URL
-      await apiClient.post("/movies", {
-        title: movieData.value.title.trim(),
-        category: movieData.value.category || undefined,
-        iframe: iframeHtml,
-        iframeSrc: iframeSrc,
-        thumbnail: movieData.value.thumbnailUrl.trim(),
-      });
-    } else {
-      // Use old method if no thumbnail provided
-      await movieService.createMovie(
-        movieData.value.title,
-        movieData.value.iframeCode,
-        movieData.value.category
-      );
-    }
+			await apiClient.post("/movies", formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+		} else if (
+			thumbnailType.value === "url" &&
+			movieData.value.thumbnailUrl.trim()
+		) {
+			// Use URL
+			await apiClient.post("/movies", {
+				title: movieData.value.title.trim(),
+				category: movieData.value.category || undefined,
+				iframe: iframeHtml,
+				iframeSrc: iframeSrc,
+				thumbnail: movieData.value.thumbnailUrl.trim(),
+			});
+		} else {
+			// Use old method if no thumbnail provided
+			await movieService.createMovie(
+				movieData.value.title,
+				movieData.value.iframeCode,
+				movieData.value.category,
+			);
+		}
 
-    emit("saved");
-    emit("close");
-    movieData.value = {
-      title: "",
-      category: "",
-      iframeCode: "",
-      thumbnailFile: null,
-      thumbnailUrl: "",
-    };
-    thumbnailType.value = "upload";
-    thumbnailPreview.value = null;
-    urlPreview.value = true;
-  } catch (error) {
-    alert(error.message || "Failed to save movie. Please try again.");
-  } finally {
-    saving.value = false;
-  }
+		emit("saved");
+		emit("close");
+		movieData.value = {
+			title: "",
+			category: "",
+			iframeCode: "",
+			thumbnailFile: null,
+			thumbnailUrl: "",
+		};
+		thumbnailType.value = "upload";
+		thumbnailPreview.value = null;
+		urlPreview.value = true;
+	} catch (error) {
+		alert(error.message || "Failed to save movie. Please try again.");
+	} finally {
+		saving.value = false;
+	}
 }
 </script>
 

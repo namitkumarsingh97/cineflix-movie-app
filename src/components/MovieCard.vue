@@ -30,71 +30,82 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { getThumbnail } from '../utils/video';
-import { useNetworkQuality } from '../composables/useNetworkQuality';
-import OptimizedImage from './OptimizedImage.vue';
+import { computed } from "vue";
+import { useNetworkQuality } from "../composables/useNetworkQuality";
+import { getThumbnail } from "../utils/video";
+import OptimizedImage from "./OptimizedImage.vue";
 
 const { shouldPreloadThumbnails } = useNetworkQuality();
 
 const props = defineProps({
-  movie: {
-    type: Object,
-    required: true,
-  },
-  showChannel: {
-    type: Boolean,
-    default: false,
-  },
+	movie: {
+		type: Object,
+		required: true,
+	},
+	showChannel: {
+		type: Boolean,
+		default: false,
+	},
 });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits(["click"]);
 
 // Generate watch URL for router-link
 const watchUrl = computed(() => {
-  if (!props.movie || !props.movie._id) return '/';
-  return `/watch/${props.movie._id}`;
+	if (!props.movie || !props.movie._id) return "/";
+	return `/watch/${props.movie._id}`;
 });
 
 function handleClick(event) {
-  // Allow right-click, middle-click, and modifier keys to work normally (open in new tab)
-  // event.button: 0=left, 1=middle, 2=right
-  if (event.button === 2 || event.button === 1 || event.ctrlKey || event.metaKey || event.shiftKey) {
-    return; // Let the browser/router-link handle it naturally
-  }
-  // For regular left-click, emit the event
-  // The router-link will handle navigation automatically
-  emit('click', props.movie);
+	// Allow right-click, middle-click, and modifier keys to work normally (open in new tab)
+	// event.button: 0=left, 1=middle, 2=right
+	if (
+		event.button === 2 ||
+		event.button === 1 ||
+		event.ctrlKey ||
+		event.metaKey ||
+		event.shiftKey
+	) {
+		return; // Let the browser/router-link handle it naturally
+	}
+	// For regular left-click, emit the event
+	// The router-link will handle navigation automatically
+	emit("click", props.movie);
 }
 
 function handleThumbnailError(event) {
-  event.target.style.display = 'none';
-  event.target.parentElement.style.background = 'var(--gradient-hero)';
+	event.target.style.display = "none";
+	event.target.parentElement.style.background = "var(--gradient-hero)";
 }
 
 function formatTimeAgo(date) {
-  if (!date) return '';
-  const now = new Date();
-  const uploadDate = new Date(date);
-  const diffInSeconds = Math.floor((now - uploadDate) / 1000);
-  
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
-  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} months ago`;
-  return `${Math.floor(diffInSeconds / 31536000)} years ago`;
+	if (!date) return "";
+	const now = new Date();
+	const uploadDate = new Date(date);
+	const diffInSeconds = Math.floor((now - uploadDate) / 1000);
+
+	if (diffInSeconds < 60) return "just now";
+	if (diffInSeconds < 3600)
+		return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+	if (diffInSeconds < 86400)
+		return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+	if (diffInSeconds < 604800)
+		return `${Math.floor(diffInSeconds / 86400)} days ago`;
+	if (diffInSeconds < 2592000)
+		return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+	if (diffInSeconds < 31536000)
+		return `${Math.floor(diffInSeconds / 2592000)} months ago`;
+	return `${Math.floor(diffInSeconds / 31536000)} years ago`;
 }
 
 function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+	if (!name) return "?";
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 }
 </script>
 

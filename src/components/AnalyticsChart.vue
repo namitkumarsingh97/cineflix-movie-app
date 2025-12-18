@@ -37,45 +37,45 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, ref } from "vue";
 
 const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  icon: {
-    type: Object,
-    required: true,
-  },
-  data: {
-    type: Array,
-    default: () => [],
-  },
+	title: {
+		type: String,
+		required: true,
+	},
+	icon: {
+		type: Object,
+		required: true,
+	},
+	data: {
+		type: Array,
+		default: () => [],
+	},
 });
 
-const emit = defineEmits(['period-change']);
+const emit = defineEmits(["period-change"]);
 
-const selectedPeriod = ref('month');
+const selectedPeriod = ref("month");
 
 const chartData = computed(() => {
-  return props.data || [];
+	return props.data || [];
 });
 
 const maxValue = computed(() => {
-  if (chartData.value.length === 0) return 1;
-  return Math.max(...chartData.value.map(item => item.value), 1);
+	if (chartData.value.length === 0) return 1;
+	return Math.max(...chartData.value.map((item) => item.value), 1);
 });
 
 function getBarColor(index) {
-  const colors = [
-    'linear-gradient(135deg, #ff4500 0%, #ff6347 100%)',
-    'linear-gradient(135deg, #ff8c00 0%, #ffa500 100%)',
-    'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
-    'linear-gradient(135deg, #32cd32 0%, #7cfc00 100%)',
-    'linear-gradient(135deg, #ff6347 0%, #ff4500 100%)',
-  ];
-  return colors[index % colors.length];
+	const colors = [
+		"linear-gradient(135deg, #ff4500 0%, #ff6347 100%)",
+		"linear-gradient(135deg, #ff8c00 0%, #ffa500 100%)",
+		"linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)",
+		"linear-gradient(135deg, #32cd32 0%, #7cfc00 100%)",
+		"linear-gradient(135deg, #ff6347 0%, #ff4500 100%)",
+	];
+	return colors[index % colors.length];
 }
 </script>
 

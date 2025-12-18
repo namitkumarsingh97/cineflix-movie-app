@@ -28,57 +28,57 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import VideoCard from './VideoCard.vue';
-import MovieCard from './MovieCard.vue';
-import { ChevronRight } from 'lucide-vue-next';
+import { ChevronRight } from "lucide-vue-next";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import MovieCard from "./MovieCard.vue";
+import VideoCard from "./VideoCard.vue";
 
 const props = defineProps({
-  recommendations: {
-    type: Array,
-    default: () => [],
-  },
-  sourceTitle: {
-    type: String,
-    default: 'this',
-  },
-  showViewAll: {
-    type: Boolean,
-    default: true,
-  },
-  viewAllLink: {
-    type: String,
-    default: '/videos',
-  },
+	recommendations: {
+		type: Array,
+		default: () => [],
+	},
+	sourceTitle: {
+		type: String,
+		default: "this",
+	},
+	showViewAll: {
+		type: Boolean,
+		default: true,
+	},
+	viewAllLink: {
+		type: String,
+		default: "/videos",
+	},
 });
 
-const emit = defineEmits(['item-click']);
+const emit = defineEmits(["item-click"]);
 
 const router = useRouter();
 
 // Separate videos and movies
 const videoRecommendations = computed(() => {
-  return props.recommendations.filter(item => 
-    item._source === 'eporner' || item.type === 'video' || !item._id
-  );
+	return props.recommendations.filter(
+		(item) => item._source === "eporner" || item.type === "video" || !item._id,
+	);
 });
 
 const movieRecommendations = computed(() => {
-  return props.recommendations.filter(item => 
-    item._id && (item.type === 'movie' || !item._source)
-  );
+	return props.recommendations.filter(
+		(item) => item._id && (item.type === "movie" || !item._source),
+	);
 });
 
 const handleItemClick = (item) => {
-  emit('item-click', item);
-  
-  // Navigate to watch page
-  if (item._source === 'eporner' || item.type === 'video') {
-    router.push(`/watch/${item.id}?source=eporner`);
-  } else {
-    router.push(`/watch/${item._id}`);
-  }
+	emit("item-click", item);
+
+	// Navigate to watch page
+	if (item._source === "eporner" || item.type === "video") {
+		router.push(`/watch/${item.id}?source=eporner`);
+	} else {
+		router.push(`/watch/${item._id}`);
+	}
 };
 </script>
 

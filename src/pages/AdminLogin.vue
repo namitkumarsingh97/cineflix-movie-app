@@ -54,41 +54,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { Shield, User, Lock, LogIn, Loader2, AlertCircle } from 'lucide-vue-next';
-import apiClient from '../plugins/axios';
+import {
+	AlertCircle,
+	Loader2,
+	Lock,
+	LogIn,
+	Shield,
+	User,
+} from "lucide-vue-next";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import apiClient from "../plugins/axios";
 
 const router = useRouter();
 
 const credentials = ref({
-  adminId: '',
-  password: '',
+	adminId: "",
+	password: "",
 });
 
 const loading = ref(false);
-const error = ref('');
+const error = ref("");
 
 async function handleLogin() {
-  error.value = '';
-  loading.value = true;
+	error.value = "";
+	loading.value = true;
 
-  try {
-    const response = await apiClient.post('/admin/login', credentials.value);
-    
-    if (response.data.success) {
-      // Store token
-      localStorage.setItem('adminToken', response.data.token);
-      localStorage.setItem('adminId', response.data.data.adminId);
-      
-      // Redirect to admin panel
-      router.push('/admin/panel');
-    }
-  } catch (err) {
-    error.value = err.response?.data?.error || err.response?.data?.message || 'Invalid credentials. Please try again.';
-  } finally {
-    loading.value = false;
-  }
+	try {
+		const response = await apiClient.post("/admin/login", credentials.value);
+
+		if (response.data.success) {
+			// Store token
+			localStorage.setItem("adminToken", response.data.token);
+			localStorage.setItem("adminId", response.data.data.adminId);
+
+			// Redirect to admin panel
+			router.push("/admin/panel");
+		}
+	} catch (err) {
+		error.value =
+			err.response?.data?.error ||
+			err.response?.data?.message ||
+			"Invalid credentials. Please try again.";
+	} finally {
+		loading.value = false;
+	}
 }
 </script>
 

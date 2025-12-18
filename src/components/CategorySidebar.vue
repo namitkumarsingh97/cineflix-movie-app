@@ -310,25 +310,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
 import {
-  RotateCcw,
-  Play,
-  ThumbsUp,
-  Star,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
+	ChevronLeft,
+	ChevronRight,
+	Eye,
+	Play,
+	RotateCcw,
+	Star,
+	ThumbsUp,
 } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { videosApi } from "../api/videos";
 import { useEporner } from "../composables/useEporner";
 
 const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    default: true,
-  },
+	isOpen: {
+		type: Boolean,
+		default: true,
+	},
 });
 
 const emit = defineEmits(["filter-change"]);
@@ -349,545 +349,545 @@ const categoryLimit = 20;
 
 // Top navigation items
 const topNavItems = [
-  { id: "history", label: "History", icon: RotateCcw },
-  { id: "newest", label: "Newest videos", icon: Play },
-  { id: "best", label: "Best Videos", icon: ThumbsUp },
-  { id: "top-rated", label: "Top rated", icon: Star },
-  { id: "most-viewed", label: "Most viewed", icon: Eye },
+	{ id: "history", label: "History", icon: RotateCcw },
+	{ id: "newest", label: "Newest videos", icon: Play },
+	{ id: "best", label: "Best Videos", icon: ThumbsUp },
+	{ id: "top-rated", label: "Top rated", icon: Star },
+	{ id: "most-viewed", label: "Most viewed", icon: Eye },
 ];
 
 // Production items (with sample counts - should come from API)
 const productionItems = ref([
-  { id: "all", label: "All", count: 0 },
-  { id: "professional", label: "Professional", count: 0 },
-  { id: "homemade", label: "Homemade", count: 0 },
+	{ id: "all", label: "All", count: 0 },
+	{ id: "professional", label: "Professional", count: 0 },
+	{ id: "homemade", label: "Homemade", count: 0 },
 ]);
 
 // Load categories from API
 async function loadCategories(page = 1) {
-  loadingCategories.value = true;
-  try {
-    // Try to get categories from API
-    const response = await videosApi.getAll({
-      page,
-      limit: categoryLimit,
-    });
+	loadingCategories.value = true;
+	try {
+		// Try to get categories from API
+		const response = await videosApi.getAll({
+			page,
+			limit: categoryLimit,
+		});
 
-    // Extract categories from videos
-    const categoryMap = new Map();
-    const videos =
-      response.data?.data || response.data?.videos || response.data || [];
+		// Extract categories from videos
+		const categoryMap = new Map();
+		const videos =
+			response.data?.data || response.data?.videos || response.data || [];
 
-    videos.forEach((video) => {
-      if (video.categories && Array.isArray(video.categories)) {
-        video.categories.forEach((cat) => {
-          if (cat && cat.trim()) {
-            const catName = cat.trim();
-            if (!categoryMap.has(catName)) {
-              categoryMap.set(catName, { name: catName, count: 0 });
-            }
-            categoryMap.get(catName).count++;
-          }
-        });
-      }
-    });
+		videos.forEach((video) => {
+			if (video.categories && Array.isArray(video.categories)) {
+				video.categories.forEach((cat) => {
+					if (cat && cat.trim()) {
+						const catName = cat.trim();
+						if (!categoryMap.has(catName)) {
+							categoryMap.set(catName, { name: catName, count: 0 });
+						}
+						categoryMap.get(catName).count++;
+					}
+				});
+			}
+		});
 
-    categories.value = Array.from(categoryMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+		categories.value = Array.from(categoryMap.values()).sort((a, b) =>
+			a.name.localeCompare(b.name),
+		);
 
-    // Calculate total pages (estimate based on response)
-    const total =
-      response.data?.total || response.data?.totalCount || videos.length;
-    categoryTotalPages.value = Math.ceil(total / categoryLimit) || 1;
-    categoryCurrentPage.value = page;
-  } catch (error) {
-    console.error("Failed to load categories:", error);
-    categories.value = [];
-  } finally {
-    loadingCategories.value = false;
-  }
+		// Calculate total pages (estimate based on response)
+		const total =
+			response.data?.total || response.data?.totalCount || videos.length;
+		categoryTotalPages.value = Math.ceil(total / categoryLimit) || 1;
+		categoryCurrentPage.value = page;
+	} catch (error) {
+		console.error("Failed to load categories:", error);
+		categories.value = [];
+	} finally {
+		loadingCategories.value = false;
+	}
 }
 
 function loadCategoryPage(page) {
-  if (page >= 1 && page <= categoryTotalPages.value) {
-    loadCategories(page);
-  }
+	if (page >= 1 && page <= categoryTotalPages.value) {
+		loadCategories(page);
+	}
 }
 
 function formatCount(count) {
-  if (!count) return "0";
-  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
-  return count.toString();
+	if (!count) return "0";
+	if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+	if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
+	return count.toString();
 }
 
 function selectTopNav(id) {
-  selectedTopNav.value = selectedTopNav.value === id ? null : id;
-  selectedProduction.value = "all";
-  selectedCategory.value = "all";
+	selectedTopNav.value = selectedTopNav.value === id ? null : id;
+	selectedProduction.value = "all";
+	selectedCategory.value = "all";
 
-  // Navigate based on selection
-  if (id === "newest") {
-    router.push("/videos?order=latest");
-  } else if (id === "best") {
-    router.push("/videos?order=most-popular");
-  } else if (id === "top-rated") {
-    router.push("/videos?order=top-rated");
-  } else if (id === "most-viewed") {
-    router.push("/videos?order=most-popular");
-  } else if (id === "history") {
-    // Navigate to watch history if available
-    router.push("/dashboard?tab=history");
-  }
+	// Navigate based on selection
+	if (id === "newest") {
+		router.push("/videos?order=latest");
+	} else if (id === "best") {
+		router.push("/videos?order=most-popular");
+	} else if (id === "top-rated") {
+		router.push("/videos?order=top-rated");
+	} else if (id === "most-viewed") {
+		router.push("/videos?order=most-popular");
+	} else if (id === "history") {
+		// Navigate to watch history if available
+		router.push("/dashboard?tab=history");
+	}
 
-  emit("filter-change", { type: "topNav", value: id });
+	emit("filter-change", { type: "topNav", value: id });
 }
 
 function selectProduction(id) {
-  selectedProduction.value = id;
-  selectedCategory.value = "all";
-  selectedTopNav.value = null;
+	selectedProduction.value = id;
+	selectedCategory.value = "all";
+	selectedTopNav.value = null;
 
-  // Filter by production type
-  const query = id === "all" ? "all" : id;
-  searchVideos(query, 1, { order: "most-popular" });
-  router.push(`/videos?q=${encodeURIComponent(query)}`);
+	// Filter by production type
+	const query = id === "all" ? "all" : id;
+	searchVideos(query, 1, { order: "most-popular" });
+	router.push(`/videos?q=${encodeURIComponent(query)}`);
 
-  emit("filter-change", { type: "production", value: id });
+	emit("filter-change", { type: "production", value: id });
 }
 
 function selectCategory(categoryName) {
-  selectedCategory.value = categoryName;
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
+	selectedCategory.value = categoryName;
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
 
-  // Filter by category
-  const query = categoryName === "all" ? "all" : categoryName;
-  searchVideos(query, 1, { order: "most-popular" });
-  router.push(`/videos?q=${encodeURIComponent(query)}`);
+	// Filter by category
+	const query = categoryName === "all" ? "all" : categoryName;
+	searchVideos(query, 1, { order: "most-popular" });
+	router.push(`/videos?q=${encodeURIComponent(query)}`);
 
-  emit("filter-change", { type: "category", value: categoryName });
+	emit("filter-change", { type: "category", value: categoryName });
 }
 
 function navigateToDoublePenetration() {
-  selectedCategory.value = "double penetration";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/double-penetration");
-  emit("filter-change", { type: "category", value: "double penetration" });
+	selectedCategory.value = "double penetration";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/double-penetration");
+	emit("filter-change", { type: "category", value: "double penetration" });
 }
 
 function navigateToAmateur() {
-  selectedCategory.value = "amateur";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/amateur");
-  emit("filter-change", { type: "category", value: "amateur" });
+	selectedCategory.value = "amateur";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/amateur");
+	emit("filter-change", { type: "category", value: "amateur" });
 }
 
 function navigateToAnal() {
-  selectedCategory.value = "anal";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/anal");
-  emit("filter-change", { type: "category", value: "anal" });
+	selectedCategory.value = "anal";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/anal");
+	emit("filter-change", { type: "category", value: "anal" });
 }
 
 function navigateToAsian() {
-  selectedCategory.value = "asian";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/asian");
-  emit("filter-change", { type: "category", value: "asian" });
+	selectedCategory.value = "asian";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/asian");
+	emit("filter-change", { type: "category", value: "asian" });
 }
 
 function navigateToBdsm() {
-  selectedCategory.value = "bdsm";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/bdsm");
-  emit("filter-change", { type: "category", value: "bdsm" });
+	selectedCategory.value = "bdsm";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/bdsm");
+	emit("filter-change", { type: "category", value: "bdsm" });
 }
 
 function navigateToBigAss() {
-  selectedCategory.value = "big ass";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/big-ass");
-  emit("filter-change", { type: "category", value: "big ass" });
+	selectedCategory.value = "big ass";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/big-ass");
+	emit("filter-change", { type: "category", value: "big ass" });
 }
 
 function navigateToBigDick() {
-  selectedCategory.value = "big dick";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/big-dick");
-  emit("filter-change", { type: "category", value: "big dick" });
+	selectedCategory.value = "big dick";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/big-dick");
+	emit("filter-change", { type: "category", value: "big dick" });
 }
 
 function navigateToBigTits() {
-  selectedCategory.value = "big tits";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/big-tits");
-  emit("filter-change", { type: "category", value: "big tits" });
+	selectedCategory.value = "big tits";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/big-tits");
+	emit("filter-change", { type: "category", value: "big tits" });
 }
 
 function navigateToBisexual() {
-  selectedCategory.value = "bisexual";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/bisexual");
-  emit("filter-change", { type: "category", value: "bisexual" });
+	selectedCategory.value = "bisexual";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/bisexual");
+	emit("filter-change", { type: "category", value: "bisexual" });
 }
 
 function navigateToBlonde() {
-  selectedCategory.value = "blonde";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/blonde");
-  emit("filter-change", { type: "category", value: "blonde" });
+	selectedCategory.value = "blonde";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/blonde");
+	emit("filter-change", { type: "category", value: "blonde" });
 }
 
 function navigateToBlowjob() {
-  selectedCategory.value = "blowjob";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/blowjob");
-  emit("filter-change", { type: "category", value: "blowjob" });
+	selectedCategory.value = "blowjob";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/blowjob");
+	emit("filter-change", { type: "category", value: "blowjob" });
 }
 
 function navigateToBrunette() {
-  selectedCategory.value = "brunette";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/brunette");
-  emit("filter-change", { type: "category", value: "brunette" });
+	selectedCategory.value = "brunette";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/brunette");
+	emit("filter-change", { type: "category", value: "brunette" });
 }
 
 function navigateToBukkake() {
-  selectedCategory.value = "bukkake";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/bukkake");
-  emit("filter-change", { type: "category", value: "bukkake" });
+	selectedCategory.value = "bukkake";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/bukkake");
+	emit("filter-change", { type: "category", value: "bukkake" });
 }
 
 function navigateToCreampie() {
-  selectedCategory.value = "creampie";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/creampie");
-  emit("filter-change", { type: "category", value: "creampie" });
+	selectedCategory.value = "creampie";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/creampie");
+	emit("filter-change", { type: "category", value: "creampie" });
 }
 
 function navigateToCumshot() {
-  selectedCategory.value = "cumshot";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/cumshot");
-  emit("filter-change", { type: "category", value: "cumshot" });
+	selectedCategory.value = "cumshot";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/cumshot");
+	emit("filter-change", { type: "category", value: "cumshot" });
 }
 
 function navigateToEbony() {
-  selectedCategory.value = "ebony";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/ebony");
-  emit("filter-change", { type: "category", value: "ebony" });
+	selectedCategory.value = "ebony";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/ebony");
+	emit("filter-change", { type: "category", value: "ebony" });
 }
 
 function navigateToForWomen() {
-  selectedCategory.value = "for women";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/for-women");
-  emit("filter-change", { type: "category", value: "for women" });
+	selectedCategory.value = "for women";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/for-women");
+	emit("filter-change", { type: "category", value: "for women" });
 }
 
 function navigateToGroupSex() {
-  selectedCategory.value = "group sex";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/group-sex");
-  emit("filter-change", { type: "category", value: "group sex" });
+	selectedCategory.value = "group sex";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/group-sex");
+	emit("filter-change", { type: "category", value: "group sex" });
 }
 
 function navigateToHandjob() {
-  selectedCategory.value = "handjob";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/handjob");
-  emit("filter-change", { type: "category", value: "handjob" });
+	selectedCategory.value = "handjob";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/handjob");
+	emit("filter-change", { type: "category", value: "handjob" });
 }
 
 function navigateToHardcore() {
-  selectedCategory.value = "hardcore";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/hardcore");
-  emit("filter-change", { type: "category", value: "hardcore" });
+	selectedCategory.value = "hardcore";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/hardcore");
+	emit("filter-change", { type: "category", value: "hardcore" });
 }
 
 function navigateToHentai() {
-  selectedCategory.value = "hentai";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/hentai");
-  emit("filter-change", { type: "category", value: "hentai" });
+	selectedCategory.value = "hentai";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/hentai");
+	emit("filter-change", { type: "category", value: "hentai" });
 }
 
 function navigateToHomemade() {
-  selectedCategory.value = "homemade";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/homemade");
-  emit("filter-change", { type: "category", value: "homemade" });
+	selectedCategory.value = "homemade";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/homemade");
+	emit("filter-change", { type: "category", value: "homemade" });
 }
 
 function navigateToHotel() {
-  selectedCategory.value = "hotel";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/hotel");
-  emit("filter-change", { type: "category", value: "hotel" });
+	selectedCategory.value = "hotel";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/hotel");
+	emit("filter-change", { type: "category", value: "hotel" });
 }
 
 function navigateToHousewives() {
-  selectedCategory.value = "housewives";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/housewives");
-  emit("filter-change", { type: "category", value: "housewives" });
+	selectedCategory.value = "housewives";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/housewives");
+	emit("filter-change", { type: "category", value: "housewives" });
 }
 
 function navigateToInterracial() {
-  selectedCategory.value = "interracial";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/interracial");
-  emit("filter-change", { type: "category", value: "interracial" });
+	selectedCategory.value = "interracial";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/interracial");
+	emit("filter-change", { type: "category", value: "interracial" });
 }
 
 function navigateToLatina() {
-  selectedCategory.value = "latina";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/latina");
-  emit("filter-change", { type: "category", value: "latina" });
+	selectedCategory.value = "latina";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/latina");
+	emit("filter-change", { type: "category", value: "latina" });
 }
 
 function navigateToLesbian() {
-  selectedCategory.value = "lesbian";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/lesbian");
-  emit("filter-change", { type: "category", value: "lesbian" });
+	selectedCategory.value = "lesbian";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/lesbian");
+	emit("filter-change", { type: "category", value: "lesbian" });
 }
 
 function navigateToMassage() {
-  selectedCategory.value = "massage";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/massage");
-  emit("filter-change", { type: "category", value: "massage" });
+	selectedCategory.value = "massage";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/massage");
+	emit("filter-change", { type: "category", value: "massage" });
 }
 
 function navigateToMasturbation() {
-  selectedCategory.value = "masturbation";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/masturbation");
-  emit("filter-change", { type: "category", value: "masturbation" });
+	selectedCategory.value = "masturbation";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/masturbation");
+	emit("filter-change", { type: "category", value: "masturbation" });
 }
 
 function navigateToMature() {
-  selectedCategory.value = "mature";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/mature");
-  emit("filter-change", { type: "category", value: "mature" });
+	selectedCategory.value = "mature";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/mature");
+	emit("filter-change", { type: "category", value: "mature" });
 }
 
 function navigateToMILF() {
-  selectedCategory.value = "milf";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/milf");
-  emit("filter-change", { type: "category", value: "milf" });
+	selectedCategory.value = "milf";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/milf");
+	emit("filter-change", { type: "category", value: "milf" });
 }
 
 function navigateToNurse() {
-  selectedCategory.value = "nurse";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/nurse");
-  emit("filter-change", { type: "category", value: "nurse" });
+	selectedCategory.value = "nurse";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/nurse");
+	emit("filter-change", { type: "category", value: "nurse" });
 }
 
 function navigateToOffice() {
-  selectedCategory.value = "office";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/office");
-  emit("filter-change", { type: "category", value: "office" });
+	selectedCategory.value = "office";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/office");
+	emit("filter-change", { type: "category", value: "office" });
 }
 
 function navigateToOutdoor() {
-  selectedCategory.value = "outdoor";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/outdoor");
-  emit("filter-change", { type: "category", value: "outdoor" });
+	selectedCategory.value = "outdoor";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/outdoor");
+	emit("filter-change", { type: "category", value: "outdoor" });
 }
 
 function navigateToPOV() {
-  selectedCategory.value = "pov";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/pov");
-  emit("filter-change", { type: "category", value: "pov" });
+	selectedCategory.value = "pov";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/pov");
+	emit("filter-change", { type: "category", value: "pov" });
 }
 
 function navigateToPublic() {
-  selectedCategory.value = "public";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/public");
-  emit("filter-change", { type: "category", value: "public" });
+	selectedCategory.value = "public";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/public");
+	emit("filter-change", { type: "category", value: "public" });
 }
 
 function navigateToShemale() {
-  selectedCategory.value = "shemale";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/shemale");
-  emit("filter-change", { type: "category", value: "shemale" });
+	selectedCategory.value = "shemale";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/shemale");
+	emit("filter-change", { type: "category", value: "shemale" });
 }
 
 function navigateToSleep() {
-  selectedCategory.value = "sleep";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/sleep");
-  emit("filter-change", { type: "category", value: "sleep" });
+	selectedCategory.value = "sleep";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/sleep");
+	emit("filter-change", { type: "category", value: "sleep" });
 }
 
 function navigateToSmallTits() {
-  selectedCategory.value = "small tits";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/small-tits");
-  emit("filter-change", { type: "category", value: "small tits" });
+	selectedCategory.value = "small tits";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/small-tits");
+	emit("filter-change", { type: "category", value: "small tits" });
 }
 
 function navigateToSquirt() {
-  selectedCategory.value = "squirt";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/squirt");
-  emit("filter-change", { type: "category", value: "squirt" });
+	selectedCategory.value = "squirt";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/squirt");
+	emit("filter-change", { type: "category", value: "squirt" });
 }
 
 function navigateToVR360() {
-  selectedCategory.value = "vr 360";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/vr-360");
-  emit("filter-change", { type: "category", value: "vr 360" });
+	selectedCategory.value = "vr 360";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/vr-360");
+	emit("filter-change", { type: "category", value: "vr 360" });
 }
 
 function navigateToHD4K() {
-  selectedCategory.value = "4k hd";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/hd-4k");
-  emit("filter-change", { type: "category", value: "4k hd" });
+	selectedCategory.value = "4k hd";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/hd-4k");
+	emit("filter-change", { type: "category", value: "4k hd" });
 }
 
 function navigateToVerifiedAmateur() {
-  selectedCategory.value = "verified amateur";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/verified-amateur");
-  emit("filter-change", { type: "category", value: "verified amateur" });
+	selectedCategory.value = "verified amateur";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/verified-amateur");
+	emit("filter-change", { type: "category", value: "verified amateur" });
 }
 
 function navigateToLiveCams() {
-  selectedCategory.value = "live cam";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/live-cams");
-  emit("filter-change", { type: "category", value: "live cam" });
+	selectedCategory.value = "live cam";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/live-cams");
+	emit("filter-change", { type: "category", value: "live cam" });
 }
 
 function navigateToCompilations() {
-  selectedCategory.value = "compilation";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/compilations");
-  emit("filter-change", { type: "category", value: "compilation" });
+	selectedCategory.value = "compilation";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/compilations");
+	emit("filter-change", { type: "category", value: "compilation" });
 }
 
 function navigateToBehindTheScenes() {
-  selectedCategory.value = "behind the scenes";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/behind-the-scenes");
-  emit("filter-change", { type: "category", value: "behind the scenes" });
+	selectedCategory.value = "behind the scenes";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/behind-the-scenes");
+	emit("filter-change", { type: "category", value: "behind the scenes" });
 }
 
 function navigateToInterviews() {
-  selectedCategory.value = "interview";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/interviews");
-  emit("filter-change", { type: "category", value: "interview" });
+	selectedCategory.value = "interview";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/interviews");
+	emit("filter-change", { type: "category", value: "interview" });
 }
 
 function navigateToParodies() {
-  selectedCategory.value = "parody";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/parodies");
-  emit("filter-change", { type: "category", value: "parody" });
+	selectedCategory.value = "parody";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/parodies");
+	emit("filter-change", { type: "category", value: "parody" });
 }
 
 function navigateToDocumentaries() {
-  selectedCategory.value = "documentary";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/documentaries");
-  emit("filter-change", { type: "category", value: "documentary" });
+	selectedCategory.value = "documentary";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/documentaries");
+	emit("filter-change", { type: "category", value: "documentary" });
 }
 
 function navigateToWebcam() {
-  selectedCategory.value = "webcam";
-  selectedProduction.value = "all";
-  selectedTopNav.value = null;
-  router.push("/webcam");
-  emit("filter-change", { type: "category", value: "webcam" });
+	selectedCategory.value = "webcam";
+	selectedProduction.value = "all";
+	selectedTopNav.value = null;
+	router.push("/webcam");
+	emit("filter-change", { type: "category", value: "webcam" });
 }
 
 // Load initial categories
 onMounted(() => {
-  loadCategories(1);
+	loadCategories(1);
 
-  // Load production counts (sample - should come from API)
-  // For now, we'll estimate based on total videos
-  videosApi
-    .getAll({ limit: 1 })
-    .then((response) => {
-      const total = response.data?.total || response.data?.totalCount || 0;
-      productionItems.value[0].count = total;
-      // Estimate: 70% professional, 30% homemade
-      productionItems.value[1].count = Math.floor(total * 0.7);
-      productionItems.value[2].count = Math.floor(total * 0.3);
-    })
-    .catch(() => {
-      // Ignore errors
-    });
+	// Load production counts (sample - should come from API)
+	// For now, we'll estimate based on total videos
+	videosApi
+		.getAll({ limit: 1 })
+		.then((response) => {
+			const total = response.data?.total || response.data?.totalCount || 0;
+			productionItems.value[0].count = total;
+			// Estimate: 70% professional, 30% homemade
+			productionItems.value[1].count = Math.floor(total * 0.7);
+			productionItems.value[2].count = Math.floor(total * 0.3);
+		})
+		.catch(() => {
+			// Ignore errors
+		});
 });
 </script>
 

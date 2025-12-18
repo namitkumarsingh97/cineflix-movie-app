@@ -5,17 +5,17 @@
 </template>
 
 <script setup>
-import SkeletonCard from './SkeletonCard.vue';
+import SkeletonCard from "./SkeletonCard.vue";
 
 defineProps({
-  count: {
-    type: Number,
-    default: 12,
-  },
-  columns: {
-    type: Number,
-    default: 4,
-  },
+	count: {
+		type: Number,
+		default: 12,
+	},
+	columns: {
+		type: Number,
+		default: 4,
+	},
 });
 </script>
 

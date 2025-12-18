@@ -162,61 +162,61 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import {
-  Film,
-  Video,
-  Image,
-  Upload,
-  Sparkles,
-  Loader2,
-  X,
-  FolderOpen,
-  AlertCircle,
-  Link,
-  Star,
+	AlertCircle,
+	Film,
+	FolderOpen,
+	Image,
+	Link,
+	Loader2,
+	Sparkles,
+	Star,
+	Upload,
+	Video,
+	X,
 } from "lucide-vue-next";
+import { ref } from "vue";
 import apiClient from "../plugins/axios";
 
 const emit = defineEmits(["saved"]);
 
 const categories = [
-  "Adventure",
-  "Amateur",
-  "Anal",
-  "Asian",
-  "BDSM",
-  "Big Ass",
-  "Desi",
-  "Blowjob",
-  "Compilation",
-  "Cartoon",
-  "Cosplay",
-  "Cuckold",
-  "Ebony",
-  "Fantasy",
-  "Family",
-  "Fetish",
-  "Foot Fetish",
-  "Gangbang",
-  "Housewife",
-  "Japanese",
-  "MILF",
-  "Massage",
-  "Mature",
-  "Romance",
-  "Teen",
-  "Threesome",
-  "Other",
+	"Adventure",
+	"Amateur",
+	"Anal",
+	"Asian",
+	"BDSM",
+	"Big Ass",
+	"Desi",
+	"Blowjob",
+	"Compilation",
+	"Cartoon",
+	"Cosplay",
+	"Cuckold",
+	"Ebony",
+	"Fantasy",
+	"Family",
+	"Fetish",
+	"Foot Fetish",
+	"Gangbang",
+	"Housewife",
+	"Japanese",
+	"MILF",
+	"Massage",
+	"Mature",
+	"Romance",
+	"Teen",
+	"Threesome",
+	"Other",
 ];
 
 const movieData = ref({
-  title: "",
-  category: "",
-  stars: "",
-  iframeCode: "",
-  thumbnailFile: null,
-  thumbnailUrl: "",
+	title: "",
+	category: "",
+	stars: "",
+	iframeCode: "",
+	thumbnailFile: null,
+	thumbnailUrl: "",
 });
 
 const thumbnailType = ref("upload"); // 'upload' or 'url'
@@ -226,121 +226,121 @@ const saving = ref(false);
 const error = ref("");
 
 function handleThumbnailChange(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 5 * 1024 * 1024) {
-      error.value = "Thumbnail size should be less than 5MB";
-      return;
-    }
-    movieData.value.thumbnailFile = file;
+	const file = event.target.files[0];
+	if (file) {
+		if (file.size > 5 * 1024 * 1024) {
+			error.value = "Thumbnail size should be less than 5MB";
+			return;
+		}
+		movieData.value.thumbnailFile = file;
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      thumbnailPreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    error.value = "";
-  }
+		// Create preview
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			thumbnailPreview.value = e.target.result;
+		};
+		reader.readAsDataURL(file);
+		error.value = "";
+	}
 }
 
 function removeThumbnail() {
-  movieData.value.thumbnailFile = null;
-  thumbnailPreview.value = null;
-  const fileInput = document.getElementById("thumbnail");
-  if (fileInput) fileInput.value = "";
+	movieData.value.thumbnailFile = null;
+	thumbnailPreview.value = null;
+	const fileInput = document.getElementById("thumbnail");
+	if (fileInput) fileInput.value = "";
 }
 
 function handleUrlChange() {
-  urlPreview.value = true;
-  if (movieData.value.thumbnailUrl) {
-    // Validate URL format
-    try {
-      new URL(movieData.value.thumbnailUrl);
-    } catch (e) {
-      // Invalid URL, but let user continue typing
-    }
-  }
+	urlPreview.value = true;
+	if (movieData.value.thumbnailUrl) {
+		// Validate URL format
+		try {
+			new URL(movieData.value.thumbnailUrl);
+		} catch (e) {
+			// Invalid URL, but let user continue typing
+		}
+	}
 }
 
 function resetForm() {
-  movieData.value = {
-    title: "",
-    category: "",
-    stars: "",
-    iframeCode: "",
-    thumbnailFile: null,
-    thumbnailUrl: "",
-  };
-  thumbnailType.value = "upload";
-  thumbnailPreview.value = null;
-  urlPreview.value = true;
-  error.value = "";
-  const fileInput = document.getElementById("thumbnail");
-  if (fileInput) fileInput.value = "";
+	movieData.value = {
+		title: "",
+		category: "",
+		stars: "",
+		iframeCode: "",
+		thumbnailFile: null,
+		thumbnailUrl: "",
+	};
+	thumbnailType.value = "upload";
+	thumbnailPreview.value = null;
+	urlPreview.value = true;
+	error.value = "";
+	const fileInput = document.getElementById("thumbnail");
+	if (fileInput) fileInput.value = "";
 }
 
 async function handleSave() {
-  error.value = "";
+	error.value = "";
 
-  if (!movieData.value.title.trim()) {
-    error.value = "Please enter a movie title";
-    return;
-  }
+	if (!movieData.value.title.trim()) {
+		error.value = "Please enter a movie title";
+		return;
+	}
 
-  if (!movieData.value.category) {
-    error.value = "Please select a category";
-    return;
-  }
+	if (!movieData.value.category) {
+		error.value = "Please select a category";
+		return;
+	}
 
-  if (!movieData.value.iframeCode.trim()) {
-    error.value = "Please enter iframe code";
-    return;
-  }
+	if (!movieData.value.iframeCode.trim()) {
+		error.value = "Please enter iframe code";
+		return;
+	}
 
-  if (thumbnailType.value === "upload" && !movieData.value.thumbnailFile) {
-    error.value = "Please upload a thumbnail image";
-    return;
-  }
+	if (thumbnailType.value === "upload" && !movieData.value.thumbnailFile) {
+		error.value = "Please upload a thumbnail image";
+		return;
+	}
 
-  if (thumbnailType.value === "url" && !movieData.value.thumbnailUrl.trim()) {
-    error.value = "Please enter a thumbnail URL";
-    return;
-  }
+	if (thumbnailType.value === "url" && !movieData.value.thumbnailUrl.trim()) {
+		error.value = "Please enter a thumbnail URL";
+		return;
+	}
 
-  if (thumbnailType.value === "url") {
-    // Validate URL
-    try {
-      new URL(movieData.value.thumbnailUrl.trim());
-    } catch (e) {
-      error.value = "Please enter a valid URL";
-      return;
-    }
-  }
+	if (thumbnailType.value === "url") {
+		// Validate URL
+		try {
+			new URL(movieData.value.thumbnailUrl.trim());
+		} catch (e) {
+			error.value = "Please enter a valid URL";
+			return;
+		}
+	}
 
-  saving.value = true;
+	saving.value = true;
 
-  try {
-    // Parse iframe code
-    let iframeSrc = movieData.value.iframeCode.trim();
-    let iframeWidth = "100%";
-    let iframeHeight = "100%";
+	try {
+		// Parse iframe code
+		let iframeSrc = movieData.value.iframeCode.trim();
+		let iframeWidth = "100%";
+		let iframeHeight = "100%";
 
-    const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
-    if (iframeMatch) {
-      iframeSrc = iframeMatch[1];
-    }
+		const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
+		if (iframeMatch) {
+			iframeSrc = iframeMatch[1];
+		}
 
-    const widthMatch = movieData.value.iframeCode.match(
-      /width=["']([^"']+)["']/
-    );
-    const heightMatch = movieData.value.iframeCode.match(
-      /height=["']([^"']+)["']/
-    );
-    if (widthMatch) iframeWidth = widthMatch[1];
-    if (heightMatch) iframeHeight = heightMatch[1];
+		const widthMatch = movieData.value.iframeCode.match(
+			/width=["']([^"']+)["']/,
+		);
+		const heightMatch = movieData.value.iframeCode.match(
+			/height=["']([^"']+)["']/,
+		);
+		if (widthMatch) iframeWidth = widthMatch[1];
+		if (heightMatch) iframeHeight = heightMatch[1];
 
-    const iframeHtml = `<iframe 
+		const iframeHtml = `<iframe 
       width="${iframeWidth}" 
       height="${iframeHeight}" 
       src="${iframeSrc}" 
@@ -351,62 +351,65 @@ async function handleSave() {
       style="border: none;"
     ></iframe>`;
 
-    // Prepare stars array
-    let starsArray = [];
-    if (movieData.value.stars && movieData.value.stars.trim()) {
-      starsArray = movieData.value.stars.split(',').map(s => s.trim()).filter(s => s);
-    }
+		// Prepare stars array
+		let starsArray = [];
+		if (movieData.value.stars && movieData.value.stars.trim()) {
+			starsArray = movieData.value.stars
+				.split(",")
+				.map((s) => s.trim())
+				.filter((s) => s);
+		}
 
-    // Create FormData for file upload or JSON for URL
-    if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
-      const formData = new FormData();
-      formData.append("title", movieData.value.title.trim());
-      formData.append("category", movieData.value.category);
-      if (starsArray.length > 0) {
-        formData.append("stars", JSON.stringify(starsArray));
-      }
-      formData.append("iframe", iframeHtml);
-      formData.append("iframeSrc", iframeSrc);
-      formData.append("thumbnail", movieData.value.thumbnailFile);
+		// Create FormData for file upload or JSON for URL
+		if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
+			const formData = new FormData();
+			formData.append("title", movieData.value.title.trim());
+			formData.append("category", movieData.value.category);
+			if (starsArray.length > 0) {
+				formData.append("stars", JSON.stringify(starsArray));
+			}
+			formData.append("iframe", iframeHtml);
+			formData.append("iframeSrc", iframeSrc);
+			formData.append("thumbnail", movieData.value.thumbnailFile);
 
-      const response = await apiClient.post("/movies", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+			const response = await apiClient.post("/movies", formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
 
-      if (response.data.success) {
-        emit("saved");
-        resetForm();
-      }
-    } else {
-      // Use JSON for URL thumbnail
-      const requestData = {
-        title: movieData.value.title.trim(),
-        category: movieData.value.category,
-        iframe: iframeHtml,
-        iframeSrc: iframeSrc,
-        thumbnail: movieData.value.thumbnailUrl.trim(),
-      };
-      if (starsArray.length > 0) {
-        requestData.stars = starsArray;
-      }
+			if (response.data.success) {
+				emit("saved");
+				resetForm();
+			}
+		} else {
+			// Use JSON for URL thumbnail
+			const requestData = {
+				title: movieData.value.title.trim(),
+				category: movieData.value.category,
+				iframe: iframeHtml,
+				iframeSrc: iframeSrc,
+				thumbnail: movieData.value.thumbnailUrl.trim(),
+			};
+			if (starsArray.length > 0) {
+				requestData.stars = starsArray;
+			}
 
-      const response = await apiClient.post("/movies", requestData);
+			const response = await apiClient.post("/movies", requestData);
 
-      if (response.data.success) {
-        emit("saved");
-        resetForm();
-      }
-    }
-  } catch (err) {
-    error.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      "Failed to save movie. Please try again.";
-  } finally {
-    saving.value = false;
-  }
+			if (response.data.success) {
+				emit("saved");
+				resetForm();
+			}
+		}
+	} catch (err) {
+		error.value =
+			err.response?.data?.error ||
+			err.response?.data?.message ||
+			"Failed to save movie. Please try again.";
+	} finally {
+		saving.value = false;
+	}
 }
 </script>
 

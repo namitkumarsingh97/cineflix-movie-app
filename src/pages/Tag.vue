@@ -84,180 +84,188 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useEporner } from '../composables/useEporner';
-import SkeletonSection from '../components/SkeletonSection.vue';
-import VideoCard from '../components/VideoCard.vue';
-import CategorySidebar from '../components/CategorySidebar.vue';
-import { Video, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, Video } from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import CategorySidebar from "../components/CategorySidebar.vue";
+import SkeletonSection from "../components/SkeletonSection.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { useEporner } from "../composables/useEporner";
 
 const route = useRoute();
 const router = useRouter();
-const {
-  videos,
-  loading,
-  currentPage,
-  totalPages,
-  totalCount,
-  searchVideos,
-} = useEporner();
+const { videos, loading, currentPage, totalPages, totalCount, searchVideos } =
+	useEporner();
 
 const sidebarOpen = ref(true);
 
 function handleFilterChange(filter) {
-  console.log('Filter changed:', filter);
+	console.log("Filter changed:", filter);
 }
 
 const maxThumbnailsPerPage = 30;
 
 // Decode tag from URL
 const decodedTag = computed(() => {
-  const tagParam = route.params.tag;
-  if (!tagParam) return '';
-  try {
-    return decodeURIComponent(tagParam);
-  } catch (e) {
-    return tagParam;
-  }
+	const tagParam = route.params.tag;
+	if (!tagParam) return "";
+	try {
+		return decodeURIComponent(tagParam);
+	} catch (e) {
+		return tagParam;
+	}
 });
 
 // Computed for display total pages (capped at 1000)
 const displayTotalPages = computed(() => {
-  const total = totalPages.value;
-  if (total > 1000) {
-    return '1000+';
-  }
-  return total.toString();
+	const total = totalPages.value;
+	if (total > 1000) {
+		return "1000+";
+	}
+	return total.toString();
 });
 
 // Calculate visible pages for pagination
 const visiblePages = computed(() => {
-  const pages = [];
-  const total = Math.min(totalPages.value, 1000);
-  const current = currentPage.value;
+	const pages = [];
+	const total = Math.min(totalPages.value, 1000);
+	const current = currentPage.value;
 
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    pages.push(1);
+	if (total <= 7) {
+		for (let i = 1; i <= total; i++) {
+			pages.push(i);
+		}
+	} else {
+		pages.push(1);
 
-    if (current > 3) {
-      pages.push('...');
-    }
+		if (current > 3) {
+			pages.push("...");
+		}
 
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
+		const start = Math.max(2, current - 1);
+		const end = Math.min(total - 1, current + 1);
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+		for (let i = start; i <= end; i++) {
+			pages.push(i);
+		}
 
-    if (current < total - 2) {
-      pages.push('...');
-    }
+		if (current < total - 2) {
+			pages.push("...");
+		}
 
-    pages.push(total);
-  }
+		pages.push(total);
+	}
 
-  return pages;
+	return pages;
 });
 
 // Navigate to video
-import { generateWatchUrl } from '../utils/slug';
+import { generateWatchUrl } from "../utils/slug";
 
 function navigateToVideo(video) {
-  const url = generateWatchUrl(video, { source: 'eporner' });
-  router.push(url);
+	const url = generateWatchUrl(video, { source: "eporner" });
+	router.push(url);
 }
 
 // Update URL with page parameter
 function updateUrlPage(page) {
-  const query = { ...route.query };
-  
-  if (page === 1) {
-    delete query.page;
-  } else {
-    query.page = page.toString();
-  }
-  
-  router.push({ 
-    path: route.path,
-    query: query
-  });
+	const query = { ...route.query };
+
+	if (page === 1) {
+		delete query.page;
+	} else {
+		query.page = page.toString();
+	}
+
+	router.push({
+		path: route.path,
+		query: query,
+	});
 }
 
 // Go to page
 function goToPage(page) {
-  if (page === '...' || page < 1 || page > totalPages.value) return;
-  
-  // Update URL first
-  updateUrlPage(page);
-  
-  // Then load videos
-  const tag = decodedTag.value;
-  if (!tag) return;
-  
-  searchVideos(tag, page, { order: 'most-popular' });
-  
-  // Scroll to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+	if (page === "..." || page < 1 || page > totalPages.value) return;
+
+	// Update URL first
+	updateUrlPage(page);
+
+	// Then load videos
+	const tag = decodedTag.value;
+	if (!tag) return;
+
+	searchVideos(tag, page, { order: "most-popular" });
+
+	// Scroll to top
+	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Load videos when tag changes
 function loadVideos() {
-  const tag = decodedTag.value;
-  if (!tag) return;
-  
-  // Get page from URL or default to 1
-  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
-  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
-  
-  searchVideos(tag, page, { order: 'most-popular' });
+	const tag = decodedTag.value;
+	if (!tag) return;
+
+	// Get page from URL or default to 1
+	const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+	const page = urlPage > 0 && !isNaN(urlPage) ? urlPage : 1;
+
+	searchVideos(tag, page, { order: "most-popular" });
 }
 
 // Watch for route changes
-watch(() => route.params.tag, () => {
-  loadVideos();
-}, { immediate: true });
+watch(
+	() => route.params.tag,
+	() => {
+		loadVideos();
+	},
+	{ immediate: true },
+);
 
 // Watch for page parameter changes (browser back/forward)
-watch(() => route.query.page, (newPageParam) => {
-  if (newPageParam) {
-    const page = parseInt(newPageParam, 10);
-    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
-      const tag = decodedTag.value;
-      if (tag) {
-        searchVideos(tag, page, { order: 'most-popular' });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }
-  } else if (currentPage.value !== 1) {
-    // If no page param and we're not on page 1, reset to 1
-    const tag = decodedTag.value;
-    if (tag) {
-      searchVideos(tag, 1, { order: 'most-popular' });
-    }
-  }
-}, { immediate: false });
+watch(
+	() => route.query.page,
+	(newPageParam) => {
+		if (newPageParam) {
+			const page = parseInt(newPageParam, 10);
+			if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+				const tag = decodedTag.value;
+				if (tag) {
+					searchVideos(tag, page, { order: "most-popular" });
+					window.scrollTo({ top: 0, behavior: "smooth" });
+				}
+			}
+		} else if (currentPage.value !== 1) {
+			// If no page param and we're not on page 1, reset to 1
+			const tag = decodedTag.value;
+			if (tag) {
+				searchVideos(tag, 1, { order: "most-popular" });
+			}
+		}
+	},
+	{ immediate: false },
+);
 
 // Update page title when tag changes
-watch(decodedTag, (newTag) => {
-  if (newTag) {
-    // Capitalize each word in the tag
-    const formattedTag = newTag
-      .split(/[\s-]+/)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-    document.title = `${formattedTag} - Cineflix`;
-  }
-}, { immediate: true });
+watch(
+	decodedTag,
+	(newTag) => {
+		if (newTag) {
+			// Capitalize each word in the tag
+			const formattedTag = newTag
+				.split(/[\s-]+/)
+				.map(
+					(word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+				)
+				.join(" ");
+			document.title = `${formattedTag} - Cineflix`;
+		}
+	},
+	{ immediate: true },
+);
 
 // Load videos on mount
 onMounted(() => {
-  loadVideos();
+	loadVideos();
 });
 </script>
 

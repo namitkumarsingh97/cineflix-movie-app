@@ -38,72 +38,72 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
-  choicePoint: {
-    type: Object,
-    required: true,
-  },
-  choices: {
-    type: Array,
-    required: true,
-  },
-  selectedChoices: {
-    type: Object,
-    default: () => ({}),
-  },
-  allowSkip: {
-    type: Boolean,
-    default: false,
-  },
-  timeLimit: {
-    type: Number,
-    default: 0, // 0 = no time limit
-  },
+	choicePoint: {
+		type: Object,
+		required: true,
+	},
+	choices: {
+		type: Array,
+		required: true,
+	},
+	selectedChoices: {
+		type: Object,
+		default: () => ({}),
+	},
+	allowSkip: {
+		type: Boolean,
+		default: false,
+	},
+	timeLimit: {
+		type: Number,
+		default: 0, // 0 = no time limit
+	},
 });
 
-const emit = defineEmits(['choice', 'skip']);
+const emit = defineEmits(["choice", "skip"]);
 
 const timeRemaining = ref(props.timeLimit);
 let timerInterval = null;
 
 function handleChoice(choice) {
-  emit('choice', {
-    choicePointId: props.choicePoint.id,
-    choiceId: choice.id,
-  });
+	emit("choice", {
+		choicePointId: props.choicePoint.id,
+		choiceId: choice.id,
+	});
 }
 
 function formatTime(seconds) {
-  if (seconds <= 0) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+	if (seconds <= 0) return "0:00";
+	const mins = Math.floor(seconds / 60);
+	const secs = Math.floor(seconds % 60);
+	return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 onMounted(() => {
-  if (props.timeLimit > 0) {
-    timeRemaining.value = props.timeLimit;
-    timerInterval = setInterval(() => {
-      timeRemaining.value--;
-      if (timeRemaining.value <= 0) {
-        clearInterval(timerInterval);
-        // Auto-select first choice or skip
-        if (props.choices.length > 0) {
-          handleChoice(props.choices[0]);
-        } else {
-          emit('skip');
-        }
-      }
-    }, 1000);
-  }
+	if (props.timeLimit > 0) {
+		timeRemaining.value = props.timeLimit;
+		timerInterval = setInterval(() => {
+			timeRemaining.value--;
+			if (timeRemaining.value <= 0) {
+				clearInterval(timerInterval);
+				// Auto-select first choice or skip
+				if (props.choices.length > 0) {
+					handleChoice(props.choices[0]);
+				} else {
+					emit("skip");
+				}
+			}
+		}, 1000);
+	}
 });
 
 onBeforeUnmount(() => {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-  }
+	if (timerInterval) {
+		clearInterval(timerInterval);
+	}
 });
 </script>
 

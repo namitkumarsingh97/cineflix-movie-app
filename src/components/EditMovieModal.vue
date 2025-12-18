@@ -175,73 +175,73 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
 import {
-  Film,
-  Video,
-  Image,
-  Upload,
-  Save,
-  Loader2,
-  X,
-  FolderOpen,
-  AlertCircle,
-  Edit,
-  Link,
-  Star,
+	AlertCircle,
+	Edit,
+	Film,
+	FolderOpen,
+	Image,
+	Link,
+	Loader2,
+	Save,
+	Star,
+	Upload,
+	Video,
+	X,
 } from "lucide-vue-next";
+import { ref, watch } from "vue";
 import apiClient from "../plugins/axios";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  movie: {
-    type: Object,
-    default: null,
-  },
+	show: {
+		type: Boolean,
+		default: false,
+	},
+	movie: {
+		type: Object,
+		default: null,
+	},
 });
 
 const emit = defineEmits(["close", "saved"]);
 
 const categories = [
-  "Adventure",
-  "Amateur",
-  "Anal",
-  "Asian",
-  "BDSM",
-  "Big Ass",
-  "Desi",
-  "Blowjob",
-  "Compilation",
-  "Cartoon",
-  "Cosplay",
-  "Cuckold",
-  "Ebony",
-  "Fantasy",
-  "Family",
-  "Fetish",
-  "Foot Fetish",
-  "Gangbang",
-  "Housewife",
-  "Japanese",
-  "MILF",
-  "Massage",
-  "Mature",
-  "Romance",
-  "Teen",
-  "Threesome",
-  "Other",
+	"Adventure",
+	"Amateur",
+	"Anal",
+	"Asian",
+	"BDSM",
+	"Big Ass",
+	"Desi",
+	"Blowjob",
+	"Compilation",
+	"Cartoon",
+	"Cosplay",
+	"Cuckold",
+	"Ebony",
+	"Fantasy",
+	"Family",
+	"Fetish",
+	"Foot Fetish",
+	"Gangbang",
+	"Housewife",
+	"Japanese",
+	"MILF",
+	"Massage",
+	"Mature",
+	"Romance",
+	"Teen",
+	"Threesome",
+	"Other",
 ];
 
 const movieData = ref({
-  title: "",
-  category: "",
-  stars: "",
-  iframeCode: "",
-  thumbnailFile: null,
-  thumbnailUrl: "",
+	title: "",
+	category: "",
+	stars: "",
+	iframeCode: "",
+	thumbnailFile: null,
+	thumbnailUrl: "",
 });
 
 const thumbnailType = ref("url");
@@ -251,120 +251,120 @@ const saving = ref(false);
 const error = ref("");
 
 watch(
-  () => props.movie,
-  (newMovie) => {
-    if (newMovie) {
-      // Convert stars array to comma-separated string
-      let starsString = "";
-      if (newMovie.stars && Array.isArray(newMovie.stars)) {
-        starsString = newMovie.stars.join(", ");
-      } else if (newMovie.stars && typeof newMovie.stars === "string") {
-        starsString = newMovie.stars;
-      }
-      
-      movieData.value = {
-        title: newMovie.title || "",
-        category: newMovie.category || "",
-        stars: starsString,
-        iframeCode: newMovie.iframe || "",
-        thumbnailFile: null,
-        thumbnailUrl: newMovie.thumbnail || "",
-      };
-      thumbnailType.value = newMovie.thumbnail ? "url" : "upload";
-      thumbnailPreview.value = null;
-      urlPreview.value = true;
-    }
-  }
+	() => props.movie,
+	(newMovie) => {
+		if (newMovie) {
+			// Convert stars array to comma-separated string
+			let starsString = "";
+			if (newMovie.stars && Array.isArray(newMovie.stars)) {
+				starsString = newMovie.stars.join(", ");
+			} else if (newMovie.stars && typeof newMovie.stars === "string") {
+				starsString = newMovie.stars;
+			}
+
+			movieData.value = {
+				title: newMovie.title || "",
+				category: newMovie.category || "",
+				stars: starsString,
+				iframeCode: newMovie.iframe || "",
+				thumbnailFile: null,
+				thumbnailUrl: newMovie.thumbnail || "",
+			};
+			thumbnailType.value = newMovie.thumbnail ? "url" : "upload";
+			thumbnailPreview.value = null;
+			urlPreview.value = true;
+		}
+	},
 );
 
 watch(
-  () => props.show,
-  (newVal) => {
-    if (!newVal) {
-      resetForm();
-    }
-  }
+	() => props.show,
+	(newVal) => {
+		if (!newVal) {
+			resetForm();
+		}
+	},
 );
 
 function handleThumbnailChange(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 5 * 1024 * 1024) {
-      error.value = "Thumbnail size should be less than 5MB";
-      return;
-    }
-    movieData.value.thumbnailFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      thumbnailPreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    error.value = "";
-  }
+	const file = event.target.files[0];
+	if (file) {
+		if (file.size > 5 * 1024 * 1024) {
+			error.value = "Thumbnail size should be less than 5MB";
+			return;
+		}
+		movieData.value.thumbnailFile = file;
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			thumbnailPreview.value = e.target.result;
+		};
+		reader.readAsDataURL(file);
+		error.value = "";
+	}
 }
 
 function removeThumbnail() {
-  movieData.value.thumbnailFile = null;
-  thumbnailPreview.value = null;
-  const fileInput = document.getElementById("editThumbnail");
-  if (fileInput) fileInput.value = "";
+	movieData.value.thumbnailFile = null;
+	thumbnailPreview.value = null;
+	const fileInput = document.getElementById("editThumbnail");
+	if (fileInput) fileInput.value = "";
 }
 
 function handleUrlChange() {
-  urlPreview.value = true;
+	urlPreview.value = true;
 }
 
 function resetForm() {
-  movieData.value = {
-    title: "",
-    category: "",
-    stars: "",
-    iframeCode: "",
-    thumbnailFile: null,
-    thumbnailUrl: "",
-  };
-  thumbnailType.value = "url";
-  thumbnailPreview.value = null;
-  urlPreview.value = true;
-  error.value = "";
+	movieData.value = {
+		title: "",
+		category: "",
+		stars: "",
+		iframeCode: "",
+		thumbnailFile: null,
+		thumbnailUrl: "",
+	};
+	thumbnailType.value = "url";
+	thumbnailPreview.value = null;
+	urlPreview.value = true;
+	error.value = "";
 }
 
 async function handleSave() {
-  error.value = "";
+	error.value = "";
 
-  if (!movieData.value.title.trim()) {
-    error.value = "Please enter a movie title";
-    return;
-  }
+	if (!movieData.value.title.trim()) {
+		error.value = "Please enter a movie title";
+		return;
+	}
 
-  if (!movieData.value.iframeCode.trim()) {
-    error.value = "Please enter iframe code";
-    return;
-  }
+	if (!movieData.value.iframeCode.trim()) {
+		error.value = "Please enter iframe code";
+		return;
+	}
 
-  saving.value = true;
+	saving.value = true;
 
-  try {
-    // Parse iframe code
-    let iframeSrc = movieData.value.iframeCode.trim();
-    let iframeWidth = "100%";
-    let iframeHeight = "100%";
+	try {
+		// Parse iframe code
+		let iframeSrc = movieData.value.iframeCode.trim();
+		let iframeWidth = "100%";
+		let iframeHeight = "100%";
 
-    const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
-    if (iframeMatch) {
-      iframeSrc = iframeMatch[1];
-    }
+		const iframeMatch = iframeSrc.match(/src=["']([^"']+)["']/);
+		if (iframeMatch) {
+			iframeSrc = iframeMatch[1];
+		}
 
-    const widthMatch = movieData.value.iframeCode.match(
-      /width=["']([^"']+)["']/
-    );
-    const heightMatch = movieData.value.iframeCode.match(
-      /height=["']([^"']+)["']/
-    );
-    if (widthMatch) iframeWidth = widthMatch[1];
-    if (heightMatch) iframeHeight = heightMatch[1];
+		const widthMatch = movieData.value.iframeCode.match(
+			/width=["']([^"']+)["']/,
+		);
+		const heightMatch = movieData.value.iframeCode.match(
+			/height=["']([^"']+)["']/,
+		);
+		if (widthMatch) iframeWidth = widthMatch[1];
+		if (heightMatch) iframeHeight = heightMatch[1];
 
-    const iframeHtml = `<iframe 
+		const iframeHtml = `<iframe 
       width="${iframeWidth}" 
       height="${iframeHeight}" 
       src="${iframeSrc}" 
@@ -375,56 +375,59 @@ async function handleSave() {
       style="border: none;"
     ></iframe>`;
 
-    // Prepare stars array
-    let starsArray = [];
-    if (movieData.value.stars && movieData.value.stars.trim()) {
-      starsArray = movieData.value.stars.split(',').map(s => s.trim()).filter(s => s);
-    }
+		// Prepare stars array
+		let starsArray = [];
+		if (movieData.value.stars && movieData.value.stars.trim()) {
+			starsArray = movieData.value.stars
+				.split(",")
+				.map((s) => s.trim())
+				.filter((s) => s);
+		}
 
-    if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
-      const formData = new FormData();
-      formData.append("title", movieData.value.title.trim());
-      formData.append("category", movieData.value.category || "");
-      if (starsArray.length > 0) {
-        formData.append("stars", JSON.stringify(starsArray));
-      }
-      formData.append("iframe", iframeHtml);
-      formData.append("iframeSrc", iframeSrc);
-      formData.append("thumbnail", movieData.value.thumbnailFile);
+		if (thumbnailType.value === "upload" && movieData.value.thumbnailFile) {
+			const formData = new FormData();
+			formData.append("title", movieData.value.title.trim());
+			formData.append("category", movieData.value.category || "");
+			if (starsArray.length > 0) {
+				formData.append("stars", JSON.stringify(starsArray));
+			}
+			formData.append("iframe", iframeHtml);
+			formData.append("iframeSrc", iframeSrc);
+			formData.append("thumbnail", movieData.value.thumbnailFile);
 
-      await apiClient.put(`/movies/${props.movie._id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-    } else {
-      const updateData = {
-        title: movieData.value.title.trim(),
-        category: movieData.value.category || "",
-        iframe: iframeHtml,
-        iframeSrc: iframeSrc,
-        thumbnail:
-          thumbnailType.value === "url" && movieData.value.thumbnailUrl.trim()
-            ? movieData.value.thumbnailUrl.trim()
-            : undefined,
-      };
-      if (starsArray.length > 0) {
-        updateData.stars = starsArray;
-      }
-      
-      await apiClient.put(`/movies/${props.movie._id}`, updateData);
-    }
+			await apiClient.put(`/movies/${props.movie._id}`, formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+		} else {
+			const updateData = {
+				title: movieData.value.title.trim(),
+				category: movieData.value.category || "",
+				iframe: iframeHtml,
+				iframeSrc: iframeSrc,
+				thumbnail:
+					thumbnailType.value === "url" && movieData.value.thumbnailUrl.trim()
+						? movieData.value.thumbnailUrl.trim()
+						: undefined,
+			};
+			if (starsArray.length > 0) {
+				updateData.stars = starsArray;
+			}
 
-    emit("saved");
-    emit("close");
-  } catch (err) {
-    error.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      "Failed to update movie. Please try again.";
-  } finally {
-    saving.value = false;
-  }
+			await apiClient.put(`/movies/${props.movie._id}`, updateData);
+		}
+
+		emit("saved");
+		emit("close");
+	} catch (err) {
+		error.value =
+			err.response?.data?.error ||
+			err.response?.data?.message ||
+			"Failed to update movie. Please try again.";
+	} finally {
+		saving.value = false;
+	}
 }
 </script>
 

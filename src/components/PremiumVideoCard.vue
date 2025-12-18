@@ -44,42 +44,42 @@
 </template>
 
 <script setup>
-import { Lock, Crown, Play, Eye, Star } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
-import OptimizedImage from './OptimizedImage.vue';
-import { formatDuration, formatViews } from '../utils/date';
+import { Crown, Eye, Lock, Play, Star } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+import { formatDuration, formatViews } from "../utils/date";
+import OptimizedImage from "./OptimizedImage.vue";
 
 const props = defineProps({
-  video: {
-    type: Object,
-    required: true,
-  },
-  isPremium: {
-    type: Boolean,
-    default: false,
-  },
+	video: {
+		type: Object,
+		required: true,
+	},
+	isPremium: {
+		type: Boolean,
+		default: false,
+	},
 });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits(["click"]);
 const router = useRouter();
 
 function handleClick(event) {
-  // ALWAYS prevent default and stop ALL propagation
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-  }
-  
-  // FORCE redirect to premium page - NO other navigation allowed in this section
-  // Even if user is premium, all clicks in premium section go to premium page
-  console.log('Premium section: All clicks blocked, redirecting to /premium');
-  router.push('/premium').catch(() => {});
-  return false;
+	// ALWAYS prevent default and stop ALL propagation
+	if (event) {
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+	}
+
+	// FORCE redirect to premium page - NO other navigation allowed in this section
+	// Even if user is premium, all clicks in premium section go to premium page
+	console.log("Premium section: All clicks blocked, redirecting to /premium");
+	router.push("/premium").catch(() => {});
+	return false;
 }
 
 function getDefaultThumbnail() {
-  return 'https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video';
+	return "https://via.placeholder.com/320x180/1a1a2e/ffffff?text=Video";
 }
 </script>
 

@@ -131,225 +131,237 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { FileText, ChevronRight, Star, ChevronLeft, Languages, Search } from 'lucide-vue-next';
-import { useStories } from '../composables/useStories';
-import Loader from '../components/Loader.vue';
+import {
+	ChevronLeft,
+	ChevronRight,
+	FileText,
+	Languages,
+	Search,
+	Star,
+} from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Loader from "../components/Loader.vue";
+import { useStories } from "../composables/useStories";
 
 const router = useRouter();
 const route = useRoute();
 const {
-  stories,
-  loading,
-  error,
-  currentPage,
-  totalPages,
-  totalCount,
-  selectedLanguage,
-  languages,
-  categories,
-  fetchStories,
-  filterByCategory,
-  filterByLanguage,
+	stories,
+	loading,
+	error,
+	currentPage,
+	totalPages,
+	totalCount,
+	selectedLanguage,
+	languages,
+	categories,
+	fetchStories,
+	filterByCategory,
+	filterByLanguage,
 } = useStories();
 
-const selectedCategory = ref('');
-const searchQuery = ref('');
+const selectedCategory = ref("");
+const searchQuery = ref("");
 
 // Update URL with page parameter
 function updateUrlPage(page) {
-  const query = { ...route.query };
-  
-  if (page === 1) {
-    delete query.page;
-  } else {
-    query.page = page.toString();
-  }
-  
-  router.push({ 
-    path: '/stories',
-    query: query
-  });
+	const query = { ...route.query };
+
+	if (page === 1) {
+		delete query.page;
+	} else {
+		query.page = page.toString();
+	}
+
+	router.push({
+		path: "/stories",
+		query: query,
+	});
 }
 
 onMounted(async () => {
-  // Get page from URL or default to 1
-  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
-  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
-  
-  // Load stories with page from URL
-  await fetchStories(page, {
-    limit: 20,
-    category: route.query.category || selectedCategory.value || undefined,
-    search: route.query.search || searchQuery.value || undefined,
-  });
+	// Get page from URL or default to 1
+	const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+	const page = urlPage > 0 && !isNaN(urlPage) ? urlPage : 1;
+
+	// Load stories with page from URL
+	await fetchStories(page, {
+		limit: 20,
+		category: route.query.category || selectedCategory.value || undefined,
+		search: route.query.search || searchQuery.value || undefined,
+	});
 });
 
 async function loadStories() {
-  const options = {
-    limit: 20,
-    category: selectedCategory.value || undefined,
-    search: searchQuery.value || undefined,
-  };
-  await fetchStories(currentPage.value, options);
+	const options = {
+		limit: 20,
+		category: selectedCategory.value || undefined,
+		search: searchQuery.value || undefined,
+	};
+	await fetchStories(currentPage.value, options);
 }
 
 async function handleSearch() {
-  // Update URL with search query and reset to page 1
-  router.push({ 
-    path: '/stories',
-    query: { 
-      ...route.query,
-      search: searchQuery.value.trim() || undefined,
-      page: undefined // Reset to page 1
-    }
-  });
-  
-  if (searchQuery.value.trim()) {
-    await fetchStories(1, { search: searchQuery.value.trim() });
-  } else {
-    await loadStories();
-  }
+	// Update URL with search query and reset to page 1
+	router.push({
+		path: "/stories",
+		query: {
+			...route.query,
+			search: searchQuery.value.trim() || undefined,
+			page: undefined, // Reset to page 1
+		},
+	});
+
+	if (searchQuery.value.trim()) {
+		await fetchStories(1, { search: searchQuery.value.trim() });
+	} else {
+		await loadStories();
+	}
 }
 
 async function handleCategoryChange() {
-  // Update URL with category and reset to page 1
-  router.push({ 
-    path: '/stories',
-    query: { 
-      ...route.query,
-      category: selectedCategory.value || undefined,
-      page: undefined // Reset to page 1
-    }
-  });
-  await loadStories();
+	// Update URL with category and reset to page 1
+	router.push({
+		path: "/stories",
+		query: {
+			...route.query,
+			category: selectedCategory.value || undefined,
+			page: undefined, // Reset to page 1
+		},
+	});
+	await loadStories();
 }
 
 async function handleLanguageChange() {
-  // Update URL with language and reset to page 1
-  router.push({ 
-    path: '/stories',
-    query: { 
-      ...route.query,
-      language: selectedLanguage.value !== 'all' ? selectedLanguage.value : undefined,
-      page: undefined // Reset to page 1
-    }
-  });
-  await filterByLanguage(selectedLanguage.value, 1);
+	// Update URL with language and reset to page 1
+	router.push({
+		path: "/stories",
+		query: {
+			...route.query,
+			language:
+				selectedLanguage.value !== "all" ? selectedLanguage.value : undefined,
+			page: undefined, // Reset to page 1
+		},
+	});
+	await filterByLanguage(selectedLanguage.value, 1);
 }
 
 // Watch for language changes
 watch(selectedLanguage, () => {
-  handleLanguageChange();
+	handleLanguageChange();
 });
 
 // Watch for page parameter changes (browser back/forward)
-watch(() => route.query.page, async (newPageParam) => {
-  if (newPageParam) {
-    const page = parseInt(newPageParam, 10);
-    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
-      await fetchStories(page, {
-        limit: 20,
-        category: selectedCategory.value || undefined,
-        search: searchQuery.value || undefined,
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  } else if (currentPage.value !== 1) {
-    // If no page param and we're not on page 1, reset to 1
-    await fetchStories(1, {
-      limit: 20,
-      category: selectedCategory.value || undefined,
-      search: searchQuery.value || undefined,
-    });
-  }
-}, { immediate: false });
+watch(
+	() => route.query.page,
+	async (newPageParam) => {
+		if (newPageParam) {
+			const page = parseInt(newPageParam, 10);
+			if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+				await fetchStories(page, {
+					limit: 20,
+					category: selectedCategory.value || undefined,
+					search: searchQuery.value || undefined,
+				});
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			}
+		} else if (currentPage.value !== 1) {
+			// If no page param and we're not on page 1, reset to 1
+			await fetchStories(1, {
+				limit: 20,
+				category: selectedCategory.value || undefined,
+				search: searchQuery.value || undefined,
+			});
+		}
+	},
+	{ immediate: false },
+);
 
 async function changePage(page) {
-  if (page >= 1 && page <= totalPages.value) {
-    // Update URL first
-    updateUrlPage(page);
-    
-    // Then load stories
-    await fetchStories(page, {
-      limit: 20,
-      category: selectedCategory.value || undefined,
-      search: searchQuery.value || undefined,
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+	if (page >= 1 && page <= totalPages.value) {
+		// Update URL first
+		updateUrlPage(page);
+
+		// Then load stories
+		await fetchStories(page, {
+			limit: 20,
+			category: selectedCategory.value || undefined,
+			search: searchQuery.value || undefined,
+		});
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	}
 }
 
 const visiblePages = computed(() => {
-  const current = currentPage.value;
-  const total = totalPages.value;
-  const pages = [];
-  
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    if (current <= 3) {
-      for (let i = 1; i <= 5; i++) pages.push(i);
-      pages.push('...');
-      pages.push(total);
-    } else if (current >= total - 2) {
-      pages.push(1);
-      pages.push('...');
-      for (let i = total - 4; i <= total; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      pages.push('...');
-      for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-      pages.push('...');
-      pages.push(total);
-    }
-  }
-  
-  return pages;
+	const current = currentPage.value;
+	const total = totalPages.value;
+	const pages = [];
+
+	if (total <= 7) {
+		for (let i = 1; i <= total; i++) {
+			pages.push(i);
+		}
+	} else {
+		if (current <= 3) {
+			for (let i = 1; i <= 5; i++) pages.push(i);
+			pages.push("...");
+			pages.push(total);
+		} else if (current >= total - 2) {
+			pages.push(1);
+			pages.push("...");
+			for (let i = total - 4; i <= total; i++) pages.push(i);
+		} else {
+			pages.push(1);
+			pages.push("...");
+			for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+			pages.push("...");
+			pages.push(total);
+		}
+	}
+
+	return pages;
 });
 
 function openStory(id) {
-  router.push(`/story/${id}`);
+	router.push(`/story/${id}`);
 }
 
 function formatNumber(num) {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K';
-  }
-  return num.toString();
+	if (num >= 1000000) {
+		return (num / 1000000).toFixed(1) + "M";
+	}
+	if (num >= 1000) {
+		return (num / 1000).toFixed(1) + "K";
+	}
+	return num.toString();
 }
 
 function formatTimeAgo(date) {
-  if (!date) return 'N/A';
-  const now = new Date();
-  const storyDate = new Date(date);
-  const diffMs = now - storyDate;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+	if (!date) return "N/A";
+	const now = new Date();
+	const storyDate = new Date(date);
+	const diffMs = now - storyDate;
+	const diffMins = Math.floor(diffMs / 60000);
+	const diffHours = Math.floor(diffMs / 3600000);
+	const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  return storyDate.toLocaleDateString();
+	if (diffMins < 1) return "Just now";
+	if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+	if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+	if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+	return storyDate.toLocaleDateString();
 }
 
 function getRating(story) {
-  // Simple rating based on views and likes
-  const views = story.views || 0;
-  const likes = story.likes || 0;
-  if (views > 10000 && likes > 100) return 5;
-  if (views > 5000 && likes > 50) return 4;
-  if (views > 1000 && likes > 10) return 3;
-  if (views > 100) return 2;
-  return 1;
+	// Simple rating based on views and likes
+	const views = story.views || 0;
+	const likes = story.likes || 0;
+	if (views > 10000 && likes > 100) return 5;
+	if (views > 5000 && likes > 50) return 4;
+	if (views > 1000 && likes > 10) return 3;
+	if (views > 100) return 2;
+	return 1;
 }
 </script>
 

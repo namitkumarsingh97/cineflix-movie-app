@@ -86,20 +86,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, FolderOpen, Film } from 'lucide-vue-next';
-import { moviesApi } from '../api/movies';
-import { videosApi } from '../api/videos';
-import VideoCard from '../components/VideoCard.vue';
-import Loader from '../components/Loader.vue';
+import { ArrowLeft, Film, FolderOpen } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { moviesApi } from "../api/movies";
+import { videosApi } from "../api/videos";
+import Loader from "../components/Loader.vue";
+import VideoCard from "../components/VideoCard.vue";
 
 const route = useRoute();
 const router = useRouter();
 
 const videos = ref([]);
 const loading = ref(true);
-const sortOrder = ref('latest');
+const sortOrder = ref("latest");
 
 const videoPage = ref(1);
 const pageSize = ref(20);
@@ -108,62 +108,61 @@ const videoTotal = ref(0);
 const videoTotalPages = ref(1);
 
 const categoryName = computed(() => {
-  return decodeURIComponent(route.params.category || 'Uncategorized');
+	return decodeURIComponent(route.params.category || "Uncategorized");
 });
 
 const totalItems = computed(() => {
-  return videoTotal.value;
+	return videoTotal.value;
 });
 
 onMounted(async () => {
-  await loadVideos();
+	await loadVideos();
 });
 
 async function loadVideos(page = videoPage.value) {
-  try {
-    videoPage.value = page;
-    const { data } = await videosApi.getByCategory(categoryName.value, {
-      page: videoPage.value,
-      limit: pageSize.value,
-      sort: sortOrder.value,
-    });
+	try {
+		videoPage.value = page;
+		const { data } = await videosApi.getByCategory(categoryName.value, {
+			page: videoPage.value,
+			limit: pageSize.value,
+			sort: sortOrder.value,
+		});
 
-    const items = data?.data || data?.videos || data || [];
-    videos.value = items;
-    videoTotal.value = data?.meta?.total || data?.total || items.length;
-    videoTotalPages.value =
-      data?.meta?.totalPages ||
-      data?.totalPages ||
-      Math.max(1, Math.ceil(videoTotal.value / pageSize.value));
-  } catch (error) {
-    console.error('Failed to load videos:', error);
-  } finally {
-    loading.value = false;
-  }
+		const items = data?.data || data?.videos || data || [];
+		videos.value = items;
+		videoTotal.value = data?.meta?.total || data?.total || items.length;
+		videoTotalPages.value =
+			data?.meta?.totalPages ||
+			data?.totalPages ||
+			Math.max(1, Math.ceil(videoTotal.value / pageSize.value));
+	} catch (error) {
+		console.error("Failed to load videos:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function navigateToMovie(movieId) {
-  // Movies not shown on category page per request
+	// Movies not shown on category page per request
 }
 
 function navigateToVideo(video) {
-  const id = video._id || video.id;
-  router.push(`/watch/${id}`);
+	const id = video._id || video.id;
+	router.push(`/watch/${id}`);
 }
 
 function changeSort(order) {
-  sortOrder.value = order;
-  loadVideos(1);
+	sortOrder.value = order;
+	loadVideos(1);
 }
 
 function changeVideoPage(page) {
-  if (page < 1 || page > videoTotalPages.value) return;
-  loadVideos(page);
+	if (page < 1 || page > videoTotalPages.value) return;
+	loadVideos(page);
 }
 
-
 function goBack() {
-  router.push('/categories');
+	router.push("/categories");
 }
 </script>
 

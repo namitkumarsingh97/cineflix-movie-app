@@ -1,184 +1,199 @@
-import { ref, computed } from 'vue';
+import { computed, ref } from "vue";
 
-const FOLLOWED_CREATORS_KEY = 'cineflix_followed_creators';
-const CREATOR_ALERTS_KEY = 'cineflix_creator_alerts';
+const FOLLOWED_CREATORS_KEY = "cineflix_followed_creators";
+const CREATOR_ALERTS_KEY = "cineflix_creator_alerts";
 
 // Load followed creators
 const loadFollowedCreators = () => {
-  try {
-    const stored = localStorage.getItem(FOLLOWED_CREATORS_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (err) {
-    console.warn('Failed to load followed creators:', err);
-    return [];
-  }
+	try {
+		const stored = localStorage.getItem(FOLLOWED_CREATORS_KEY);
+		return stored ? JSON.parse(stored) : [];
+	} catch (err) {
+		console.warn("Failed to load followed creators:", err);
+		return [];
+	}
 };
 
 // Save followed creators
 const saveFollowedCreators = (creators) => {
-  try {
-    localStorage.setItem(FOLLOWED_CREATORS_KEY, JSON.stringify(creators));
-  } catch (err) {
-    console.warn('Failed to save followed creators:', err);
-  }
+	try {
+		localStorage.setItem(FOLLOWED_CREATORS_KEY, JSON.stringify(creators));
+	} catch (err) {
+		console.warn("Failed to save followed creators:", err);
+	}
 };
 
 export function useCreators() {
-  const followedCreators = ref(loadFollowedCreators());
-  const creatorAlerts = ref([]);
+	const followedCreators = ref(loadFollowedCreators());
+	const creatorAlerts = ref([]);
 
-  // Extract creator/studio from video
-  const extractCreator = (video) => {
-    return {
-      id: video.channel || video.studio || video.creator || `creator_${video.id || video._id}`,
-      name: video.channel || video.studio || video.creator || 'Unknown Creator',
-      type: video.studio ? 'studio' : 'creator',
-      thumbnail: video.creatorThumbnail || video.channelThumbnail || null,
-      description: video.creatorDescription || video.channelDescription || '',
-      followerCount: video.followers || 0,
-      videoCount: video.videoCount || 0,
-    };
-  };
+	// Extract creator/studio from video
+	const extractCreator = (video) => {
+		return {
+			id:
+				video.channel ||
+				video.studio ||
+				video.creator ||
+				`creator_${video.id || video._id}`,
+			name: video.channel || video.studio || video.creator || "Unknown Creator",
+			type: video.studio ? "studio" : "creator",
+			thumbnail: video.creatorThumbnail || video.channelThumbnail || null,
+			description: video.creatorDescription || video.channelDescription || "",
+			followerCount: video.followers || 0,
+			videoCount: video.videoCount || 0,
+		};
+	};
 
-  // Follow a creator
-  const followCreator = (creator) => {
-    const creatorId = creator.id || creator;
-    const exists = followedCreators.value.some(c => c.id === creatorId);
-    
-    if (!exists) {
-      const creatorData = typeof creator === 'string' 
-        ? { id: creatorId, name: creatorId, followedAt: new Date().toISOString() }
-        : { ...creator, followedAt: new Date().toISOString() };
-      
-      followedCreators.value.push(creatorData);
-      saveFollowedCreators(followedCreators.value);
-    }
-  };
+	// Follow a creator
+	const followCreator = (creator) => {
+		const creatorId = creator.id || creator;
+		const exists = followedCreators.value.some((c) => c.id === creatorId);
 
-  // Unfollow a creator
-  const unfollowCreator = (creatorId) => {
-    followedCreators.value = followedCreators.value.filter(c => c.id !== creatorId);
-    saveFollowedCreators(followedCreators.value);
-  };
+		if (!exists) {
+			const creatorData =
+				typeof creator === "string"
+					? {
+							id: creatorId,
+							name: creatorId,
+							followedAt: new Date().toISOString(),
+						}
+					: { ...creator, followedAt: new Date().toISOString() };
 
-  // Check if creator is followed
-  const isCreatorFollowed = (creatorId) => {
-    return followedCreators.value.some(c => c.id === creatorId);
-  };
+			followedCreators.value.push(creatorData);
+			saveFollowedCreators(followedCreators.value);
+		}
+	};
 
-  // Get creator hub data
-  const getCreatorHub = (creatorId, allVideos) => {
-    const creator = followedCreators.value.find(c => c.id === creatorId);
-    if (!creator) return null;
+	// Unfollow a creator
+	const unfollowCreator = (creatorId) => {
+		followedCreators.value = followedCreators.value.filter(
+			(c) => c.id !== creatorId,
+		);
+		saveFollowedCreators(followedCreators.value);
+	};
 
-    // Get all videos from this creator
-    const creatorVideos = allVideos.filter(video => {
-      const videoCreator = extractCreator(video);
-      return videoCreator.id === creatorId;
-    });
+	// Check if creator is followed
+	const isCreatorFollowed = (creatorId) => {
+		return followedCreators.value.some((c) => c.id === creatorId);
+	};
 
-    // Get recent releases (last 30 days)
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-    const recentReleases = creatorVideos.filter(video => {
-      const videoDate = video.createdAt || video.uploadedAt || video.added;
-      if (!videoDate) return false;
-      return new Date(videoDate).getTime() > thirtyDaysAgo;
-    }).sort((a, b) => {
-      const dateA = new Date(a.createdAt || a.uploadedAt || a.added);
-      const dateB = new Date(b.createdAt || b.uploadedAt || b.added);
-      return dateB - dateA;
-    });
+	// Get creator hub data
+	const getCreatorHub = (creatorId, allVideos) => {
+		const creator = followedCreators.value.find((c) => c.id === creatorId);
+		if (!creator) return null;
 
-    return {
-      ...creator,
-      videos: creatorVideos,
-      recentReleases,
-      totalVideos: creatorVideos.length,
-      latestRelease: recentReleases[0] || null,
-    };
-  };
+		// Get all videos from this creator
+		const creatorVideos = allVideos.filter((video) => {
+			const videoCreator = extractCreator(video);
+			return videoCreator.id === creatorId;
+		});
 
-  // Get mini-feed for followed creators
-  const getMiniFeed = (allVideos, limit = 20) => {
-    const followedIds = followedCreators.value.map(c => c.id);
-    
-    // Get videos from followed creators
-    const feedVideos = allVideos
-      .filter(video => {
-        const creator = extractCreator(video);
-        return followedIds.includes(creator.id);
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.createdAt || a.uploadedAt || a.added || 0);
-        const dateB = new Date(b.createdAt || b.uploadedAt || b.added || 0);
-        return dateB - dateA;
-      })
-      .slice(0, limit);
+		// Get recent releases (last 30 days)
+		const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+		const recentReleases = creatorVideos
+			.filter((video) => {
+				const videoDate = video.createdAt || video.uploadedAt || video.added;
+				if (!videoDate) return false;
+				return new Date(videoDate).getTime() > thirtyDaysAgo;
+			})
+			.sort((a, b) => {
+				const dateA = new Date(a.createdAt || a.uploadedAt || a.added);
+				const dateB = new Date(b.createdAt || b.uploadedAt || b.added);
+				return dateB - dateA;
+			});
 
-    return feedVideos;
-  };
+		return {
+			...creator,
+			videos: creatorVideos,
+			recentReleases,
+			totalVideos: creatorVideos.length,
+			latestRelease: recentReleases[0] || null,
+		};
+	};
 
-  // Check for new releases from followed creators
-  const checkNewReleases = (allVideos) => {
-    const followedIds = followedCreators.value.map(c => c.id);
-    const lastCheck = localStorage.getItem('cineflix_last_release_check') || '0';
-    const lastCheckTime = parseInt(lastCheck);
+	// Get mini-feed for followed creators
+	const getMiniFeed = (allVideos, limit = 20) => {
+		const followedIds = followedCreators.value.map((c) => c.id);
 
-    const newReleases = allVideos.filter(video => {
-      const creator = extractCreator(video);
-      if (!followedIds.includes(creator.id)) return false;
+		// Get videos from followed creators
+		const feedVideos = allVideos
+			.filter((video) => {
+				const creator = extractCreator(video);
+				return followedIds.includes(creator.id);
+			})
+			.sort((a, b) => {
+				const dateA = new Date(a.createdAt || a.uploadedAt || a.added || 0);
+				const dateB = new Date(b.createdAt || b.uploadedAt || b.added || 0);
+				return dateB - dateA;
+			})
+			.slice(0, limit);
 
-      const videoDate = video.createdAt || video.uploadedAt || video.added;
-      if (!videoDate) return false;
+		return feedVideos;
+	};
 
-      const videoTime = new Date(videoDate).getTime();
-      return videoTime > lastCheckTime;
-    });
+	// Check for new releases from followed creators
+	const checkNewReleases = (allVideos) => {
+		const followedIds = followedCreators.value.map((c) => c.id);
+		const lastCheck =
+			localStorage.getItem("cineflix_last_release_check") || "0";
+		const lastCheckTime = parseInt(lastCheck);
 
-    // Update last check time
-    localStorage.setItem('cineflix_last_release_check', String(Date.now()));
+		const newReleases = allVideos.filter((video) => {
+			const creator = extractCreator(video);
+			if (!followedIds.includes(creator.id)) return false;
 
-    return newReleases;
-  };
+			const videoDate = video.createdAt || video.uploadedAt || video.added;
+			if (!videoDate) return false;
 
-  // Get all creators from videos
-  const getAllCreators = (allVideos) => {
-    const creatorsMap = new Map();
+			const videoTime = new Date(videoDate).getTime();
+			return videoTime > lastCheckTime;
+		});
 
-    allVideos.forEach(video => {
-      const creator = extractCreator(video);
-      if (!creatorsMap.has(creator.id)) {
-        creatorsMap.set(creator.id, {
-          ...creator,
-          videos: [],
-        });
-      }
-      creatorsMap.get(creator.id).videos.push(video);
-    });
+		// Update last check time
+		localStorage.setItem("cineflix_last_release_check", String(Date.now()));
 
-    // Convert to array and add counts
-    return Array.from(creatorsMap.values()).map(creator => ({
-      ...creator,
-      videoCount: creator.videos.length,
-      latestVideo: creator.videos.sort((a, b) => {
-        const dateA = new Date(a.createdAt || a.uploadedAt || a.added || 0);
-        const dateB = new Date(b.createdAt || b.uploadedAt || b.added || 0);
-        return dateB - dateA;
-      })[0],
-    })).sort((a, b) => b.videoCount - a.videoCount);
-  };
+		return newReleases;
+	};
 
-  return {
-    followedCreators,
-    creatorAlerts,
-    followCreator,
-    unfollowCreator,
-    isCreatorFollowed,
-    getCreatorHub,
-    getMiniFeed,
-    checkNewReleases,
-    getAllCreators,
-    extractCreator,
-  };
+	// Get all creators from videos
+	const getAllCreators = (allVideos) => {
+		const creatorsMap = new Map();
+
+		allVideos.forEach((video) => {
+			const creator = extractCreator(video);
+			if (!creatorsMap.has(creator.id)) {
+				creatorsMap.set(creator.id, {
+					...creator,
+					videos: [],
+				});
+			}
+			creatorsMap.get(creator.id).videos.push(video);
+		});
+
+		// Convert to array and add counts
+		return Array.from(creatorsMap.values())
+			.map((creator) => ({
+				...creator,
+				videoCount: creator.videos.length,
+				latestVideo: creator.videos.sort((a, b) => {
+					const dateA = new Date(a.createdAt || a.uploadedAt || a.added || 0);
+					const dateB = new Date(b.createdAt || b.uploadedAt || b.added || 0);
+					return dateB - dateA;
+				})[0],
+			}))
+			.sort((a, b) => b.videoCount - a.videoCount);
+	};
+
+	return {
+		followedCreators,
+		creatorAlerts,
+		followCreator,
+		unfollowCreator,
+		isCreatorFollowed,
+		getCreatorHub,
+		getMiniFeed,
+		checkNewReleases,
+		getAllCreators,
+		extractCreator,
+	};
 }
-

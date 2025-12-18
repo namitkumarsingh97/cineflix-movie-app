@@ -26,29 +26,29 @@
 </template>
 
 <script setup>
-import { Play } from 'lucide-vue-next';
+import { Play } from "lucide-vue-next";
 
 const props = defineProps({
-  scene: {
-    type: Object,
-    required: true,
-  },
+	scene: {
+		type: Object,
+		required: true,
+	},
 });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits(["click"]);
 
 const formatTime = (seconds) => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+	const mins = Math.floor(seconds / 60);
+	const secs = Math.floor(seconds % 60);
+	return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
 const handleClick = () => {
-  emit('click', props.scene);
+	emit("click", props.scene);
 };
 
 const handleThumbnailError = (event) => {
-  event.target.style.display = 'none';
+	event.target.style.display = "none";
 };
 </script>
 

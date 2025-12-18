@@ -57,75 +57,80 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Star, Eye, Heart } from 'lucide-vue-next';
-import { useNetworkQuality } from '../composables/useNetworkQuality';
-import OptimizedImage from './OptimizedImage.vue';
+import { Eye, Heart, Star } from "lucide-vue-next";
+import { ref } from "vue";
+import { useNetworkQuality } from "../composables/useNetworkQuality";
+import OptimizedImage from "./OptimizedImage.vue";
 
 const { shouldPreloadThumbnails } = useNetworkQuality();
 
 const props = defineProps({
-  picture: {
-    type: Object,
-    required: true,
-  },
+	picture: {
+		type: Object,
+		required: true,
+	},
 });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits(["click"]);
 
 const cardRef = ref(null);
 
 function handleClick() {
-  emit('click', props.picture);
+	emit("click", props.picture);
 }
 
 function handleMouseEnter() {
-  // Could add hover preview here if needed
+	// Could add hover preview here if needed
 }
 
 function handleMouseLeave() {
-  // Could hide hover preview here if needed
+	// Could hide hover preview here if needed
 }
 
 function getDefaultImage() {
-  return 'https://via.placeholder.com/400x600/1a1a2e/ffffff?text=Image';
+	return "https://via.placeholder.com/400x600/1a1a2e/ffffff?text=Image";
 }
 
 function handleImageError(event) {
-  event.target.src = getDefaultImage();
+	event.target.src = getDefaultImage();
 }
 
 function formatTimeAgo(date) {
-  if (!date) return '';
-  
-  const now = new Date();
-  let uploadDate;
-  
-  try {
-    uploadDate = new Date(date);
-    if (isNaN(uploadDate.getTime())) {
-      return '';
-    }
-  } catch (e) {
-    return '';
-  }
-  
-  const diffInSeconds = Math.floor((now - uploadDate) / 1000);
-  
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
-  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} months ago`;
-  return `${Math.floor(diffInSeconds / 31536000)} years ago`;
+	if (!date) return "";
+
+	const now = new Date();
+	let uploadDate;
+
+	try {
+		uploadDate = new Date(date);
+		if (isNaN(uploadDate.getTime())) {
+			return "";
+		}
+	} catch (e) {
+		return "";
+	}
+
+	const diffInSeconds = Math.floor((now - uploadDate) / 1000);
+
+	if (diffInSeconds < 60) return "just now";
+	if (diffInSeconds < 3600)
+		return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+	if (diffInSeconds < 86400)
+		return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+	if (diffInSeconds < 604800)
+		return `${Math.floor(diffInSeconds / 86400)} days ago`;
+	if (diffInSeconds < 2592000)
+		return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+	if (diffInSeconds < 31536000)
+		return `${Math.floor(diffInSeconds / 2592000)} months ago`;
+	return `${Math.floor(diffInSeconds / 31536000)} years ago`;
 }
 
 function formatViews(views) {
-  if (!views) return '0';
-  if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
-  if (views >= 1000) return `${(views / 1000).toFixed(1)}k`;
-  return views.toString();
+	if (!views) return "0";
+	if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+	if (views >= 1000) return `${(views / 1000).toFixed(1)}k`;
+	return views.toString();
 }
 </script>
 

@@ -185,56 +185,73 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
+import {
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	watch,
+} from "vue";
+
 // Lazy load HLS.js only when needed (saves 1MB+ on initial load)
 let Hls = null;
 const loadHls = async () => {
-  if (!Hls) {
-    const hlsModule = await import('hls.js');
-    Hls = hlsModule.default;
-  }
-  return Hls;
+	if (!Hls) {
+		const hlsModule = await import("hls.js");
+		Hls = hlsModule.default;
+	}
+	return Hls;
 };
+
 import {
-  Play,
-  Pause,
-  Volume2,
-  Volume1,
-  VolumeX,
-  Maximize,
-  Minimize,
-  PictureInPicture,
-  Settings,
-} from 'lucide-vue-next';
+	Maximize,
+	Minimize,
+	Pause,
+	PictureInPicture,
+	Play,
+	Settings,
+	Volume1,
+	Volume2,
+	VolumeX,
+} from "lucide-vue-next";
 
 const props = defineProps({
-  src: {
-    type: String,
-    required: true,
-  },
-  poster: {
-    type: String,
-    default: '',
-  },
-  sources: {
-    type: Array,
-    default: () => [],
-  },
-  autoplay: {
-    type: Boolean,
-    default: false,
-  },
-  muted: {
-    type: Boolean,
-    default: false,
-  },
-  loop: {
-    type: Boolean,
-    default: false,
-  },
+	src: {
+		type: String,
+		required: true,
+	},
+	poster: {
+		type: String,
+		default: "",
+	},
+	sources: {
+		type: Array,
+		default: () => [],
+	},
+	autoplay: {
+		type: Boolean,
+		default: false,
+	},
+	muted: {
+		type: Boolean,
+		default: false,
+	},
+	loop: {
+		type: Boolean,
+		default: false,
+	},
 });
 
-const emit = defineEmits(['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'fullscreenchange', 'error']);
+const emit = defineEmits([
+	"play",
+	"pause",
+	"ended",
+	"timeupdate",
+	"volumechange",
+	"fullscreenchange",
+	"error",
+]);
 
 const videoElement = ref(null);
 const videoContainer = ref(null);
@@ -255,7 +272,7 @@ const isPictureInPicture = ref(false);
 const controlsVisible = ref(true);
 const controlsTimeout = ref(null);
 const playbackSpeed = ref(1);
-const currentQuality = ref('Auto');
+const currentQuality = ref("Auto");
 const showSpeedMenu = ref(false);
 const showQualityMenu = ref(false);
 const showSettingsMenu = ref(false);
@@ -266,382 +283,414 @@ const previewPosition = ref(0);
 const playbackSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
 const progressPercentage = computed(() => {
-  if (duration.value === 0) return 0;
-  return (currentTime.value / duration.value) * 100;
+	if (duration.value === 0) return 0;
+	return (currentTime.value / duration.value) * 100;
 });
 
 // Format time helper
 function formatTime(seconds) {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+	if (!seconds || isNaN(seconds)) return "0:00";
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const secs = Math.floor(seconds % 60);
+
+	if (hours > 0) {
+		return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+	}
+	return `${minutes}:${secs.toString().padStart(2, "0")}`;
 }
 
 // Setup HLS if needed
 async function setupHls() {
-  if (!props.isHls || !videoElement.value || !props.src) return;
-  
-  const HlsClass = await loadHls();
-  if (HlsClass.isSupported()) {
-    destroyHls();
-    hlsInstance.value = new HlsClass({
-      enableWorker: true,
-      lowLatencyMode: true,
-      backBufferLength: 30,
-      maxBufferLength: 6,
-      maxMaxBufferLength: 10,
-    });
-    
-    hlsInstance.value.loadSource(props.src);
-    hlsInstance.value.attachMedia(videoElement.value);
-    
-    hlsInstance.value.on(HlsClass.Events.ERROR, (event, data) => {
-      if (data.fatal) {
-        switch (data.type) {
-          case HlsClass.ErrorTypes.NETWORK_ERROR:
-            hlsInstance.value.startLoad();
-            break;
-          case HlsClass.ErrorTypes.MEDIA_ERROR:
-            hlsInstance.value.recoverMediaError();
-            break;
-          default:
-            destroyHls();
-            break;
-        }
-      }
-    });
-  } else if (videoElement.value.canPlayType('application/vnd.apple.mpegurl')) {
-    // Safari native HLS support
-    videoElement.value.src = props.src;
-  }
+	if (!props.isHls || !videoElement.value || !props.src) return;
+
+	const HlsClass = await loadHls();
+	if (HlsClass.isSupported()) {
+		destroyHls();
+		hlsInstance.value = new HlsClass({
+			enableWorker: true,
+			lowLatencyMode: true,
+			backBufferLength: 30,
+			maxBufferLength: 6,
+			maxMaxBufferLength: 10,
+		});
+
+		hlsInstance.value.loadSource(props.src);
+		hlsInstance.value.attachMedia(videoElement.value);
+
+		hlsInstance.value.on(HlsClass.Events.ERROR, (event, data) => {
+			if (data.fatal) {
+				switch (data.type) {
+					case HlsClass.ErrorTypes.NETWORK_ERROR:
+						hlsInstance.value.startLoad();
+						break;
+					case HlsClass.ErrorTypes.MEDIA_ERROR:
+						hlsInstance.value.recoverMediaError();
+						break;
+					default:
+						destroyHls();
+						break;
+				}
+			}
+		});
+	} else if (videoElement.value.canPlayType("application/vnd.apple.mpegurl")) {
+		// Safari native HLS support
+		videoElement.value.src = props.src;
+	}
 }
 
 function destroyHls() {
-  if (hlsInstance.value) {
-    hlsInstance.value.destroy();
-    hlsInstance.value = null;
-  }
+	if (hlsInstance.value) {
+		hlsInstance.value.destroy();
+		hlsInstance.value = null;
+	}
 }
 
 // Video event handlers
 function onLoadedMetadata() {
-  if (videoElement.value) {
-    duration.value = videoElement.value.duration;
-    videoElement.value.volume = volume.value;
-    videoElement.value.muted = isMuted.value;
-    videoElement.value.playbackRate = playbackSpeed.value;
-  }
+	if (videoElement.value) {
+		duration.value = videoElement.value.duration;
+		videoElement.value.volume = volume.value;
+		videoElement.value.muted = isMuted.value;
+		videoElement.value.playbackRate = playbackSpeed.value;
+	}
 }
 
 function onTimeUpdate() {
-  if (videoElement.value) {
-    currentTime.value = videoElement.value.currentTime;
-    const buffered = videoElement.value.buffered;
-    if (buffered.length > 0 && duration.value > 0) {
-      loadedPercentage.value = (buffered.end(buffered.length - 1) / duration.value) * 100;
-    }
-    emit('timeupdate', currentTime.value);
-  }
+	if (videoElement.value) {
+		currentTime.value = videoElement.value.currentTime;
+		const buffered = videoElement.value.buffered;
+		if (buffered.length > 0 && duration.value > 0) {
+			loadedPercentage.value =
+				(buffered.end(buffered.length - 1) / duration.value) * 100;
+		}
+		emit("timeupdate", currentTime.value);
+	}
 }
 
 function onPlay() {
-  isPlaying.value = true;
-  emit('play');
+	isPlaying.value = true;
+	emit("play");
 }
 
 function onPause() {
-  isPlaying.value = false;
-  emit('pause');
+	isPlaying.value = false;
+	emit("pause");
 }
 
 function onEnded() {
-  isPlaying.value = false;
-  emit('ended');
+	isPlaying.value = false;
+	emit("ended");
 }
 
 function onVolumeChange() {
-  if (videoElement.value) {
-    volume.value = videoElement.value.volume;
-    isMuted.value = videoElement.value.muted;
-    emit('volumechange', { volume: volume.value, muted: isMuted.value });
-  }
+	if (videoElement.value) {
+		volume.value = videoElement.value.volume;
+		isMuted.value = videoElement.value.muted;
+		emit("volumechange", { volume: volume.value, muted: isMuted.value });
+	}
 }
 
 function onWaiting() {
-  isLoading.value = true;
+	isLoading.value = true;
 }
 
 function onPlaying() {
-  isLoading.value = false;
+	isLoading.value = false;
 }
 
 function onError(event) {
-  console.error('Video playback error:', event);
-  isLoading.value = false;
-  if (event && event.target && event.target.error) {
-    const error = event.target.error;
-    console.error('Video error details:', {
-      code: error.code,
-      message: error.message
-    });
-  }
-  emit('error', event);
+	console.error("Video playback error:", event);
+	isLoading.value = false;
+	if (event && event.target && event.target.error) {
+		const error = event.target.error;
+		console.error("Video error details:", {
+			code: error.code,
+			message: error.message,
+		});
+	}
+	emit("error", event);
 }
 
 // Control functions
 function togglePlayPause() {
-  if (!videoElement.value) return;
-  if (isPlaying.value) {
-    videoElement.value.pause();
-  } else {
-    videoElement.value.play();
-  }
+	if (!videoElement.value) return;
+	if (isPlaying.value) {
+		videoElement.value.pause();
+	} else {
+		videoElement.value.play();
+	}
 }
 
 function toggleMute() {
-  if (!videoElement.value) return;
-  videoElement.value.muted = !videoElement.value.muted;
-  isMuted.value = videoElement.value.muted;
-  if (!isMuted.value && volume.value === 0) {
-    volume.value = 0.5;
-    videoElement.value.volume = 0.5;
-  }
+	if (!videoElement.value) return;
+	videoElement.value.muted = !videoElement.value.muted;
+	isMuted.value = videoElement.value.muted;
+	if (!isMuted.value && volume.value === 0) {
+		volume.value = 0.5;
+		videoElement.value.volume = 0.5;
+	}
 }
 
 function seekTo(event) {
-  if (!videoElement.value || !duration.value) return;
-  const rect = event.currentTarget.getBoundingClientRect();
-  const percent = (event.clientX - rect.left) / rect.width;
-  const newTime = percent * duration.value;
-  videoElement.value.currentTime = newTime;
-  currentTime.value = newTime;
+	if (!videoElement.value || !duration.value) return;
+	const rect = event.currentTarget.getBoundingClientRect();
+	const percent = (event.clientX - rect.left) / rect.width;
+	const newTime = percent * duration.value;
+	videoElement.value.currentTime = newTime;
+	currentTime.value = newTime;
 }
 
 function onProgressHover(event) {
-  if (!duration.value) return;
-  const rect = event.currentTarget.getBoundingClientRect();
-  const percent = (event.clientX - rect.left) / rect.width;
-  previewPosition.value = percent * 100;
-  previewTime.value = percent * duration.value;
+	if (!duration.value) return;
+	const rect = event.currentTarget.getBoundingClientRect();
+	const percent = (event.clientX - rect.left) / rect.width;
+	previewPosition.value = percent * 100;
+	previewTime.value = percent * duration.value;
 }
 
 function hidePreview() {
-  previewTime.value = null;
+	previewTime.value = null;
 }
 
 function setPlaybackSpeed(speed) {
-  playbackSpeed.value = speed;
-  if (videoElement.value) {
-    videoElement.value.playbackRate = speed;
-  }
-  showSpeedMenu.value = false;
-  showSettingsMenu.value = false;
+	playbackSpeed.value = speed;
+	if (videoElement.value) {
+		videoElement.value.playbackRate = speed;
+	}
+	showSpeedMenu.value = false;
+	showSettingsMenu.value = false;
 }
 
 function setQuality(source) {
-  if (videoElement.value && source.src) {
-    videoElement.value.src = source.src;
-    currentQuality.value = source.quality || 'Auto';
-    videoElement.value.load();
-  }
-  showQualityMenu.value = false;
-  showSettingsMenu.value = false;
+	if (videoElement.value && source.src) {
+		videoElement.value.src = source.src;
+		currentQuality.value = source.quality || "Auto";
+		videoElement.value.load();
+	}
+	showQualityMenu.value = false;
+	showSettingsMenu.value = false;
 }
 
 async function toggleFullscreen() {
-  if (!videoContainer.value) return;
-  
-  try {
-    if (!isFullscreen.value) {
-      if (videoContainer.value.requestFullscreen) {
-        await videoContainer.value.requestFullscreen();
-      } else if (videoContainer.value.webkitRequestFullscreen) {
-        await videoContainer.value.webkitRequestFullscreen();
-      } else if (videoContainer.value.mozRequestFullScreen) {
-        await videoContainer.value.mozRequestFullScreen();
-      } else if (videoContainer.value.msRequestFullscreen) {
-        await videoContainer.value.msRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        await document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        await document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        await document.msExitFullscreen();
-      }
-    }
-  } catch (error) {
-    console.error('Fullscreen error:', error);
-  }
+	if (!videoContainer.value) return;
+
+	try {
+		if (!isFullscreen.value) {
+			if (videoContainer.value.requestFullscreen) {
+				await videoContainer.value.requestFullscreen();
+			} else if (videoContainer.value.webkitRequestFullscreen) {
+				await videoContainer.value.webkitRequestFullscreen();
+			} else if (videoContainer.value.mozRequestFullScreen) {
+				await videoContainer.value.mozRequestFullScreen();
+			} else if (videoContainer.value.msRequestFullscreen) {
+				await videoContainer.value.msRequestFullscreen();
+			}
+		} else {
+			if (document.exitFullscreen) {
+				await document.exitFullscreen();
+			} else if (document.webkitExitFullscreen) {
+				await document.webkitExitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+				await document.mozCancelFullScreen();
+			} else if (document.msExitFullscreen) {
+				await document.msExitFullscreen();
+			}
+		}
+	} catch (error) {
+		console.error("Fullscreen error:", error);
+	}
 }
 
 async function togglePictureInPicture() {
-  if (!videoElement.value) return;
-  
-  try {
-    if (isPictureInPicture.value) {
-      await document.exitPictureInPicture();
-    } else {
-      await videoElement.value.requestPictureInPicture();
-    }
-  } catch (error) {
-    console.error('Picture-in-Picture error:', error);
-  }
+	if (!videoElement.value) return;
+
+	try {
+		if (isPictureInPicture.value) {
+			await document.exitPictureInPicture();
+		} else {
+			await videoElement.value.requestPictureInPicture();
+		}
+	} catch (error) {
+		console.error("Picture-in-Picture error:", error);
+	}
 }
 
 function showControls() {
-  controlsVisible.value = true;
-  if (controlsTimeout.value) {
-    clearTimeout(controlsTimeout.value);
-  }
-  if (isPlaying.value) {
-    controlsTimeout.value = setTimeout(() => {
-      controlsVisible.value = false;
-    }, 3000);
-  }
+	controlsVisible.value = true;
+	if (controlsTimeout.value) {
+		clearTimeout(controlsTimeout.value);
+	}
+	if (isPlaying.value) {
+		controlsTimeout.value = setTimeout(() => {
+			controlsVisible.value = false;
+		}, 3000);
+	}
 }
 
 function hideControls() {
-  if (isPlaying.value) {
-    controlsTimeout.value = setTimeout(() => {
-      controlsVisible.value = false;
-    }, 2000);
-  }
+	if (isPlaying.value) {
+		controlsTimeout.value = setTimeout(() => {
+			controlsVisible.value = false;
+		}, 2000);
+	}
 }
 
 // Fullscreen change handlers
 function handleFullscreenChange() {
-  isFullscreen.value = !!(
-    document.fullscreenElement ||
-    document.webkitFullscreenElement ||
-    document.mozFullScreenElement ||
-    document.msFullscreenElement
-  );
-  emit('fullscreenchange', isFullscreen.value);
+	isFullscreen.value = !!(
+		document.fullscreenElement ||
+		document.webkitFullscreenElement ||
+		document.mozFullScreenElement ||
+		document.msFullscreenElement
+	);
+	emit("fullscreenchange", isFullscreen.value);
 }
 
 function handlePictureInPictureChange() {
-  isPictureInPicture.value = !!document.pictureInPictureElement;
+	isPictureInPicture.value = !!document.pictureInPictureElement;
 }
 
 // Keyboard controls
 function handleKeyDown(event) {
-  if (!videoElement.value) return;
-  
-  // Don't handle if user is typing in an input
-  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
-  
-  switch (event.key.toLowerCase()) {
-    case ' ':
-    case 'k':
-      event.preventDefault();
-      togglePlayPause();
-      break;
-    case 'arrowleft':
-      event.preventDefault();
-      videoElement.value.currentTime = Math.max(0, currentTime.value - 10);
-      break;
-    case 'arrowright':
-      event.preventDefault();
-      videoElement.value.currentTime = Math.min(duration.value, currentTime.value + 10);
-      break;
-    case 'arrowup':
-      event.preventDefault();
-      volume.value = Math.min(1, volume.value + 0.1);
-      videoElement.value.volume = volume.value;
-      break;
-    case 'arrowdown':
-      event.preventDefault();
-      volume.value = Math.max(0, volume.value - 0.1);
-      videoElement.value.volume = volume.value;
-      break;
-    case 'm':
-      event.preventDefault();
-      toggleMute();
-      break;
-    case 'f':
-      event.preventDefault();
-      toggleFullscreen();
-      break;
-    case 'p':
-      event.preventDefault();
-      togglePictureInPicture();
-      break;
-  }
+	if (!videoElement.value) return;
+
+	// Don't handle if user is typing in an input
+	if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA")
+		return;
+
+	switch (event.key.toLowerCase()) {
+		case " ":
+		case "k":
+			event.preventDefault();
+			togglePlayPause();
+			break;
+		case "arrowleft":
+			event.preventDefault();
+			videoElement.value.currentTime = Math.max(0, currentTime.value - 10);
+			break;
+		case "arrowright":
+			event.preventDefault();
+			videoElement.value.currentTime = Math.min(
+				duration.value,
+				currentTime.value + 10,
+			);
+			break;
+		case "arrowup":
+			event.preventDefault();
+			volume.value = Math.min(1, volume.value + 0.1);
+			videoElement.value.volume = volume.value;
+			break;
+		case "arrowdown":
+			event.preventDefault();
+			volume.value = Math.max(0, volume.value - 0.1);
+			videoElement.value.volume = volume.value;
+			break;
+		case "m":
+			event.preventDefault();
+			toggleMute();
+			break;
+		case "f":
+			event.preventDefault();
+			toggleFullscreen();
+			break;
+		case "p":
+			event.preventDefault();
+			togglePictureInPicture();
+			break;
+	}
 }
 
 // Watch for prop changes
-watch(() => props.autoplay, (newVal) => {
-  if (newVal && videoElement.value) {
-    videoElement.value.play();
-  }
-});
+watch(
+	() => props.autoplay,
+	(newVal) => {
+		if (newVal && videoElement.value) {
+			videoElement.value.play();
+		}
+	},
+);
 
-watch(() => props.muted, (newVal) => {
-  if (videoElement.value) {
-    videoElement.value.muted = newVal;
-    isMuted.value = newVal;
-  }
-});
+watch(
+	() => props.muted,
+	(newVal) => {
+		if (videoElement.value) {
+			videoElement.value.muted = newVal;
+			isMuted.value = newVal;
+		}
+	},
+);
 
-watch(() => props.src, () => {
-  if (props.isHls) {
-    setupHls().catch(err => console.error('HLS setup error:', err));
-  }
-});
+watch(
+	() => props.src,
+	() => {
+		if (props.isHls) {
+			setupHls().catch((err) => console.error("HLS setup error:", err));
+		}
+	},
+);
 
-watch(() => props.isHls, () => {
-  if (props.isHls) {
-    setupHls().catch(err => console.error('HLS setup error:', err));
-  } else {
-    destroyHls();
-  }
-});
+watch(
+	() => props.isHls,
+	() => {
+		if (props.isHls) {
+			setupHls().catch((err) => console.error("HLS setup error:", err));
+		} else {
+			destroyHls();
+		}
+	},
+);
 
 onMounted(() => {
-  document.addEventListener('fullscreenchange', handleFullscreenChange);
-  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-  document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-  document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-  document.addEventListener('enterpictureinpicture', handlePictureInPictureChange);
-  document.addEventListener('leavepictureinpicture', handlePictureInPictureChange);
-  document.addEventListener('keydown', handleKeyDown);
-  
-  if (props.isHls) {
-    nextTick(() => {
-      setupHls().catch(err => console.error('HLS setup error:', err));
-    });
-  }
-  
-  if (props.autoplay && videoElement.value) {
-    nextTick(() => {
-      videoElement.value?.play();
-    });
-  }
+	document.addEventListener("fullscreenchange", handleFullscreenChange);
+	document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+	document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+	document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+	document.addEventListener(
+		"enterpictureinpicture",
+		handlePictureInPictureChange,
+	);
+	document.addEventListener(
+		"leavepictureinpicture",
+		handlePictureInPictureChange,
+	);
+	document.addEventListener("keydown", handleKeyDown);
+
+	if (props.isHls) {
+		nextTick(() => {
+			setupHls().catch((err) => console.error("HLS setup error:", err));
+		});
+	}
+
+	if (props.autoplay && videoElement.value) {
+		nextTick(() => {
+			videoElement.value?.play();
+		});
+	}
 });
 
 onBeforeUnmount(() => {
-  destroyHls();
-  document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-  document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-  document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
-  document.removeEventListener('enterpictureinpicture', handlePictureInPictureChange);
-  document.removeEventListener('leavepictureinpicture', handlePictureInPictureChange);
-  document.removeEventListener('keydown', handleKeyDown);
-  
-  if (controlsTimeout.value) {
-    clearTimeout(controlsTimeout.value);
-  }
+	destroyHls();
+	document.removeEventListener("fullscreenchange", handleFullscreenChange);
+	document.removeEventListener(
+		"webkitfullscreenchange",
+		handleFullscreenChange,
+	);
+	document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+	document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+	document.removeEventListener(
+		"enterpictureinpicture",
+		handlePictureInPictureChange,
+	);
+	document.removeEventListener(
+		"leavepictureinpicture",
+		handlePictureInPictureChange,
+	);
+	document.removeEventListener("keydown", handleKeyDown);
+
+	if (controlsTimeout.value) {
+		clearTimeout(controlsTimeout.value);
+	}
 });
 </script>
 

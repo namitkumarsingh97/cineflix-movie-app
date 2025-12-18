@@ -130,11 +130,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import CategorySidebar from '../components/CategorySidebar.vue';
-import { Star, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-vue-next';
-import { useActresses } from '../composables/useActresses';
+import { ChevronLeft, ChevronRight, RefreshCw, Star } from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import CategorySidebar from "../components/CategorySidebar.vue";
+import { useActresses } from "../composables/useActresses";
 
 const router = useRouter();
 const route = useRoute();
@@ -145,35 +145,45 @@ const extracting = ref(false);
 
 // Initialize currentPage from URL query parameter or default to 1
 function getPageFromUrl() {
-  const pageParam = route.query.page;
-  if (pageParam) {
-    const page = parseInt(pageParam, 10);
-    if (page > 0 && !isNaN(page)) {
-      return page;
-    }
-  }
-  return 1;
+	const pageParam = route.query.page;
+	if (pageParam) {
+		const page = parseInt(pageParam, 10);
+		if (page > 0 && !isNaN(page)) {
+			return page;
+		}
+	}
+	return 1;
 }
 
 // Initialize selectedLetter from URL query parameter or default to empty (all)
 function getLetterFromUrl() {
-  const letterParam = route.query.letter;
-  if (letterParam && /^[A-Z]$/i.test(letterParam)) {
-    return letterParam.toUpperCase();
-  }
-  return '';
+	const letterParam = route.query.letter;
+	if (letterParam && /^[A-Z]$/i.test(letterParam)) {
+		return letterParam.toUpperCase();
+	}
+	return "";
 }
 
 const currentPage = ref(getPageFromUrl());
 const selectedLetter = ref(getLetterFromUrl());
 
 // Generate alphabet letters A-Z
-const alphabetLetters = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+const alphabetLetters = Array.from({ length: 26 }, (_, i) =>
+	String.fromCharCode(65 + i),
+);
 
-const { actresses, loading, extractAllActresses, loadFromStorage, getActressImage, getAllKnownActresses, isValidActressName } = useActresses();
+const {
+	actresses,
+	loading,
+	extractAllActresses,
+	loadFromStorage,
+	getActressImage,
+	getAllKnownActresses,
+	isValidActressName,
+} = useActresses();
 
 function handleFilterChange(filter) {
-  console.log('Filter changed:', filter);
+	console.log("Filter changed:", filter);
 }
 
 // Use only actresses from KNOWN_ACTRESSES with images from pornpics.com
@@ -183,135 +193,147 @@ const allActors = ref([]);
 
 // Update URL with page and letter filter parameters
 function updateUrlParams(page, letter = null) {
-  const query = { ...route.query };
-  
-  // Handle page parameter
-  if (page === 1) {
-    delete query.page;
-  } else {
-    query.page = page.toString();
-  }
-  
-  // Handle letter filter parameter
-  if (letter === null) {
-    letter = selectedLetter.value;
-  }
-  if (letter) {
-    query.letter = letter;
-  } else {
-    delete query.letter;
-  }
-  
-  router.push({ 
-    path: '/actors',
-    query: query
-  });
+	const query = { ...route.query };
+
+	// Handle page parameter
+	if (page === 1) {
+		delete query.page;
+	} else {
+		query.page = page.toString();
+	}
+
+	// Handle letter filter parameter
+	if (letter === null) {
+		letter = selectedLetter.value;
+	}
+	if (letter) {
+		query.letter = letter;
+	} else {
+		delete query.letter;
+	}
+
+	router.push({
+		path: "/actors",
+		query: query,
+	});
 }
 
 // Update URL with page parameter (backward compatibility)
 function updateUrlPage(page) {
-  updateUrlParams(page);
+	updateUrlParams(page);
 }
 
 // Watch for URL query parameter changes (e.g., browser back/forward)
-watch(() => route.query.page, (newPageParam) => {
-  const page = newPageParam ? parseInt(newPageParam, 10) : 1;
-  if (page > 0 && !isNaN(page) && page !== currentPage.value) {
-    currentPage.value = page;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-}, { immediate: false });
+watch(
+	() => route.query.page,
+	(newPageParam) => {
+		const page = newPageParam ? parseInt(newPageParam, 10) : 1;
+		if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+			currentPage.value = page;
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}
+	},
+	{ immediate: false },
+);
 
 // Watch for letter filter changes in URL (browser back/forward)
-watch(() => route.query.letter, (newLetterParam) => {
-  const letter = newLetterParam && /^[A-Z]$/i.test(newLetterParam) 
-    ? newLetterParam.toUpperCase() 
-    : '';
-  if (letter !== selectedLetter.value) {
-    selectedLetter.value = letter;
-    // Reset to page 1 when filter changes from URL
-    currentPage.value = 1;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-}, { immediate: false });
+watch(
+	() => route.query.letter,
+	(newLetterParam) => {
+		const letter =
+			newLetterParam && /^[A-Z]$/i.test(newLetterParam)
+				? newLetterParam.toUpperCase()
+				: "";
+		if (letter !== selectedLetter.value) {
+			selectedLetter.value = letter;
+			// Reset to page 1 when filter changes from URL
+			currentPage.value = 1;
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}
+	},
+	{ immediate: false },
+);
 
 // Handle letter filter change
 function handleLetterFilterChange() {
-  // Reset to page 1 when filter changes
-  currentPage.value = 1;
-  // Update URL with new filter
-  updateUrlParams(1, selectedLetter.value);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+	// Reset to page 1 when filter changes
+	currentPage.value = 1;
+	// Update URL with new filter
+	updateUrlParams(1, selectedLetter.value);
+	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Load actresses on mount - use only KNOWN_ACTRESSES
 onMounted(async () => {
-  // Load known actresses from KNOWN_ACTRESSES with images from pornpics.com
-  const knownActresses = getAllKnownActresses();
-  allActors.value = knownActresses;
-  
-  // Calculate total pages
-  const totalPagesCount = Math.ceil(knownActresses.length / actorsPerPage);
-  
-  // Get page from URL or default to 1
-  const urlPage = getPageFromUrl();
-  
-  // Validate and set page
-  if (urlPage > totalPagesCount) {
-    // If URL page is beyond total pages, go to last page and update URL
-    currentPage.value = totalPagesCount;
-    updateUrlPage(totalPagesCount);
-  } else if (urlPage > 1) {
-    // Valid page from URL
-    currentPage.value = urlPage;
-  } else {
-    // Page 1 - ensure URL doesn't have page param
-    if (route.query.page) {
-      updateUrlPage(1);
-    }
-  }
-  
-  // Save to localStorage for persistence
-  try {
-    localStorage.setItem('extracted_actresses', JSON.stringify(knownActresses));
-  } catch (e) {
-    console.warn('Could not save actresses to localStorage:', e);
-  }
-  
-  // Scroll to top
-  window.scrollTo({ top: 0, behavior: 'instant' });
+	// Load known actresses from KNOWN_ACTRESSES with images from pornpics.com
+	const knownActresses = getAllKnownActresses();
+	allActors.value = knownActresses;
+
+	// Calculate total pages
+	const totalPagesCount = Math.ceil(knownActresses.length / actorsPerPage);
+
+	// Get page from URL or default to 1
+	const urlPage = getPageFromUrl();
+
+	// Validate and set page
+	if (urlPage > totalPagesCount) {
+		// If URL page is beyond total pages, go to last page and update URL
+		currentPage.value = totalPagesCount;
+		updateUrlPage(totalPagesCount);
+	} else if (urlPage > 1) {
+		// Valid page from URL
+		currentPage.value = urlPage;
+	} else {
+		// Page 1 - ensure URL doesn't have page param
+		if (route.query.page) {
+			updateUrlPage(1);
+		}
+	}
+
+	// Save to localStorage for persistence
+	try {
+		localStorage.setItem("extracted_actresses", JSON.stringify(knownActresses));
+	} catch (e) {
+		console.warn("Could not save actresses to localStorage:", e);
+	}
+
+	// Scroll to top
+	window.scrollTo({ top: 0, behavior: "instant" });
 });
 
 // Function to manually refresh actresses - reload from KNOWN_ACTRESSES
 async function refreshActresses() {
-  extracting.value = true;
-  try {
-    // Reload known actresses
-    const knownActresses = getAllKnownActresses();
-    allActors.value = knownActresses;
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem('extracted_actresses', JSON.stringify(knownActresses));
-    } catch (e) {
-      console.warn('Could not save actresses to localStorage:', e);
-    }
-  } catch (error) {
-    console.error('Error refreshing actresses:', error);
-  } finally {
-    extracting.value = false;
-  }
+	extracting.value = true;
+	try {
+		// Reload known actresses
+		const knownActresses = getAllKnownActresses();
+		allActors.value = knownActresses;
+
+		// Save to localStorage
+		try {
+			localStorage.setItem(
+				"extracted_actresses",
+				JSON.stringify(knownActresses),
+			);
+		} catch (e) {
+			console.warn("Could not save actresses to localStorage:", e);
+		}
+	} catch (error) {
+		console.error("Error refreshing actresses:", error);
+	} finally {
+		extracting.value = false;
+	}
 }
 
 // Filter actors by selected letter
 const filteredActors = computed(() => {
-  if (!selectedLetter.value) {
-    return allActors.value;
-  }
-  return allActors.value.filter(actor => {
-    const firstLetter = actor.name.charAt(0).toUpperCase();
-    return firstLetter === selectedLetter.value;
-  });
+	if (!selectedLetter.value) {
+		return allActors.value;
+	}
+	return allActors.value.filter((actor) => {
+		const firstLetter = actor.name.charAt(0).toUpperCase();
+		return firstLetter === selectedLetter.value;
+	});
 });
 
 // Computed for total actors count (filtered)
@@ -319,126 +341,127 @@ const totalActorsCount = computed(() => filteredActors.value.length);
 
 // Computed for total pages (based on filtered actors)
 const totalPages = computed(() => {
-  return Math.ceil(totalActorsCount.value / actorsPerPage);
+	return Math.ceil(totalActorsCount.value / actorsPerPage);
 });
 
 // Computed for display total pages
 const displayTotalPages = computed(() => {
-  const total = totalPages.value;
-  if (total > 100) {
-    return '100+';
-  }
-  return total.toString();
+	const total = totalPages.value;
+	if (total > 100) {
+		return "100+";
+	}
+	return total.toString();
 });
 
 // Computed for displayed actors (paginated)
 const displayedActors = computed(() => {
-  const start = (currentPage.value - 1) * actorsPerPage;
-  const end = start + actorsPerPage;
-  return filteredActors.value.slice(start, end);
+	const start = (currentPage.value - 1) * actorsPerPage;
+	const end = start + actorsPerPage;
+	return filteredActors.value.slice(start, end);
 });
 
 // Calculate visible pages for pagination
 const visiblePages = computed(() => {
-  const pages = [];
-  const total = totalPages.value;
-  const current = currentPage.value;
+	const pages = [];
+	const total = totalPages.value;
+	const current = currentPage.value;
 
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    pages.push(1);
+	if (total <= 7) {
+		for (let i = 1; i <= total; i++) {
+			pages.push(i);
+		}
+	} else {
+		pages.push(1);
 
-    if (current > 3) {
-      pages.push('...');
-    }
+		if (current > 3) {
+			pages.push("...");
+		}
 
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
+		const start = Math.max(2, current - 1);
+		const end = Math.min(total - 1, current + 1);
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+		for (let i = start; i <= end; i++) {
+			pages.push(i);
+		}
 
-    if (current < total - 2) {
-      pages.push('...');
-    }
+		if (current < total - 2) {
+			pages.push("...");
+		}
 
-    pages.push(total);
-  }
+		pages.push(total);
+	}
 
-  return pages;
+	return pages;
 });
 
 // Get initials for avatar
 function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+	if (!name) return "?";
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 }
 
 // Get unique gradient style for each avatar based on name hash
 function getAvatarStyle(name, index) {
-  const gradients = [
-    'linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)',
-    'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
-    'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)',
-    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-  ];
-  
-  // Use name hash to consistently assign gradient
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const gradientIndex = Math.abs(hash) % gradients.length;
-  
-  return {
-    background: gradients[gradientIndex],
-  };
+	const gradients = [
+		"linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)",
+		"linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)",
+		"linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)",
+		"linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+		"linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+		"linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+		"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+		"linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+		"linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+		"linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+		"linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+		"linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
+	];
+
+	// Use name hash to consistently assign gradient
+	let hash = 0;
+	for (let i = 0; i < name.length; i++) {
+		hash = name.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	const gradientIndex = Math.abs(hash) % gradients.length;
+
+	return {
+		background: gradients[gradientIndex],
+	};
 }
 
 // Navigate to actor page
 function navigateToActor(actorName) {
-  if (!actorName) return;
-  const encodedName = encodeURIComponent(actorName.toLowerCase().replace(/\s+/g, '-'));
-  router.push(`/${encodedName}`);
+	if (!actorName) return;
+	const encodedName = encodeURIComponent(
+		actorName.toLowerCase().replace(/\s+/g, "-"),
+	);
+	router.push(`/${encodedName}`);
 }
 
 // Handle image load error - fallback to avatar
 function handleImageError(event, actor) {
-  // Hide the image and show avatar instead
-  actor.image = null;
-  event.target.style.display = 'none';
+	// Hide the image and show avatar instead
+	actor.image = null;
+	event.target.style.display = "none";
 }
-
 
 // Go to page
 function goToPage(page) {
-  if (page === '...' || page < 1 || page > totalPages.value) return;
-  
-  // Update URL with new page
-  updateUrlPage(page);
-  
-  // Update current page (URL watcher will also update it, but this is immediate)
-  currentPage.value = page;
-  
-  // Scroll to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+	if (page === "..." || page < 1 || page > totalPages.value) return;
+
+	// Update URL with new page
+	updateUrlPage(page);
+
+	// Update current page (URL watcher will also update it, but this is immediate)
+	currentPage.value = page;
+
+	// Scroll to top
+	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 </script>
 
