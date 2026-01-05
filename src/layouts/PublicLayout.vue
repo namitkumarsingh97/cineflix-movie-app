@@ -242,7 +242,7 @@
             <router-link
               v-if="!isAuthenticated && !isAdminLoggedIn"
               to="/login"
-              class="navbar-btn login-btn"
+              class="navbar-btn login-btn hide-on-sm"
               title="Sign In"
             >
               <LogIn :size="18" />
@@ -364,7 +364,11 @@
             <Film :size="24" />
             <span>MovieHub</span>
           </div>
-          <button class="mobile-menu-close" @click="closeMobileMenu" aria-label="Close mobile menu">
+          <button
+            class="mobile-menu-close"
+            @click="closeMobileMenu"
+            aria-label="Close mobile menu"
+          >
             <X :size="24" />
           </button>
         </div>
@@ -449,301 +453,554 @@
           <div class="mobile-menu-section">
             <h3 class="mobile-menu-section-header">CATEGORIES</h3>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/hd-4k' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                'mobile-featured-item-divider',
+                { active: route.path === '/hd-4k' },
+              ]"
               @click="navigateToMobileHD4K"
             >
               <span>4K/HD Only</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/amateur' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                'mobile-featured-item-divider',
+                { active: route.path === '/amateur' },
+              ]"
               @click="navigateToMobileAmateur"
             >
               <span>Amateur</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/anal' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                'mobile-featured-item-divider',
+                { active: route.path === '/anal' },
+              ]"
               @click="navigateToMobileAnal"
             >
               <span>Anal</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/asian' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/asian' },
+              ]"
               @click="navigateToMobileAsian"
             >
               <span>Asian</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/behind-the-scenes' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/behind-the-scenes' },
+              ]"
               @click="navigateToMobileBehindTheScenes"
             >
               <span>Behind the Scenes</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bdsm' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/bdsm' },
+              ]"
               @click="navigateToMobileBdsm"
             >
               <span>BDSM</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-ass' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/big-ass' },
+              ]"
               @click="navigateToMobileBigAss"
             >
               <span>Big Ass</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-dick' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/big-dick' },
+              ]"
               @click="navigateToMobileBigDick"
             >
               <span>Big Dick</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-tits' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/big-tits' },
+              ]"
               @click="navigateToMobileBigTits"
             >
               <span>Big Tits</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bisexual' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/bisexual' },
+              ]"
               @click="navigateToMobileBisexual"
             >
               <span>Bisexual</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/blonde' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/blonde' },
+              ]"
               @click="navigateToMobileBlonde"
             >
               <span>Blonde</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/blowjob' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/blowjob' },
+              ]"
               @click="navigateToMobileBlowjob"
             >
               <span>Blowjob</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/brunette' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/brunette' },
+              ]"
               @click="navigateToMobileBrunette"
             >
               <span>Brunette</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bukkake' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/bukkake' },
+              ]"
               @click="navigateToMobileBukkake"
             >
               <span>Bukkake</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/compilations' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/compilations' },
+              ]"
               @click="navigateToMobileCompilations"
             >
               <span>Compilations</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/creampie' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/creampie' },
+              ]"
               @click="navigateToMobileCreampie"
             >
               <span>Creampie</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/cumshot' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/cumshot' },
+              ]"
               @click="navigateToMobileCumshot"
             >
               <span>Cumshot</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/documentaries' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/documentaries' },
+              ]"
               @click="navigateToMobileDocumentaries"
             >
               <span>Documentaries</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/double-penetration' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/double-penetration' },
+              ]"
               @click="navigateToMobileDoublePenetration"
             >
               <span>Double Penetration</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/ebony' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/ebony' },
+              ]"
               @click="navigateToMobileEbony"
             >
               <span>Ebony</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/for-women' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/for-women' },
+              ]"
               @click="navigateToMobileForWomen"
             >
               <span>For Women</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/group-sex' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/group-sex' },
+              ]"
               @click="navigateToMobileGroupSex"
             >
               <span>Group Sex</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/handjob' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/handjob' },
+              ]"
               @click="navigateToMobileHandjob"
             >
               <span>Handjob</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hardcore' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/hardcore' },
+              ]"
               @click="navigateToMobileHardcore"
             >
               <span>Hardcore</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hentai' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/hentai' },
+              ]"
               @click="navigateToMobileHentai"
             >
               <span>Hentai</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/homemade' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/homemade' },
+              ]"
               @click="navigateToMobileHomemade"
             >
               <span>Homemade</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hotel' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/hotel' },
+              ]"
               @click="navigateToMobileHotel"
             >
               <span>Hotel</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/housewives' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/housewives' },
+              ]"
               @click="navigateToMobileHousewives"
             >
               <span>Housewives</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/interracial' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/interracial' },
+              ]"
               @click="navigateToMobileInterracial"
             >
               <span>Interracial</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/interviews' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/interviews' },
+              ]"
               @click="navigateToMobileInterviews"
             >
               <span>Interviews</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/latina' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/latina' },
+              ]"
               @click="navigateToMobileLatina"
             >
               <span>Latina</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/lesbian' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/lesbian' },
+              ]"
               @click="navigateToMobileLesbian"
             >
               <span>Lesbian</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/live-cams' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/live-cams' },
+              ]"
               @click="navigateToMobileLiveCams"
             >
               <span>Live Cams</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/massage' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/massage' },
+              ]"
               @click="navigateToMobileMassage"
             >
               <span>Massage</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/masturbation' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/masturbation' },
+              ]"
               @click="navigateToMobileMasturbation"
             >
               <span>Masturbation</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/mature' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/mature' },
+              ]"
               @click="navigateToMobileMature"
             >
               <span>Mature</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/milf' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/milf' },
+              ]"
               @click="navigateToMobileMILF"
             >
               <span>MILF</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/nurse' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/nurse' },
+              ]"
               @click="navigateToMobileNurse"
             >
               <span>Nurse</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/office' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/office' },
+              ]"
               @click="navigateToMobileOffice"
             >
               <span>Office</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/outdoor' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/outdoor' },
+              ]"
               @click="navigateToMobileOutdoor"
             >
               <span>Outdoor</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/parodies' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/parodies' },
+              ]"
               @click="navigateToMobileParodies"
             >
               <span>Parodies</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/pov' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/pov' },
+              ]"
               @click="navigateToMobilePOV"
             >
               <span>POV</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/public' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/public' },
+              ]"
               @click="navigateToMobilePublic"
             >
               <span>Public</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/shemale' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/shemale' },
+              ]"
               @click="navigateToMobileShemale"
             >
               <span>Shemale</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/sleep' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/sleep' },
+              ]"
               @click="navigateToMobileSleep"
             >
               <span>Sleep</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/small-tits' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/small-tits' },
+              ]"
               @click="navigateToMobileSmallTits"
             >
               <span>Small Tits</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/squirt' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/squirt' },
+              ]"
               @click="navigateToMobileSquirt"
             >
               <span>Squirt</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/verified-amateur' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/verified-amateur' },
+              ]"
               @click="navigateToMobileVerifiedAmateur"
             >
               <span>Verified Amateur</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/vr-360' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/vr-360' },
+              ]"
               @click="navigateToMobileVR360"
             >
               <span>VR/360° Videos</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/webcam' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/webcam' },
+              ]"
               @click="navigateToMobileWebcam"
             >
               <span>Webcam</span>
@@ -890,40 +1147,40 @@
 
 <script setup>
 import {
-	Accessibility,
-	ChevronDown,
-	ChevronLeft,
-	ChevronRight,
-	Clock,
-	Crown,
-	Eye,
-	Facebook,
-	FileText,
-	Film,
-	FolderOpen,
-	Heart,
-	Home,
-	Image,
-	Instagram,
-	Languages,
-	Layout,
-	ListMusic,
-	LogIn,
-	LogOut,
-	Menu,
-	Play,
-	RefreshCw,
-	RotateCcw,
-	Search,
-	Settings,
-	Shield,
-	Star,
-	ThumbsUp,
-	TrendingUp,
-	Twitter,
-	User,
-	X,
-	Youtube,
+  Accessibility,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Crown,
+  Eye,
+  Facebook,
+  FileText,
+  Film,
+  FolderOpen,
+  Heart,
+  Home,
+  Image,
+  Instagram,
+  Languages,
+  Layout,
+  ListMusic,
+  LogIn,
+  LogOut,
+  Menu,
+  Play,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  Settings,
+  Shield,
+  Star,
+  ThumbsUp,
+  TrendingUp,
+  Twitter,
+  User,
+  X,
+  Youtube,
 } from "lucide-vue-next";
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -942,10 +1199,10 @@ const router = useRouter();
 const route = useRoute();
 
 const props = defineProps({
-	modelValue: {
-		type: String,
-		default: "",
-	},
+  modelValue: {
+    type: String,
+    default: "",
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "refresh", "addMovie"]);
@@ -962,39 +1219,39 @@ const { user, isAuthenticated, logout: authLogout, checkAuth } = useAuth();
 const userMenuOpen = ref(false);
 
 function toggleUserMenu() {
-	userMenuOpen.value = !userMenuOpen.value;
-	if (userMenuOpen.value) {
-		adminMenuOpen.value = false;
-	}
+  userMenuOpen.value = !userMenuOpen.value;
+  if (userMenuOpen.value) {
+    adminMenuOpen.value = false;
+  }
 }
 
 function closeUserMenu() {
-	userMenuOpen.value = false;
+  userMenuOpen.value = false;
 }
 
 async function handleLogout() {
-	if (confirm("Are you sure you want to logout?")) {
-		await authLogout();
-		closeUserMenu();
-	}
+  if (confirm("Are you sure you want to logout?")) {
+    await authLogout();
+    closeUserMenu();
+  }
 }
 const { skipToMain } = useAccessibility();
 const { watchLaterCount, followedStarsCount } = useBadgeCounts();
 const {
-	subscribe,
-	requestPermission,
-	isSupported: pushSupported,
+  subscribe,
+  requestPermission,
+  isSupported: pushSupported,
 } = usePushNotifications();
 
 // Get available categories for preferences
 const availableCategories = computed(() => {
-	const categories = new Set();
-	movies.value.forEach((movie) => {
-		if (movie.category) {
-			categories.add(movie.category);
-		}
-	});
-	return Array.from(categories).sort();
+  const categories = new Set();
+  movies.value.forEach((movie) => {
+    if (movie.category) {
+      categories.add(movie.category);
+    }
+  });
+  return Array.from(categories).sort();
 });
 
 // Search autocomplete
@@ -1018,789 +1275,797 @@ const mobileCategoryLimit = 20;
 
 // Mobile top navigation items
 const mobileTopNavItems = [
-	{ id: "history", label: "History", icon: RotateCcw },
-	{ id: "newest", label: "Newest videos", icon: Play },
-	{ id: "best", label: "Best Videos", icon: ThumbsUp },
-	{ id: "top-rated", label: "Top rated", icon: Star },
-	{ id: "most-viewed", label: "Most viewed", icon: Eye },
+  { id: "history", label: "History", icon: RotateCcw },
+  { id: "newest", label: "Newest videos", icon: Play },
+  { id: "best", label: "Best Videos", icon: ThumbsUp },
+  { id: "top-rated", label: "Top rated", icon: Star },
+  { id: "most-viewed", label: "Most viewed", icon: Eye },
 ];
 
 // Mobile production items
 const mobileProductionItems = ref([
-	{ id: "all", label: "All", count: 0 },
-	{ id: "professional", label: "Professional", count: 0 },
-	{ id: "homemade", label: "Homemade", count: 0 },
+  { id: "all", label: "All", count: 0 },
+  { id: "professional", label: "Professional", count: 0 },
+  { id: "homemade", label: "Homemade", count: 0 },
 ]);
 
 // Load movies and videos on mount for autocomplete
 onMounted(async () => {
-	await loadMovies();
-	// Load some popular videos for autocomplete
-	await searchVideos("all", 1, { perPage: 20, order: "most-popular" });
+  await loadMovies();
+  // Load some popular videos for autocomplete
+  await searchVideos("all", 1, { perPage: 20, order: "most-popular" });
 });
 
 // Generate search suggestions from both movies and videos
 const generateSuggestions = (query) => {
-	if (!query || query.length < 2) {
-		suggestions.value = [];
-		return;
-	}
+  if (!query || query.length < 2) {
+    suggestions.value = [];
+    return;
+  }
 
-	const queryLower = query.toLowerCase();
-	const suggestionsList = [];
+  const queryLower = query.toLowerCase();
+  const suggestionsList = [];
 
-	// Add movie titles
-	movies.value.forEach((movie) => {
-		if (movie.title && movie.title.toLowerCase().includes(queryLower)) {
-			suggestionsList.push({
-				title: movie.title,
-				type: "Movie",
-				id: movie._id,
-				source: "movie",
-			});
-		}
-		// Add stars
-		if (movie.stars && Array.isArray(movie.stars)) {
-			movie.stars.forEach((star) => {
-				if (star && star.toLowerCase().includes(queryLower)) {
-					suggestionsList.push({
-						title: star,
-						type: "Star",
-						id: movie._id,
-						source: "movie",
-					});
-				}
-			});
-		}
-	});
+  // Add movie titles
+  movies.value.forEach((movie) => {
+    if (movie.title && movie.title.toLowerCase().includes(queryLower)) {
+      suggestionsList.push({
+        title: movie.title,
+        type: "Movie",
+        id: movie._id,
+        source: "movie",
+      });
+    }
+    // Add stars
+    if (movie.stars && Array.isArray(movie.stars)) {
+      movie.stars.forEach((star) => {
+        if (star && star.toLowerCase().includes(queryLower)) {
+          suggestionsList.push({
+            title: star,
+            type: "Star",
+            id: movie._id,
+            source: "movie",
+          });
+        }
+      });
+    }
+  });
 
-	// Add Eporner video titles
-	epornerVideos.value.forEach((video) => {
-		if (video.title && video.title.toLowerCase().includes(queryLower)) {
-			suggestionsList.push({
-				title: video.title,
-				type: "Video",
-				id: video.id,
-				source: "eporner",
-			});
-		}
-		// Add video categories
-		if (video.categories && Array.isArray(video.categories)) {
-			video.categories.forEach((cat) => {
-				if (cat && cat.toLowerCase().includes(queryLower)) {
-					suggestionsList.push({
-						title: cat,
-						type: "Category",
-						id: video.id,
-						source: "eporner",
-					});
-				}
-			});
-		}
-	});
+  // Add Eporner video titles
+  epornerVideos.value.forEach((video) => {
+    if (video.title && video.title.toLowerCase().includes(queryLower)) {
+      suggestionsList.push({
+        title: video.title,
+        type: "Video",
+        id: video.id,
+        source: "eporner",
+      });
+    }
+    // Add video categories
+    if (video.categories && Array.isArray(video.categories)) {
+      video.categories.forEach((cat) => {
+        if (cat && cat.toLowerCase().includes(queryLower)) {
+          suggestionsList.push({
+            title: cat,
+            type: "Category",
+            id: video.id,
+            source: "eporner",
+          });
+        }
+      });
+    }
+  });
 
-	// Limit to 8 suggestions and remove duplicates
-	const seen = new Set();
-	suggestions.value = suggestionsList
-		.filter((item) => {
-			const key = `${item.title}-${item.type}`;
-			if (seen.has(key)) return false;
-			seen.add(key);
-			return true;
-		})
-		.slice(0, 8);
+  // Limit to 8 suggestions and remove duplicates
+  const seen = new Set();
+  suggestions.value = suggestionsList
+    .filter((item) => {
+      const key = `${item.title}-${item.type}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 8);
 };
 
 const handleSearchInput = (event) => {
-	const value = event.target.value;
-	emit("update:modelValue", value);
-	generateSuggestions(value);
-	showSuggestions.value = true;
-	selectedIndex.value = -1;
+  const value = event.target.value;
+  emit("update:modelValue", value);
+  generateSuggestions(value);
+  showSuggestions.value = true;
+  selectedIndex.value = -1;
 };
 
 const selectSuggestion = (suggestion) => {
-	const searchText =
-		typeof suggestion === "string" ? suggestion : suggestion.title;
-	emit("update:modelValue", searchText);
-	showSuggestions.value = false;
-	suggestions.value = [];
+  const searchText =
+    typeof suggestion === "string" ? suggestion : suggestion.title;
+  emit("update:modelValue", searchText);
+  showSuggestions.value = false;
+  suggestions.value = [];
 
-	// Navigate to search results or watch page
-	if (typeof suggestion === "object" && suggestion.id) {
-		if (suggestion.source === "eporner") {
-			router.push(`/watch/${suggestion.id}?source=eporner`);
-		} else {
-			router.push(`/watch/${suggestion.id}`);
-		}
-	} else {
-		// Navigate to Videos page with search query
-		handleSearch();
-	}
+  // Navigate to search results or watch page
+  if (typeof suggestion === "object" && suggestion.id) {
+    if (suggestion.source === "eporner") {
+      router.push(`/watch/${suggestion.id}?source=eporner`);
+    } else {
+      router.push(`/watch/${suggestion.id}`);
+    }
+  } else {
+    // Navigate to Videos page with search query
+    handleSearch();
+  }
 };
 
 const handleSearch = () => {
-	const query = props.modelValue || searchInput.value?.value || "";
-	if (query.trim()) {
-		showSuggestions.value = false;
-		// Navigate to Videos page with search query
-		router.push({
-			path: "/videos",
-			query: { q: query.trim() },
-		});
-		emit("update:modelValue", "");
-		if (searchInput.value) {
-			searchInput.value.value = "";
-			searchInput.value.blur();
-		}
-	}
+  const query = props.modelValue || searchInput.value?.value || "";
+  if (query.trim()) {
+    showSuggestions.value = false;
+    // Navigate to Videos page with search query
+    router.push({
+      path: "/videos",
+      query: { q: query.trim() },
+    });
+    emit("update:modelValue", "");
+    if (searchInput.value) {
+      searchInput.value.value = "";
+      searchInput.value.blur();
+    }
+  }
 };
 
 const navigateSuggestions = (direction) => {
-	if (suggestions.value.length === 0) return;
+  if (suggestions.value.length === 0) return;
 
-	selectedIndex.value += direction;
+  selectedIndex.value += direction;
 
-	if (selectedIndex.value < 0) {
-		selectedIndex.value = suggestions.value.length - 1;
-	} else if (selectedIndex.value >= suggestions.value.length) {
-		selectedIndex.value = 0;
-	}
+  if (selectedIndex.value < 0) {
+    selectedIndex.value = suggestions.value.length - 1;
+  } else if (selectedIndex.value >= suggestions.value.length) {
+    selectedIndex.value = 0;
+  }
 };
 
 const handleBlur = () => {
-	// Delay to allow click on suggestion
-	setTimeout(() => {
-		showSuggestions.value = false;
-	}, 200);
+  // Delay to allow click on suggestion
+  setTimeout(() => {
+    showSuggestions.value = false;
+  }, 200);
 };
 
 const isAdminRoute = computed(() => {
-	return route.path.startsWith("/admin");
+  return route.path.startsWith("/admin");
 });
 
 // Watch for auth state changes to update UI immediately
 watch(
-	isAuthenticated,
-	async (newValue) => {
-		if (newValue) {
-			// User just logged in, refresh auth state
-			await checkAuth();
-		}
-	},
-	{ immediate: true },
+  isAuthenticated,
+  async (newValue) => {
+    if (newValue) {
+      // User just logged in, refresh auth state
+      await checkAuth();
+    }
+  },
+  { immediate: true }
 );
 
 onMounted(async () => {
-	checkAdminStatus();
-	// Check admin status periodically
-	const interval = setInterval(checkAdminStatus, 1000);
-	window._adminStatusInterval = interval;
+  checkAdminStatus();
+  // Check admin status periodically
+  const interval = setInterval(checkAdminStatus, 1000);
+  window._adminStatusInterval = interval;
 
-	// Check auth status on mount to ensure UI updates
-	await checkAuth();
+  // Check auth status on mount to ensure UI updates
+  await checkAuth();
 
-	// Load production counts for mobile
-	try {
-		const { videosApi } = await import("../api/videos");
-		const response = await videosApi.getAll({ limit: 1 });
-		const total = response.data?.total || response.data?.totalCount || 0;
-		mobileProductionItems.value[0].count = total;
-		mobileProductionItems.value[1].count = Math.floor(total * 0.7);
-		mobileProductionItems.value[2].count = Math.floor(total * 0.3);
-	} catch (error) {
-		// Ignore errors
-	}
+  // Load production counts for mobile
+  try {
+    const { videosApi } = await import("../api/videos");
+    const response = await videosApi.getAll({ limit: 1 });
+    const total = response.data?.total || response.data?.totalCount || 0;
+    mobileProductionItems.value[0].count = total;
+    mobileProductionItems.value[1].count = Math.floor(total * 0.7);
+    mobileProductionItems.value[2].count = Math.floor(total * 0.3);
+  } catch (error) {
+    // Ignore errors
+  }
 
-	// Initialize push notifications if supported and logged in
-	if (
-		pushSupported.value &&
-		(localStorage.getItem("cineflix_auth_token") ||
-			localStorage.getItem("adminToken"))
-	) {
-		const hasPermission = await requestPermission();
-		if (hasPermission) {
-			await subscribe();
-		}
-	}
+  // Initialize push notifications if supported and logged in
+  if (
+    pushSupported.value &&
+    (localStorage.getItem("cineflix_auth_token") ||
+      localStorage.getItem("adminToken"))
+  ) {
+    const hasPermission = await requestPermission();
+    if (hasPermission) {
+      await subscribe();
+    }
+  }
 
-	// Close admin menu and user menu when clicking outside
-	const handleClickOutside = (event) => {
-		if (!event.target.closest(".profile-menu-wrapper")) {
-			adminMenuOpen.value = false;
-		}
-		if (!event.target.closest(".user-menu-wrapper")) {
-			userMenuOpen.value = false;
-		}
-	};
-	document.addEventListener("click", handleClickOutside);
-	window._adminMenuClickHandler = handleClickOutside;
+  // Close admin menu and user menu when clicking outside
+  const handleClickOutside = (event) => {
+    if (!event.target.closest(".profile-menu-wrapper")) {
+      adminMenuOpen.value = false;
+    }
+    if (!event.target.closest(".user-menu-wrapper")) {
+      userMenuOpen.value = false;
+    }
+  };
+  document.addEventListener("click", handleClickOutside);
+  window._adminMenuClickHandler = handleClickOutside;
 });
 
 onUnmounted(() => {
-	if (window._adminStatusInterval) {
-		clearInterval(window._adminStatusInterval);
-		delete window._adminStatusInterval;
-	}
-	if (window._adminMenuClickHandler) {
-		document.removeEventListener("click", window._adminMenuClickHandler);
-		delete window._adminMenuClickHandler;
-	}
+  if (window._adminStatusInterval) {
+    clearInterval(window._adminStatusInterval);
+    delete window._adminStatusInterval;
+  }
+  if (window._adminMenuClickHandler) {
+    document.removeEventListener("click", window._adminMenuClickHandler);
+    delete window._adminMenuClickHandler;
+  }
 });
 
 function checkAdminStatus() {
-	const token = localStorage.getItem("adminToken");
-	const id = localStorage.getItem("adminId");
-	isAdminLoggedIn.value = !!token;
-	adminId.value = id || "";
+  const token = localStorage.getItem("adminToken");
+  const id = localStorage.getItem("adminId");
+  isAdminLoggedIn.value = !!token;
+  adminId.value = id || "";
 }
 
 function toggleAdminMenu() {
-	adminMenuOpen.value = !adminMenuOpen.value;
+  adminMenuOpen.value = !adminMenuOpen.value;
 }
 
 function closeAdminMenu() {
-	adminMenuOpen.value = false;
+  adminMenuOpen.value = false;
 }
 
 function handleAdminLogout() {
-	localStorage.removeItem("adminToken");
-	localStorage.removeItem("adminId");
-	isAdminLoggedIn.value = false;
-	adminId.value = "";
-	adminMenuOpen.value = false;
-	router.push("/");
+  localStorage.removeItem("adminToken");
+  localStorage.removeItem("adminId");
+  isAdminLoggedIn.value = false;
+  adminId.value = "";
+  adminMenuOpen.value = false;
+  router.push("/");
 }
 
 function closeMobileMenu() {
-	mobileMenuOpen.value = false;
-	document.body.style.overflow = "";
+  mobileMenuOpen.value = false;
+  document.body.style.overflow = "";
 }
 
 function toggleMobileMenu() {
-	mobileMenuOpen.value = !mobileMenuOpen.value;
-	if (mobileMenuOpen.value) {
-		document.body.style.overflow = "hidden";
-		// Load categories when menu opens
-		if (mobileCategories.value.length === 0) {
-			loadMobileCategories(1);
-		}
-	} else {
-		document.body.style.overflow = "";
-	}
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+  if (mobileMenuOpen.value) {
+    document.body.style.overflow = "hidden";
+    // Load categories when menu opens
+    if (mobileCategories.value.length === 0) {
+      loadMobileCategories(1);
+    }
+  } else {
+    document.body.style.overflow = "";
+  }
 }
 
 // Mobile category functions
 async function loadMobileCategories(page = 1) {
-	loadingMobileCategories.value = true;
-	try {
-		const { videosApi } = await import("../api/videos");
-		const response = await videosApi.getAll({
-			page,
-			limit: mobileCategoryLimit,
-		});
+  loadingMobileCategories.value = true;
+  try {
+    const { videosApi } = await import("../api/videos");
+    const response = await videosApi.getAll({
+      page,
+      limit: mobileCategoryLimit,
+    });
 
-		const categoryMap = new Map();
-		const videos =
-			response.data?.data || response.data?.videos || response.data || [];
+    const categoryMap = new Map();
+    const videos =
+      response.data?.data || response.data?.videos || response.data || [];
 
-		videos.forEach((video) => {
-			if (video.categories && Array.isArray(video.categories)) {
-				video.categories.forEach((cat) => {
-					if (cat && cat.trim()) {
-						const catName = cat.trim();
-						if (!categoryMap.has(catName)) {
-							categoryMap.set(catName, { name: catName, count: 0 });
-						}
-						categoryMap.get(catName).count++;
-					}
-				});
-			}
-		});
+    videos.forEach((video) => {
+      if (video.categories && Array.isArray(video.categories)) {
+        video.categories.forEach((cat) => {
+          if (cat && cat.trim()) {
+            const catName = cat.trim();
+            if (!categoryMap.has(catName)) {
+              categoryMap.set(catName, { name: catName, count: 0 });
+            }
+            categoryMap.get(catName).count++;
+          }
+        });
+      }
+    });
 
-		mobileCategories.value = Array.from(categoryMap.values()).sort((a, b) =>
-			a.name.localeCompare(b.name),
-		);
+    mobileCategories.value = Array.from(categoryMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
 
-		const total =
-			response.data?.total || response.data?.totalCount || videos.length;
-		mobileCategoryTotalPages.value =
-			Math.ceil(total / mobileCategoryLimit) || 1;
-		mobileCategoryCurrentPage.value = page;
-	} catch (error) {
-		console.error("Failed to load mobile categories:", error);
-		mobileCategories.value = [];
-	} finally {
-		loadingMobileCategories.value = false;
-	}
+    const total =
+      response.data?.total || response.data?.totalCount || videos.length;
+    mobileCategoryTotalPages.value =
+      Math.ceil(total / mobileCategoryLimit) || 1;
+    mobileCategoryCurrentPage.value = page;
+  } catch (error) {
+    console.error("Failed to load mobile categories:", error);
+    mobileCategories.value = [];
+  } finally {
+    loadingMobileCategories.value = false;
+  }
 }
 
 function loadMobileCategoryPage(page) {
-	if (page >= 1 && page <= mobileCategoryTotalPages.value) {
-		loadMobileCategories(page);
-	}
+  if (page >= 1 && page <= mobileCategoryTotalPages.value) {
+    loadMobileCategories(page);
+  }
 }
 
 function formatMobileCount(count) {
-	if (!count) return "0";
-	if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-	if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
-	return count.toString();
+  if (!count) return "0";
+  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
+  return count.toString();
 }
 
 function handleMobileTopNav(id) {
-	selectedMobileTopNav.value = selectedMobileTopNav.value === id ? null : id;
-	selectedMobileProduction.value = "all";
-	selectedMobileCategory.value = "all";
+  selectedMobileTopNav.value = selectedMobileTopNav.value === id ? null : id;
+  selectedMobileProduction.value = "all";
+  selectedMobileCategory.value = "all";
 
-	if (id === "newest") {
-		router.push("/videos?order=latest");
-	} else if (id === "best") {
-		router.push("/videos?order=most-popular");
-	} else if (id === "top-rated") {
-		router.push("/videos?order=top-rated");
-	} else if (id === "most-viewed") {
-		router.push("/videos?order=most-popular");
-	} else if (id === "history") {
-		router.push("/dashboard?tab=history");
-	}
+  if (id === "newest") {
+    router.push("/videos?order=latest");
+  } else if (id === "best") {
+    router.push("/videos?order=most-popular");
+  } else if (id === "top-rated") {
+    router.push("/videos?order=top-rated");
+  } else if (id === "most-viewed") {
+    router.push("/videos?order=most-popular");
+  } else if (id === "history") {
+    router.push("/dashboard?tab=history");
+  }
 
-	closeMobileMenu();
+  closeMobileMenu();
 }
 
 function handleMobileProduction(id) {
-	selectedMobileProduction.value = id;
-	selectedMobileCategory.value = "all";
-	selectedMobileTopNav.value = null;
+  selectedMobileProduction.value = id;
+  selectedMobileCategory.value = "all";
+  selectedMobileTopNav.value = null;
 
-	const query = id === "all" ? "all" : id;
-	searchVideos(query, 1, { order: "most-popular" });
-	router.push(`/videos?q=${encodeURIComponent(query)}`);
-	closeMobileMenu();
+  const query = id === "all" ? "all" : id;
+  searchVideos(query, 1, { order: "most-popular" });
+  router.push(`/videos?q=${encodeURIComponent(query)}`);
+  closeMobileMenu();
 }
 
 function handleMobileCategory(categoryName) {
-	selectedMobileCategory.value = categoryName;
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
+  selectedMobileCategory.value = categoryName;
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
 
-	const query = categoryName === "all" ? "all" : categoryName;
-	searchVideos(query, 1, { order: "most-popular" });
-	router.push(`/videos?q=${encodeURIComponent(query)}`);
-	closeMobileMenu();
+  const query = categoryName === "all" ? "all" : categoryName;
+  searchVideos(query, 1, { order: "most-popular" });
+  router.push(`/videos?q=${encodeURIComponent(query)}`);
+  closeMobileMenu();
 }
 
 function navigateToMobileDoublePenetration() {
-	selectedMobileCategory.value = "double penetration";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/double-penetration");
-	closeMobileMenu();
+  selectedMobileCategory.value = "double penetration";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/double-penetration");
+  closeMobileMenu();
 }
 
 function navigateToMobileAmateur() {
-	selectedMobileCategory.value = "amateur";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/amateur");
-	closeMobileMenu();
+  selectedMobileCategory.value = "amateur";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/amateur");
+  closeMobileMenu();
 }
 
 function navigateToMobileAnal() {
-	selectedMobileCategory.value = "anal";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/anal");
-	closeMobileMenu();
+  selectedMobileCategory.value = "anal";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/anal");
+  closeMobileMenu();
 }
 
 function navigateToMobileAsian() {
-	selectedMobileCategory.value = "asian";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/asian");
-	closeMobileMenu();
+  selectedMobileCategory.value = "asian";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/asian");
+  closeMobileMenu();
 }
 
 function navigateToMobileBdsm() {
-	selectedMobileCategory.value = "bdsm";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/bdsm");
-	closeMobileMenu();
+  selectedMobileCategory.value = "bdsm";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/bdsm");
+  closeMobileMenu();
 }
 
 function navigateToMobileBigAss() {
-	selectedMobileCategory.value = "big ass";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/big-ass");
-	closeMobileMenu();
+  selectedMobileCategory.value = "big ass";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/big-ass");
+  closeMobileMenu();
 }
 
 function navigateToMobileBigDick() {
-	selectedMobileCategory.value = "big dick";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/big-dick");
-	closeMobileMenu();
+  selectedMobileCategory.value = "big dick";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/big-dick");
+  closeMobileMenu();
 }
 
 function navigateToMobileBigTits() {
-	selectedMobileCategory.value = "big tits";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/big-tits");
-	closeMobileMenu();
+  selectedMobileCategory.value = "big tits";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/big-tits");
+  closeMobileMenu();
 }
 
 function navigateToMobileBisexual() {
-	selectedMobileCategory.value = "bisexual";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/bisexual");
-	closeMobileMenu();
+  selectedMobileCategory.value = "bisexual";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/bisexual");
+  closeMobileMenu();
 }
 
 function navigateToMobileBlonde() {
-	selectedMobileCategory.value = "blonde";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/blonde");
-	closeMobileMenu();
+  selectedMobileCategory.value = "blonde";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/blonde");
+  closeMobileMenu();
 }
 
 function navigateToMobileBlowjob() {
-	selectedMobileCategory.value = "blowjob";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/blowjob");
-	closeMobileMenu();
+  selectedMobileCategory.value = "blowjob";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/blowjob");
+  closeMobileMenu();
 }
 
 function navigateToMobileBrunette() {
-	selectedMobileCategory.value = "brunette";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/brunette");
-	closeMobileMenu();
+  selectedMobileCategory.value = "brunette";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/brunette");
+  closeMobileMenu();
 }
 
 function navigateToMobileBukkake() {
-	selectedMobileCategory.value = "bukkake";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/bukkake");
-	closeMobileMenu();
+  selectedMobileCategory.value = "bukkake";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/bukkake");
+  closeMobileMenu();
 }
 
 function navigateToMobileCreampie() {
-	selectedMobileCategory.value = "creampie";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/creampie");
-	closeMobileMenu();
+  selectedMobileCategory.value = "creampie";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/creampie");
+  closeMobileMenu();
 }
 
 function navigateToMobileCumshot() {
-	selectedMobileCategory.value = "cumshot";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/cumshot");
-	closeMobileMenu();
+  selectedMobileCategory.value = "cumshot";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/cumshot");
+  closeMobileMenu();
 }
 
 function navigateToMobileEbony() {
-	selectedMobileCategory.value = "ebony";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/ebony");
-	closeMobileMenu();
+  selectedMobileCategory.value = "ebony";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/ebony");
+  closeMobileMenu();
 }
 
 function navigateToMobileForWomen() {
-	selectedMobileCategory.value = "for women";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/for-women");
-	closeMobileMenu();
+  selectedMobileCategory.value = "for women";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/for-women");
+  closeMobileMenu();
 }
 
 function navigateToMobileGroupSex() {
-	selectedMobileCategory.value = "group sex";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/group-sex");
-	closeMobileMenu();
+  selectedMobileCategory.value = "group sex";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/group-sex");
+  closeMobileMenu();
 }
 
 function navigateToMobileHandjob() {
-	selectedMobileCategory.value = "handjob";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/handjob");
-	closeMobileMenu();
+  selectedMobileCategory.value = "handjob";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/handjob");
+  closeMobileMenu();
 }
 
 function navigateToMobileHardcore() {
-	selectedMobileCategory.value = "hardcore";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/hardcore");
-	closeMobileMenu();
+  selectedMobileCategory.value = "hardcore";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hardcore");
+  closeMobileMenu();
 }
 
 function navigateToMobileHentai() {
-	selectedMobileCategory.value = "hentai";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/hentai");
-	closeMobileMenu();
+  selectedMobileCategory.value = "hentai";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hentai");
+  closeMobileMenu();
 }
 
 function navigateToMobileHomemade() {
-	selectedMobileCategory.value = "homemade";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/homemade");
-	closeMobileMenu();
+  selectedMobileCategory.value = "homemade";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/homemade");
+  closeMobileMenu();
 }
 
 function navigateToMobileHotel() {
-	selectedMobileCategory.value = "hotel";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/hotel");
-	closeMobileMenu();
+  selectedMobileCategory.value = "hotel";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hotel");
+  closeMobileMenu();
 }
 
 function navigateToMobileHousewives() {
-	selectedMobileCategory.value = "housewives";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/housewives");
-	closeMobileMenu();
+  selectedMobileCategory.value = "housewives";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/housewives");
+  closeMobileMenu();
 }
 
 function navigateToMobileInterracial() {
-	selectedMobileCategory.value = "interracial";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/interracial");
-	closeMobileMenu();
+  selectedMobileCategory.value = "interracial";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/interracial");
+  closeMobileMenu();
 }
 
 function navigateToMobileLatina() {
-	selectedMobileCategory.value = "latina";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/latina");
-	closeMobileMenu();
+  selectedMobileCategory.value = "latina";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/latina");
+  closeMobileMenu();
 }
 
 function navigateToMobileLesbian() {
-	selectedMobileCategory.value = "lesbian";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/lesbian");
-	closeMobileMenu();
+  selectedMobileCategory.value = "lesbian";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/lesbian");
+  closeMobileMenu();
 }
 
 function navigateToMobileMassage() {
-	selectedMobileCategory.value = "massage";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/massage");
-	closeMobileMenu();
+  selectedMobileCategory.value = "massage";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/massage");
+  closeMobileMenu();
 }
 
 function navigateToMobileMasturbation() {
-	selectedMobileCategory.value = "masturbation";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/masturbation");
-	closeMobileMenu();
+  selectedMobileCategory.value = "masturbation";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/masturbation");
+  closeMobileMenu();
 }
 
 function navigateToMobileMature() {
-	selectedMobileCategory.value = "mature";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/mature");
-	closeMobileMenu();
+  selectedMobileCategory.value = "mature";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/mature");
+  closeMobileMenu();
 }
 
 function navigateToMobileMILF() {
-	selectedMobileCategory.value = "milf";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/milf");
-	closeMobileMenu();
+  selectedMobileCategory.value = "milf";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/milf");
+  closeMobileMenu();
 }
 
 function navigateToMobileNurse() {
-	selectedMobileCategory.value = "nurse";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/nurse");
-	closeMobileMenu();
+  selectedMobileCategory.value = "nurse";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/nurse");
+  closeMobileMenu();
 }
 
 function navigateToMobileOffice() {
-	selectedMobileCategory.value = "office";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/office");
-	closeMobileMenu();
+  selectedMobileCategory.value = "office";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/office");
+  closeMobileMenu();
 }
 
 function navigateToMobileOutdoor() {
-	selectedMobileCategory.value = "outdoor";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/outdoor");
-	closeMobileMenu();
+  selectedMobileCategory.value = "outdoor";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/outdoor");
+  closeMobileMenu();
 }
 
 function navigateToMobilePOV() {
-	selectedMobileCategory.value = "pov";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/pov");
-	closeMobileMenu();
+  selectedMobileCategory.value = "pov";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/pov");
+  closeMobileMenu();
 }
 
 function navigateToMobilePublic() {
-	selectedMobileCategory.value = "public";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/public");
-	closeMobileMenu();
+  selectedMobileCategory.value = "public";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/public");
+  closeMobileMenu();
 }
 
 function navigateToMobileShemale() {
-	selectedMobileCategory.value = "shemale";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/shemale");
-	closeMobileMenu();
+  selectedMobileCategory.value = "shemale";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/shemale");
+  closeMobileMenu();
 }
 
 function navigateToMobileSleep() {
-	selectedMobileCategory.value = "sleep";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/sleep");
-	closeMobileMenu();
+  selectedMobileCategory.value = "sleep";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/sleep");
+  closeMobileMenu();
 }
 
 function navigateToMobileSmallTits() {
-	selectedMobileCategory.value = "small tits";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/small-tits");
-	closeMobileMenu();
+  selectedMobileCategory.value = "small tits";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/small-tits");
+  closeMobileMenu();
 }
 
 function navigateToMobileSquirt() {
-	selectedMobileCategory.value = "squirt";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/squirt");
-	closeMobileMenu();
+  selectedMobileCategory.value = "squirt";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/squirt");
+  closeMobileMenu();
 }
 
 function navigateToMobileVR360() {
-	selectedMobileCategory.value = "vr 360";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/vr-360");
-	closeMobileMenu();
+  selectedMobileCategory.value = "vr 360";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/vr-360");
+  closeMobileMenu();
 }
 
 function navigateToMobileHD4K() {
-	selectedMobileCategory.value = "4k hd";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/hd-4k");
-	closeMobileMenu();
+  selectedMobileCategory.value = "4k hd";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/hd-4k");
+  closeMobileMenu();
 }
 
 function navigateToMobileVerifiedAmateur() {
-	selectedMobileCategory.value = "verified amateur";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/verified-amateur");
-	closeMobileMenu();
+  selectedMobileCategory.value = "verified amateur";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/verified-amateur");
+  closeMobileMenu();
 }
 
 function navigateToMobileLiveCams() {
-	selectedMobileCategory.value = "live cam";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/live-cams");
-	closeMobileMenu();
+  selectedMobileCategory.value = "live cam";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/live-cams");
+  closeMobileMenu();
 }
 
 function navigateToMobileCompilations() {
-	selectedMobileCategory.value = "compilation";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/compilations");
-	closeMobileMenu();
+  selectedMobileCategory.value = "compilation";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/compilations");
+  closeMobileMenu();
 }
 
 function navigateToMobileBehindTheScenes() {
-	selectedMobileCategory.value = "behind the scenes";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/behind-the-scenes");
-	closeMobileMenu();
+  selectedMobileCategory.value = "behind the scenes";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/behind-the-scenes");
+  closeMobileMenu();
 }
 
 function navigateToMobileInterviews() {
-	selectedMobileCategory.value = "interview";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/interviews");
-	closeMobileMenu();
+  selectedMobileCategory.value = "interview";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/interviews");
+  closeMobileMenu();
 }
 
 function navigateToMobileParodies() {
-	selectedMobileCategory.value = "parody";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/parodies");
-	closeMobileMenu();
+  selectedMobileCategory.value = "parody";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/parodies");
+  closeMobileMenu();
 }
 
 function navigateToMobileDocumentaries() {
-	selectedMobileCategory.value = "documentary";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/documentaries");
-	closeMobileMenu();
+  selectedMobileCategory.value = "documentary";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/documentaries");
+  closeMobileMenu();
 }
 
 function navigateToMobileWebcam() {
-	selectedMobileCategory.value = "webcam";
-	selectedMobileProduction.value = "all";
-	selectedMobileTopNav.value = null;
-	router.push("/webcam");
-	closeMobileMenu();
+  selectedMobileCategory.value = "webcam";
+  selectedMobileProduction.value = "all";
+  selectedMobileTopNav.value = null;
+  router.push("/webcam");
+  closeMobileMenu();
 }
 
 // Load production counts for mobile
 onMounted(async () => {
-	try {
-		const { videosApi } = await import("../api/videos");
-		const response = await videosApi.getAll({ limit: 1 });
-		const total = response.data?.total || response.data?.totalCount || 0;
-		mobileProductionItems.value[0].count = total;
-		mobileProductionItems.value[1].count = Math.floor(total * 0.7);
-		mobileProductionItems.value[2].count = Math.floor(total * 0.3);
-	} catch (error) {
-		// Ignore errors
-	}
+  try {
+    const { videosApi } = await import("../api/videos");
+    const response = await videosApi.getAll({ limit: 1 });
+    const total = response.data?.total || response.data?.totalCount || 0;
+    mobileProductionItems.value[0].count = total;
+    mobileProductionItems.value[1].count = Math.floor(total * 0.7);
+    mobileProductionItems.value[2].count = Math.floor(total * 0.3);
+  } catch (error) {
+    // Ignore errors
+  }
 });
 </script>
+
+<style scoped>
+@media (max-width: 640px) {
+  .hide-on-sm {
+    display: none !important;
+  }
+}
+</style>
