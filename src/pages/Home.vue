@@ -417,7 +417,7 @@
     <!-- All Movies Section -->
     <section 
       v-if="isSectionEnabled('allMovies')"
-      class="movies-section"
+      class="movies-section hide-on-sm"
       aria-label="All movies"
     >
       <!-- Advanced Search Filters -->
