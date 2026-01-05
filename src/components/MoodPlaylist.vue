@@ -40,23 +40,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { RefreshCw } from 'lucide-vue-next';
-import { useMoodSequencing } from '../composables/useMoodSequencing';
-import { useEporner } from '../composables/useEporner';
-import { useVideos } from '../composables/useVideos';
-import { useMovies } from '../composables/useMovies';
-import VideoCard from './VideoCard.vue';
-import Loader from './Loader.vue';
+import { RefreshCw } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useEporner } from "../composables/useEporner";
+import { useMoodSequencing } from "../composables/useMoodSequencing";
+import { useMovies } from "../composables/useMovies";
+import { useVideos } from "../composables/useVideos";
+import Loader from "./Loader.vue";
+import VideoCard from "./VideoCard.vue";
 
 const router = useRouter();
-const { 
-  currentMood, 
-  moodPlaylist, 
-  moodTypes, 
-  detectMood, 
-  generateMoodPlaylist 
+const {
+	currentMood,
+	moodPlaylist,
+	moodTypes,
+	detectMood,
+	generateMoodPlaylist,
 } = useMoodSequencing();
 
 const { videos: epornerVideos } = useEporner();
@@ -67,86 +67,84 @@ const selectedMood = ref(null);
 const playlist = ref([]);
 
 const currentMoodName = computed(() => {
-  const mood = selectedMood.value || currentMood.value;
-  return moodTypes[mood]?.name || 'Personalized';
+	const mood = selectedMood.value || currentMood.value;
+	return moodTypes[mood]?.name || "Personalized";
 });
 
 const currentMoodIcon = computed(() => {
-  const mood = selectedMood.value || currentMood.value;
-  return moodTypes[mood]?.icon || '🎵';
+	const mood = selectedMood.value || currentMood.value;
+	return moodTypes[mood]?.icon || "🎵";
 });
 
 const totalDuration = computed(() => {
-  return playlist.value.reduce((sum, video) => sum + (video.duration || 0), 0);
+	return playlist.value.reduce((sum, video) => sum + (video.duration || 0), 0);
 });
 
 function formatDuration(seconds) {
-  if (!seconds) return '0:00';
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}m`;
+	if (!seconds) return "0:00";
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+
+	if (hours > 0) {
+		return `${hours}h ${minutes}m`;
+	}
+	return `${minutes}m`;
 }
 
 function handleMoodChange() {
-  generatePlaylist();
+	generatePlaylist();
 }
 
 async function generatePlaylist() {
-  const mood = selectedMood.value || currentMood.value;
-  
-  // Get all available videos
-  const allVideos = [
-    ...epornerVideos.value,
-    ...videos.value,
-    ...movies.value
-  ];
+	const mood = selectedMood.value || currentMood.value;
 
-  if (allVideos.length === 0) {
-    playlist.value = [];
-    return;
-  }
+	// Get all available videos
+	const allVideos = [...epornerVideos.value, ...videos.value, ...movies.value];
 
-  // Generate mood-based playlist
-  const generated = generateMoodPlaylist(allVideos, {
-    mood,
-    maxVideos: 30,
-  });
+	if (allVideos.length === 0) {
+		playlist.value = [];
+		return;
+	}
 
-  playlist.value = generated;
+	// Generate mood-based playlist
+	const generated = generateMoodPlaylist(allVideos, {
+		mood,
+		maxVideos: 30,
+	});
+
+	playlist.value = generated;
 }
 
 async function refreshPlaylist() {
-  // Re-detect mood and regenerate
-  detectMood();
-  await generatePlaylist();
+	// Re-detect mood and regenerate
+	detectMood();
+	await generatePlaylist();
 }
 
-import { generateWatchUrl } from '../utils/slug';
+import { generateWatchUrl } from "../utils/slug";
 
 function navigateToVideo(video) {
-  const videoId = video.id || video._id;
-  const source = video._source || (epornerVideos.value.some(v => v.id === videoId) ? 'eporner' : null);
-  
-  const url = generateWatchUrl(video, { source: source || undefined });
-  router.push(url);
-  
-  // Legacy code below (kept for reference but not used)
-  if (false) {
-    router.push(`/watch/${videoId}`);
-  }
+	const videoId = video.id || video._id;
+	const source =
+		video._source ||
+		(epornerVideos.value.some((v) => v.id === videoId) ? "eporner" : null);
+
+	const url = generateWatchUrl(video, { source: source || undefined });
+	router.push(url);
+
+	// Legacy code below (kept for reference but not used)
+	if (false) {
+		router.push(`/watch/${videoId}`);
+	}
 }
 
 onMounted(async () => {
-  // Detect initial mood
-  detectMood();
-  selectedMood.value = currentMood.value;
-  
-  // Generate initial playlist
-  await generatePlaylist();
+	// Detect initial mood
+	detectMood();
+	selectedMood.value = currentMood.value;
+
+	// Generate initial playlist
+	await generatePlaylist();
 });
 </script>
 

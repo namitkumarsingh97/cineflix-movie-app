@@ -159,48 +159,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { onMounted } from 'vue';
+import { onMounted, ref } from "vue";
 
 onMounted(() => {
-  document.title = 'Contact Us - MovieHub';
-  window.scrollTo(0, 0);
+	document.title = "Contact Us - MovieHub";
+	window.scrollTo(0, 0);
 });
 
 const form = ref({
-  name: '',
-  email: '',
-  subject: '',
-  message: ''
+	name: "",
+	email: "",
+	subject: "",
+	message: "",
 });
 
 const submitting = ref(false);
-const submitMessage = ref('');
+const submitMessage = ref("");
 const submitSuccess = ref(false);
 
 const handleSubmit = async () => {
-  submitting.value = true;
-  submitMessage.value = '';
+	submitting.value = true;
+	submitMessage.value = "";
 
-  // Simulate form submission (in a real app, this would send to a backend)
-  setTimeout(() => {
-    submitting.value = false;
-    submitSuccess.value = true;
-    submitMessage.value = 'Thank you for your message! We\'ll get back to you within 24-48 hours.';
-    
-    // Reset form
-    form.value = {
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    };
+	// Simulate form submission (in a real app, this would send to a backend)
+	setTimeout(() => {
+		submitting.value = false;
+		submitSuccess.value = true;
+		submitMessage.value =
+			"Thank you for your message! We'll get back to you within 24-48 hours.";
 
-    // Clear message after 5 seconds
-    setTimeout(() => {
-      submitMessage.value = '';
-    }, 5000);
-  }, 1500);
+		// Reset form
+		form.value = {
+			name: "",
+			email: "",
+			subject: "",
+			message: "",
+		};
+
+		// Clear message after 5 seconds
+		setTimeout(() => {
+			submitMessage.value = "";
+		}, 5000);
+	}, 1500);
 };
 </script>
 

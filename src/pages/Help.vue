@@ -62,34 +62,33 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { onMounted } from 'vue';
+import { computed, onMounted, ref } from "vue";
 
 onMounted(() => {
-  document.title = 'Help Center - MovieHub';
-  window.scrollTo(0, 0);
+	document.title = "Help Center - MovieHub";
+	window.scrollTo(0, 0);
 });
 
-const searchQuery = ref('');
-const activeCategory = ref('all');
+const searchQuery = ref("");
+const activeCategory = ref("all");
 const openFaq = ref(null);
 
 const categories = [
-  { id: 'all', name: 'All Topics' },
-  { id: 'getting-started', name: 'Getting Started' },
-  { id: 'account', name: 'Account & Privacy' },
-  { id: 'streaming', name: 'Streaming & Features' },
-  { id: 'troubleshooting', name: 'Troubleshooting' },
-  { id: 'billing', name: 'Billing & Payments' },
-  { id: 'content', name: 'Content & Categories' }
+	{ id: "all", name: "All Topics" },
+	{ id: "getting-started", name: "Getting Started" },
+	{ id: "account", name: "Account & Privacy" },
+	{ id: "streaming", name: "Streaming & Features" },
+	{ id: "troubleshooting", name: "Troubleshooting" },
+	{ id: "billing", name: "Billing & Payments" },
+	{ id: "content", name: "Content & Categories" },
 ];
 
 const allFaqs = [
-  {
-    id: 1,
-    category: 'getting-started',
-    question: 'How do I verify my age and create an account?',
-    answer: `
+	{
+		id: 1,
+		category: "getting-started",
+		question: "How do I verify my age and create an account?",
+		answer: `
       <p>To access MovieHub, you must be 18 years or older. Here's how to get started:</p>
       <ol>
         <li>Click on "Sign Up" or "Register" in the top right corner</li>
@@ -101,13 +100,13 @@ const allFaqs = [
         <li>Start exploring content!</li>
       </ol>
       <p><strong>Important:</strong> Age verification is mandatory and cannot be bypassed. We use multiple verification methods to ensure only adults can access our platform.</p>
-    `
-  },
-  {
-    id: 2,
-    category: 'getting-started',
-    question: 'Is MovieHub free? What are the subscription options?',
-    answer: `
+    `,
+	},
+	{
+		id: 2,
+		category: "getting-started",
+		question: "Is MovieHub free? What are the subscription options?",
+		answer: `
       <p>MovieHub offers flexible access options:</p>
       <ul>
         <li><strong>Free Access:</strong> Limited access to content with advertisements. Some premium content may be restricted.</li>
@@ -124,13 +123,13 @@ const allFaqs = [
         <li>Exclusive content and early access to new releases</li>
       </ul>
       <p>You can upgrade, downgrade, or cancel your subscription at any time from your account settings.</p>
-    `
-  },
-  {
-    id: 3,
-    category: 'getting-started',
-    question: 'What devices can I use? Is my viewing private?',
-    answer: `
+    `,
+	},
+	{
+		id: 3,
+		category: "getting-started",
+		question: "What devices can I use? Is my viewing private?",
+		answer: `
       <p>MovieHub works on all modern devices:</p>
       <ul>
         <li>Desktop/Laptop (Windows, Mac, Linux) - Chrome, Firefox, Safari, Edge</li>
@@ -148,13 +147,13 @@ const allFaqs = [
         <li>Discreet billing - charges appear as generic service charges</li>
       </ul>
       <p>For maximum privacy, use incognito/private browsing mode and clear your browser history after viewing.</p>
-    `
-  },
-  {
-    id: 16,
-    category: 'getting-started',
-    question: 'How do I follow my favorite performers or studios?',
-    answer: `
+    `,
+	},
+	{
+		id: 16,
+		category: "getting-started",
+		question: "How do I follow my favorite performers or studios?",
+		answer: `
       <p>Following performers and studios helps you stay updated on new content:</p>
       <ol>
         <li>Navigate to any video page</li>
@@ -163,13 +162,13 @@ const allFaqs = [
         <li>Access all followed performers from the "Followed Stars" section in your account</li>
       </ol>
       <p>You can also browse by performer or studio from the categories page and follow them directly from their profile pages.</p>
-    `
-  },
-  {
-    id: 4,
-    category: 'account',
-    question: 'How do I change my password?',
-    answer: `
+    `,
+	},
+	{
+		id: 4,
+		category: "account",
+		question: "How do I change my password?",
+		answer: `
       <p>To change your password:</p>
       <ol>
         <li>Go to your Account Settings</li>
@@ -180,13 +179,13 @@ const allFaqs = [
         <li>Click "Save Changes"</li>
       </ol>
       <p>If you've forgotten your password, use the "Forgot Password" link on the login page.</p>
-    `
-  },
-  {
-    id: 5,
-    category: 'account',
-    question: 'How do I update my profile information?',
-    answer: `
+    `,
+	},
+	{
+		id: 5,
+		category: "account",
+		question: "How do I update my profile information?",
+		answer: `
       <p>To update your profile:</p>
       <ol>
         <li>Click on your profile icon in the top right corner</li>
@@ -195,13 +194,13 @@ const allFaqs = [
         <li>Click "Save Changes"</li>
       </ol>
       <p>You can update your profile picture, display name, and viewing preferences at any time.</p>
-    `
-  },
-  {
-    id: 6,
-    category: 'account',
-    question: 'How do I delete my account?',
-    answer: `
+    `,
+	},
+	{
+		id: 6,
+		category: "account",
+		question: "How do I delete my account?",
+		answer: `
       <p>To delete your account:</p>
       <ol>
         <li>Go to Account Settings</li>
@@ -212,13 +211,13 @@ const allFaqs = [
         <li>Click "Permanently Delete Account"</li>
       </ol>
       <p><strong>Warning:</strong> This action cannot be undone. All your data, watch history, and preferences will be permanently deleted.</p>
-    `
-  },
-  {
-    id: 7,
-    category: 'streaming',
-    question: 'Why is my video buffering or loading slowly?',
-    answer: `
+    `,
+	},
+	{
+		id: 7,
+		category: "streaming",
+		question: "Why is my video buffering or loading slowly?",
+		answer: `
       <p>Slow buffering can be caused by several factors:</p>
       <ul>
         <li><strong>Internet connection:</strong> Check your internet speed. We recommend at least 5 Mbps for HD streaming</li>
@@ -228,13 +227,13 @@ const allFaqs = [
         <li><strong>Server load:</strong> High traffic times may affect streaming quality</li>
       </ul>
       <p>Try lowering the video quality in the player settings if issues persist.</p>
-    `
-  },
-  {
-    id: 8,
-    category: 'streaming',
-    question: 'How do I change video quality?',
-    answer: `
+    `,
+	},
+	{
+		id: 8,
+		category: "streaming",
+		question: "How do I change video quality?",
+		answer: `
       <p>To change video quality:</p>
       <ol>
         <li>While a video is playing, click on the settings icon (gear icon) in the player</li>
@@ -250,13 +249,13 @@ const allFaqs = [
         </li>
       </ol>
       <p>The player will remember your quality preference for future videos.</p>
-    `
-  },
-  {
-    id: 9,
-    category: 'streaming',
-    question: 'Can I download videos for offline viewing? How does it work?',
-    answer: `
+    `,
+	},
+	{
+		id: 9,
+		category: "streaming",
+		question: "Can I download videos for offline viewing? How does it work?",
+		answer: `
       <p>Yes! Premium subscribers can download videos for offline viewing:</p>
       <ol>
         <li>Find the video you want to download</li>
@@ -275,13 +274,13 @@ const allFaqs = [
         <li>Downloads sync across devices when logged in</li>
       </ul>
       <p><strong>Privacy Note:</strong> Downloaded videos are stored securely on your device and are not accessible by other apps or users.</p>
-    `
-  },
-  {
-    id: 10,
-    category: 'streaming',
-    question: 'How do I use Watch Later, Favorites, and Playlists?',
-    answer: `
+    `,
+	},
+	{
+		id: 10,
+		category: "streaming",
+		question: "How do I use Watch Later, Favorites, and Playlists?",
+		answer: `
       <p>MovieHub offers several ways to save and organize content:</p>
       <p><strong>Watch Later:</strong></p>
       <ol>
@@ -304,13 +303,13 @@ const allFaqs = [
         <li>Share playlists with other users (optional)</li>
       </ol>
       <p>All saved content is private and only visible to you. You can manage all saved items from your account dashboard.</p>
-    `
-  },
-  {
-    id: 17,
-    category: 'streaming',
-    question: 'What video qualities are available? How do I change quality?',
-    answer: `
+    `,
+	},
+	{
+		id: 17,
+		category: "streaming",
+		question: "What video qualities are available? How do I change quality?",
+		answer: `
       <p>MovieHub offers multiple video quality options:</p>
       <ul>
         <li><strong>Auto:</strong> Automatically adjusts based on your connection (recommended)</li>
@@ -328,13 +327,13 @@ const allFaqs = [
         <li>Settings are saved for future videos</li>
       </ol>
       <p><strong>Note:</strong> Higher quality requires faster internet. We recommend at least 5 Mbps for HD and 25 Mbps for 4K streaming.</p>
-    `
-  },
-  {
-    id: 11,
-    category: 'troubleshooting',
-    question: 'The video won\'t play. What should I do?',
-    answer: `
+    `,
+	},
+	{
+		id: 11,
+		category: "troubleshooting",
+		question: "The video won't play. What should I do?",
+		answer: `
       <p>If a video won't play, try these steps:</p>
       <ol>
         <li><strong>Refresh the page:</strong> Press F5 or click the refresh button</li>
@@ -346,13 +345,13 @@ const allFaqs = [
         <li><strong>Check if JavaScript is enabled:</strong> MovieHub requires JavaScript to function</li>
       </ol>
       <p>If the problem persists, contact our support team with details about the issue.</p>
-    `
-  },
-  {
-    id: 12,
-    category: 'troubleshooting',
-    question: 'I\'m getting an error message. What does it mean?',
-    answer: `
+    `,
+	},
+	{
+		id: 12,
+		category: "troubleshooting",
+		question: "I'm getting an error message. What does it mean?",
+		answer: `
       <p>Common error messages and solutions:</p>
       <ul>
         <li><strong>"Video not available":</strong> The content may have been removed or is not available in your region</li>
@@ -362,13 +361,13 @@ const allFaqs = [
         <li><strong>"Account required":</strong> Some content requires you to be logged in</li>
       </ul>
       <p>If you continue to see errors, please contact support with the specific error message.</p>
-    `
-  },
-  {
-    id: 13,
-    category: 'troubleshooting',
-    question: 'The website is not loading properly. How do I fix it?',
-    answer: `
+    `,
+	},
+	{
+		id: 13,
+		category: "troubleshooting",
+		question: "The website is not loading properly. How do I fix it?",
+		answer: `
       <p>If the website isn't loading correctly:</p>
       <ol>
         <li><strong>Check your internet connection</strong></li>
@@ -381,13 +380,13 @@ const allFaqs = [
         <li><strong>Disable VPN</strong> if you're using one</li>
       </ol>
       <p>If none of these work, the issue may be on our end. Check our status page or contact support.</p>
-    `
-  },
-  {
-    id: 14,
-    category: 'billing',
-    question: 'How do I cancel my Premium subscription? Will I get a refund?',
-    answer: `
+    `,
+	},
+	{
+		id: 14,
+		category: "billing",
+		question: "How do I cancel my Premium subscription? Will I get a refund?",
+		answer: `
       <p>To cancel your Premium subscription:</p>
       <ol>
         <li>Go to Account Settings → Subscription</li>
@@ -405,13 +404,13 @@ const allFaqs = [
         <li>After cancellation, you'll revert to free account with limited access</li>
       </ul>
       <p><strong>Refund Policy:</strong> Refunds are available within 7 days of initial subscription or if you experience technical issues preventing access. Contact support for refund requests.</p>
-    `
-  },
-  {
-    id: 18,
-    category: 'billing',
-    question: 'How does billing work? Is it discreet?',
-    answer: `
+    `,
+	},
+	{
+		id: 18,
+		category: "billing",
+		question: "How does billing work? Is it discreet?",
+		answer: `
       <p>MovieHub offers secure and discreet billing:</p>
       <p><strong>Payment Methods:</strong></p>
       <ul>
@@ -435,13 +434,13 @@ const allFaqs = [
         <li>Email notifications sent before each charge</li>
       </ul>
       <p>All payments are processed through secure, PCI-DSS compliant payment gateways. We never store your full credit card information.</p>
-    `
-  },
-  {
-    id: 15,
-    category: 'billing',
-    question: 'How do I update my payment method?',
-    answer: `
+    `,
+	},
+	{
+		id: 15,
+		category: "billing",
+		question: "How do I update my payment method?",
+		answer: `
       <p>To update your payment method:</p>
       <ol>
         <li>Go to Account Settings → Billing</li>
@@ -453,13 +452,13 @@ const allFaqs = [
       </ol>
       <p>Your new payment method will be used for all future transactions. We accept major credit cards, PayPal, and cryptocurrency.</p>
       <p><strong>Security:</strong> All payment information is encrypted and processed through secure payment gateways. We never store your full card details.</p>
-    `
-  },
-  {
-    id: 19,
-    category: 'content',
-    question: 'How do I find specific types of content or categories?',
-    answer: `
+    `,
+	},
+	{
+		id: 19,
+		category: "content",
+		question: "How do I find specific types of content or categories?",
+		answer: `
       <p>MovieHub offers multiple ways to discover content:</p>
       <p><strong>Search:</strong></p>
       <ul>
@@ -486,13 +485,13 @@ const allFaqs = [
         <li>Sort by newest, most popular, highest rated, or longest</li>
         <li>Save filter preferences for quick access</li>
       </ul>
-    `
-  },
-  {
-    id: 20,
-    category: 'account',
-    question: 'How do I ensure my viewing is completely private?',
-    answer: `
+    `,
+	},
+	{
+		id: 20,
+		category: "account",
+		question: "How do I ensure my viewing is completely private?",
+		answer: `
       <p>MovieHub offers several privacy features:</p>
       <p><strong>Account Privacy Settings:</strong></p>
       <ul>
@@ -521,13 +520,13 @@ const allFaqs = [
         <li>Cryptocurrency payment option for maximum anonymity</li>
         <li>No adult content mentioned in billing</li>
       </ul>
-    `
-  },
-  {
-    id: 21,
-    category: 'troubleshooting',
-    question: 'The video quality is poor or keeps buffering. What can I do?',
-    answer: `
+    `,
+	},
+	{
+		id: 21,
+		category: "troubleshooting",
+		question: "The video quality is poor or keeps buffering. What can I do?",
+		answer: `
       <p>Poor quality or buffering can be caused by several factors:</p>
       <p><strong>Internet Connection:</strong></p>
       <ul>
@@ -558,45 +557,47 @@ const allFaqs = [
         <li>Check our status page for known issues</li>
         <li>Contact support if problem persists</li>
       </ul>
-    `
-  }
+    `,
+	},
 ];
 
 const filteredCategories = computed(() => {
-  let filtered = allFaqs;
+	let filtered = allFaqs;
 
-  // Filter by category
-  if (activeCategory.value !== 'all') {
-    filtered = filtered.filter(faq => faq.category === activeCategory.value);
-  }
+	// Filter by category
+	if (activeCategory.value !== "all") {
+		filtered = filtered.filter((faq) => faq.category === activeCategory.value);
+	}
 
-  // Filter by search query
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(faq =>
-      faq.question.toLowerCase().includes(query) ||
-      faq.answer.toLowerCase().includes(query)
-    );
-  }
+	// Filter by search query
+	if (searchQuery.value.trim()) {
+		const query = searchQuery.value.toLowerCase();
+		filtered = filtered.filter(
+			(faq) =>
+				faq.question.toLowerCase().includes(query) ||
+				faq.answer.toLowerCase().includes(query),
+		);
+	}
 
-  // Group by category
-  const grouped = {};
-  filtered.forEach(faq => {
-    if (!grouped[faq.category]) {
-      grouped[faq.category] = {
-        id: faq.category,
-        name: categories.find(c => c.id === faq.category)?.name || faq.category,
-        faqs: []
-      };
-    }
-    grouped[faq.category].faqs.push(faq);
-  });
+	// Group by category
+	const grouped = {};
+	filtered.forEach((faq) => {
+		if (!grouped[faq.category]) {
+			grouped[faq.category] = {
+				id: faq.category,
+				name:
+					categories.find((c) => c.id === faq.category)?.name || faq.category,
+				faqs: [],
+			};
+		}
+		grouped[faq.category].faqs.push(faq);
+	});
 
-  return Object.values(grouped);
+	return Object.values(grouped);
 });
 
 const toggleFaq = (id) => {
-  openFaq.value = openFaq.value === id ? null : id;
+	openFaq.value = openFaq.value === id ? null : id;
 };
 </script>
 

@@ -12,67 +12,69 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const props = defineProps({
-  mood: {
-    type: String,
-    required: true,
-  },
-  items: {
-    type: Array,
-    default: () => [],
-  },
+	mood: {
+		type: String,
+		required: true,
+	},
+	items: {
+		type: Array,
+		default: () => [],
+	},
 });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits(["click"]);
 
 const moodConfig = {
-  energetic: {
-    name: 'Energetic',
-    emoji: '⚡',
-    description: 'Fast-paced, intense content',
-    gradient: 'linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)',
-  },
-  relaxed: {
-    name: 'Relaxed',
-    emoji: '🌙',
-    description: 'Slow, sensual, romantic',
-    gradient: 'linear-gradient(135deg, #ff6347 0%, #ff4500 100%)',
-  },
-  adventurous: {
-    name: 'Adventurous',
-    emoji: '🏔️',
-    description: 'Outdoor, wild, exciting',
-    gradient: 'linear-gradient(135deg, #ff8c00 0%, #ffd700 100%)',
-  },
-  intimate: {
-    name: 'Intimate',
-    emoji: '💕',
-    description: 'Romantic, private, close',
-    gradient: 'linear-gradient(135deg, #ff6347 0%, #ff4500 100%)',
-  },
-  quick: {
-    name: 'Quick Mix',
-    emoji: '⚡',
-    description: 'Short, quick sessions',
-    gradient: 'linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)',
-  },
-  marathon: {
-    name: 'Marathon',
-    emoji: '🎬',
-    description: 'Long-form extended content',
-    gradient: 'linear-gradient(135deg, #ff8c00 0%, #ffd700 100%)',
-  },
+	energetic: {
+		name: "Energetic",
+		emoji: "⚡",
+		description: "Fast-paced, intense content",
+		gradient: "linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)",
+	},
+	relaxed: {
+		name: "Relaxed",
+		emoji: "🌙",
+		description: "Slow, sensual, romantic",
+		gradient: "linear-gradient(135deg, #ff6347 0%, #ff4500 100%)",
+	},
+	adventurous: {
+		name: "Adventurous",
+		emoji: "🏔️",
+		description: "Outdoor, wild, exciting",
+		gradient: "linear-gradient(135deg, #ff8c00 0%, #ffd700 100%)",
+	},
+	intimate: {
+		name: "Intimate",
+		emoji: "💕",
+		description: "Romantic, private, close",
+		gradient: "linear-gradient(135deg, #ff6347 0%, #ff4500 100%)",
+	},
+	quick: {
+		name: "Quick Mix",
+		emoji: "⚡",
+		description: "Short, quick sessions",
+		gradient: "linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)",
+	},
+	marathon: {
+		name: "Marathon",
+		emoji: "🎬",
+		description: "Long-form extended content",
+		gradient: "linear-gradient(135deg, #ff8c00 0%, #ffd700 100%)",
+	},
 };
 
 const moodData = computed(() => {
-  return moodConfig[props.mood] || {
-    name: props.mood,
-    emoji: '🎵',
-    description: 'Curated mix',
-    gradient: 'linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)',
-  };
+	return (
+		moodConfig[props.mood] || {
+			name: props.mood,
+			emoji: "🎵",
+			description: "Curated mix",
+			gradient: "linear-gradient(135deg, #ff4500 0%, #ff8c00 100%)",
+		}
+	);
 });
 
 const moodName = computed(() => moodData.value.name);
@@ -81,7 +83,7 @@ const moodDescription = computed(() => moodData.value.description);
 const moodGradient = computed(() => moodData.value.gradient);
 
 const handleClick = () => {
-  emit('click', props.mood);
+	emit("click", props.mood);
 };
 </script>
 

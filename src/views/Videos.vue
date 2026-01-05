@@ -89,103 +89,98 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
 import axios from "axios";
-import {
-  Video,
-  Play,
-  X,
-  Calendar,
-  Loader2,
-} from "lucide-vue-next";
+import { Calendar, Loader2, Play, Video, X } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
 
 // API Configuration
-const API_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.DEV 
-    ? "http://localhost:5000/api" 
-    : "https://cineflix-api-rho.vercel.app/api");
+const API_URL =
+	import.meta.env.VITE_API_URL ||
+	(import.meta.env.DEV
+		? "http://localhost:5000/api"
+		: "https://cineflix-api-rho.vercel.app/api");
 
 export default {
-  name: "Videos",
-  setup() {
-    const videos = ref([]);
-    const loading = ref(false);
-    const selectedVideo = ref(null);
+	name: "Videos",
+	setup() {
+		const videos = ref([]);
+		const loading = ref(false);
+		const selectedVideo = ref(null);
 
-    async function loadVideos() {
-      loading.value = true;
-      try {
-        const response = await axios.get(`${API_URL}/videos`);
-        if (response.data.success && response.data.data) {
-          videos.value = response.data.data;
-        } else {
-          console.error("Invalid API response:", response.data);
-          videos.value = [];
-        }
-      } catch (error) {
-        console.error("Error loading videos:", error);
-        // Show error but don't crash - empty state will be shown
-        videos.value = [];
-      } finally {
-        loading.value = false;
-      }
-    }
+		async function loadVideos() {
+			loading.value = true;
+			try {
+				const response = await axios.get(`${API_URL}/videos`);
+				if (response.data.success && response.data.data) {
+					videos.value = response.data.data;
+				} else {
+					console.error("Invalid API response:", response.data);
+					videos.value = [];
+				}
+			} catch (error) {
+				console.error("Error loading videos:", error);
+				// Show error but don't crash - empty state will be shown
+				videos.value = [];
+			} finally {
+				loading.value = false;
+			}
+		}
 
-    function openVideoPlayer(video) {
-      selectedVideo.value = video;
-      document.body.style.overflow = "hidden";
-    }
+		function openVideoPlayer(video) {
+			selectedVideo.value = video;
+			document.body.style.overflow = "hidden";
+		}
 
-    function closeVideoPlayer() {
-      selectedVideo.value = null;
-      document.body.style.overflow = "";
-    }
+		function closeVideoPlayer() {
+			selectedVideo.value = null;
+			document.body.style.overflow = "";
+		}
 
-    function formatDate(date) {
-      if (!date) return "";
-      const d = new Date(date);
-      return d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    }
+		function formatDate(date) {
+			if (!date) return "";
+			const d = new Date(date);
+			return d.toLocaleDateString("en-US", {
+				month: "short",
+				day: "numeric",
+				year: "numeric",
+			});
+		}
 
-    function formatDuration(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs.toString().padStart(2, "0")}`;
-    }
+		function formatDuration(seconds) {
+			const mins = Math.floor(seconds / 60);
+			const secs = seconds % 60;
+			return `${mins}:${secs.toString().padStart(2, "0")}`;
+		}
 
-    function getDefaultThumbnail() {
-      return "https://via.placeholder.com/400x225/1a1a2e/ffffff?text=Video+Thumbnail";
-    }
+		function getDefaultThumbnail() {
+			return "https://via.placeholder.com/400x225/1a1a2e/ffffff?text=Video+Thumbnail";
+		}
 
-    function handleThumbnailError(event) {
-      event.target.src = getDefaultThumbnail();
-    }
+		function handleThumbnailError(event) {
+			event.target.src = getDefaultThumbnail();
+		}
 
-    onMounted(() => {
-      loadVideos();
-    });
+		onMounted(() => {
+			loadVideos();
+		});
 
-    return {
-      videos,
-      loading,
-      selectedVideo,
-      openVideoPlayer,
-      closeVideoPlayer,
-      formatDate,
-      formatDuration,
-      getDefaultThumbnail,
-      handleThumbnailError,
-      Video,
-      Play,
-      X,
-      Calendar,
-      Loader2,
-    };
-  },
+		return {
+			videos,
+			loading,
+			selectedVideo,
+			openVideoPlayer,
+			closeVideoPlayer,
+			formatDate,
+			formatDuration,
+			getDefaultThumbnail,
+			handleThumbnailError,
+			Video,
+			Play,
+			X,
+			Calendar,
+			Loader2,
+		};
+	},
 };
 </script>
 

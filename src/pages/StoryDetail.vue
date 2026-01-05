@@ -75,11 +75,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, Eye, Heart, ChevronLeft, ChevronRight, AlertCircle, Languages } from 'lucide-vue-next';
-import { useStories } from '../composables/useStories';
-import Loader from '../components/Loader.vue';
+import {
+	AlertCircle,
+	ArrowLeft,
+	ChevronLeft,
+	ChevronRight,
+	Eye,
+	Heart,
+	Languages,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Loader from "../components/Loader.vue";
+import { useStories } from "../composables/useStories";
 
 const route = useRoute();
 const router = useRouter();
@@ -91,160 +99,167 @@ const currentPage = ref(1);
 const wordsPerPage = 2000; // Increased for more content per page
 
 const totalPages = computed(() => {
-  if (!story.value || !story.value.content) return 1;
-  const words = story.value.content.split(/\s+/).length;
-  return Math.ceil(words / wordsPerPage);
+	if (!story.value || !story.value.content) return 1;
+	const words = story.value.content.split(/\s+/).length;
+	return Math.ceil(words / wordsPerPage);
 });
 
 const paginatedContent = computed(() => {
-  if (!story.value || !story.value.content) return [];
-  
-  // Split content by paragraphs (double line breaks)
-  const paragraphs = story.value.content.split(/\n\s*\n/).filter(p => p.trim());
-  
-  // Calculate words per page
-  const totalWords = story.value.content.split(/\s+/).length;
-  const wordsPerPageCount = Math.ceil(totalWords / totalPages.value);
-  
-  const pages = [];
-  let currentPage = '';
-  let currentWordCount = 0;
-  
-  for (const paragraph of paragraphs) {
-    const paraWords = paragraph.trim().split(/\s+/).length;
-    
-    // If adding this paragraph would exceed the page limit, start a new page
-    if (currentWordCount + paraWords > wordsPerPageCount && currentPage) {
-      pages.push(currentPage.trim());
-      currentPage = paragraph.trim() + '\n\n';
-      currentWordCount = paraWords;
-    } else {
-      currentPage += (currentPage ? '\n\n' : '') + paragraph.trim();
-      currentWordCount += paraWords;
-    }
-  }
-  
-  // Add the last page if there's content
-  if (currentPage.trim()) {
-    pages.push(currentPage.trim());
-  }
-  
-  // If no pages were created, return the full content as one page
-  return pages.length > 0 ? pages : [story.value.content];
+	if (!story.value || !story.value.content) return [];
+
+	// Split content by paragraphs (double line breaks)
+	const paragraphs = story.value.content
+		.split(/\n\s*\n/)
+		.filter((p) => p.trim());
+
+	// Calculate words per page
+	const totalWords = story.value.content.split(/\s+/).length;
+	const wordsPerPageCount = Math.ceil(totalWords / totalPages.value);
+
+	const pages = [];
+	let currentPage = "";
+	let currentWordCount = 0;
+
+	for (const paragraph of paragraphs) {
+		const paraWords = paragraph.trim().split(/\s+/).length;
+
+		// If adding this paragraph would exceed the page limit, start a new page
+		if (currentWordCount + paraWords > wordsPerPageCount && currentPage) {
+			pages.push(currentPage.trim());
+			currentPage = paragraph.trim() + "\n\n";
+			currentWordCount = paraWords;
+		} else {
+			currentPage += (currentPage ? "\n\n" : "") + paragraph.trim();
+			currentWordCount += paraWords;
+		}
+	}
+
+	// Add the last page if there's content
+	if (currentPage.trim()) {
+		pages.push(currentPage.trim());
+	}
+
+	// If no pages were created, return the full content as one page
+	return pages.length > 0 ? pages : [story.value.content];
 });
 
 onMounted(async () => {
-  await loadStory();
+	await loadStory();
 });
 
 async function loadStory() {
-  loading.value = true;
-  try {
-    const storyData = await fetchStoryById(route.params.id);
-    if (storyData) {
-      story.value = storyData;
-      currentPage.value = 1;
-    }
-  } catch (error) {
-    console.error('Failed to load story:', error);
-  } finally {
-    loading.value = false;
-  }
+	loading.value = true;
+	try {
+		const storyData = await fetchStoryById(route.params.id);
+		if (storyData) {
+			story.value = storyData;
+			currentPage.value = 1;
+		}
+	} catch (error) {
+		console.error("Failed to load story:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function previousPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    scrollToTop();
-  }
+	if (currentPage.value > 1) {
+		currentPage.value--;
+		scrollToTop();
+	}
 }
 
 function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-    scrollToTop();
-  }
+	if (currentPage.value < totalPages.value) {
+		currentPage.value++;
+		scrollToTop();
+	}
 }
 
 function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+	window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function formatContent(text) {
-  if (!text) return '';
-  
-  // Check if content already contains HTML (like img tags)
-  if (text.includes('<img') || text.includes('<p>') || text.includes('<div>')) {
-    // Content is already HTML, return as-is but sanitize
-    return sanitizeHTML(text);
-  }
-  
-  // Split by double line breaks (paragraph breaks)
-  const paragraphs = text.split(/\n\s*\n/);
-  
-  // Process each paragraph
-  const formattedParagraphs = paragraphs.map(para => {
-    // Trim whitespace
-    para = para.trim();
-    
-    // If paragraph is empty, return empty string
-    if (!para) return '';
-    
-    // Check if paragraph contains image markers like [IMAGE:url] or [IMG:url]
-    if (para.match(/\[(IMAGE|IMG):(.+?)\]/i)) {
-      const match = para.match(/\[(IMAGE|IMG):(.+?)\]/i);
-      const imageUrl = match[2];
-      // Replace marker with img tag
-      para = para.replace(/\[(IMAGE|IMG):.+?\]/i, `<div class="story-image-container"><img src="${imageUrl}" alt="Story image" class="story-image" /></div>`);
-    }
-    
-    // Replace single line breaks within paragraph with <br> tags
-    para = para.replace(/\n/g, '<br>');
-    
-    // Wrap in paragraph tag (unless it already contains div/img)
-    if (para.includes('<div') || para.includes('<img')) {
-      return para;
-    }
-    return `<p>${para}</p>`;
-  }).filter(p => p); // Remove empty paragraphs
-  
-  return formattedParagraphs.join('');
+	if (!text) return "";
+
+	// Check if content already contains HTML (like img tags)
+	if (text.includes("<img") || text.includes("<p>") || text.includes("<div>")) {
+		// Content is already HTML, return as-is but sanitize
+		return sanitizeHTML(text);
+	}
+
+	// Split by double line breaks (paragraph breaks)
+	const paragraphs = text.split(/\n\s*\n/);
+
+	// Process each paragraph
+	const formattedParagraphs = paragraphs
+		.map((para) => {
+			// Trim whitespace
+			para = para.trim();
+
+			// If paragraph is empty, return empty string
+			if (!para) return "";
+
+			// Check if paragraph contains image markers like [IMAGE:url] or [IMG:url]
+			if (para.match(/\[(IMAGE|IMG):(.+?)\]/i)) {
+				const match = para.match(/\[(IMAGE|IMG):(.+?)\]/i);
+				const imageUrl = match[2];
+				// Replace marker with img tag
+				para = para.replace(
+					/\[(IMAGE|IMG):.+?\]/i,
+					`<div class="story-image-container"><img src="${imageUrl}" alt="Story image" class="story-image" /></div>`,
+				);
+			}
+
+			// Replace single line breaks within paragraph with <br> tags
+			para = para.replace(/\n/g, "<br>");
+
+			// Wrap in paragraph tag (unless it already contains div/img)
+			if (para.includes("<div") || para.includes("<img")) {
+				return para;
+			}
+			return `<p>${para}</p>`;
+		})
+		.filter((p) => p); // Remove empty paragraphs
+
+	return formattedParagraphs.join("");
 }
 
 function sanitizeHTML(html) {
-  // Basic sanitization - allow img, p, br, div tags
-  // In production, use a proper HTML sanitizer library
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
-    .replace(/on\w+="[^"]*"/gi, ''); // Remove event handlers
+	// Basic sanitization - allow img, p, br, div tags
+	// In production, use a proper HTML sanitizer library
+	return html
+		.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove scripts
+		.replace(/on\w+="[^"]*"/gi, ""); // Remove event handlers
 }
 
 function formatNumber(num) {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K';
-  }
-  return num.toString();
+	if (num >= 1000000) {
+		return (num / 1000000).toFixed(1) + "M";
+	}
+	if (num >= 1000) {
+		return (num / 1000).toFixed(1) + "K";
+	}
+	return num.toString();
 }
 
 function formatDate(date) {
-  if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+	if (!date) return "N/A";
+	return new Date(date).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 }
 
 function goBack() {
-  router.push('/stories');
+	router.push("/stories");
 }
 
 function getLanguageName(code) {
-  const lang = languages.value.find(l => l.code === code);
-  return lang ? lang.name : code.toUpperCase();
+	const lang = languages.value.find((l) => l.code === code);
+	return lang ? lang.name : code.toUpperCase();
 }
 </script>
 

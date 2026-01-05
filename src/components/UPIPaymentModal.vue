@@ -131,29 +131,29 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
 import {
-  X,
-  CreditCard,
-  QrCode,
-  Copy,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Loader2,
+	CheckCircle,
+	Clock,
+	Copy,
+	CreditCard,
+	Loader2,
+	QrCode,
+	X,
+	XCircle,
 } from "lucide-vue-next";
-import { useSubscription } from "../composables/useSubscription";
+import { computed, onMounted, ref } from "vue";
 import { subscriptionApi } from "../api/subscription";
+import { useSubscription } from "../composables/useSubscription";
 
 const props = defineProps({
-  plan: {
-    type: Object,
-    required: true,
-  },
-  isPremium: {
-    type: Boolean,
-    default: false,
-  },
+	plan: {
+		type: Object,
+		required: true,
+	},
+	isPremium: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 const emit = defineEmits(["close", "success"]);
@@ -170,128 +170,128 @@ const error = ref("");
 
 // Generate UPI QR Code
 async function generateQRCode() {
-  loadingQR.value = true;
-  error.value = "";
+	loadingQR.value = true;
+	error.value = "";
 
-  try {
-    // Create payment order
-    const orderResponse = await subscriptionApi.createUPIOrder({
-      planId: props.plan.id,
-      amount: props.plan.price,
-      type:
-        props.plan.id === "lifetime"
-          ? "lifetime"
-          : props.plan.id === "yearly"
-          ? "yearly"
-          : "monthly",
-    });
+	try {
+		// Create payment order
+		const orderResponse = await subscriptionApi.createUPIOrder({
+			planId: props.plan.id,
+			amount: props.plan.price,
+			type:
+				props.plan.id === "lifetime"
+					? "lifetime"
+					: props.plan.id === "yearly"
+						? "yearly"
+						: "monthly",
+		});
 
-    if (orderResponse.qrCodeUrl) {
-      qrCodeUrl.value = orderResponse.qrCodeUrl;
-      orderId.value = orderResponse.orderId;
-      paymentStatus.value = "pending";
-    } else if (orderResponse.upiLink) {
-      // If Razorpay returns UPI link, convert to QR code
-      qrCodeUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-        orderResponse.upiLink
-      )}`;
-      orderId.value = orderResponse.orderId;
-      paymentStatus.value = "pending";
-    }
+		if (orderResponse.qrCodeUrl) {
+			qrCodeUrl.value = orderResponse.qrCodeUrl;
+			orderId.value = orderResponse.orderId;
+			paymentStatus.value = "pending";
+		} else if (orderResponse.upiLink) {
+			// If Razorpay returns UPI link, convert to QR code
+			qrCodeUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+				orderResponse.upiLink,
+			)}`;
+			orderId.value = orderResponse.orderId;
+			paymentStatus.value = "pending";
+		}
 
-    if (orderResponse.upiId) {
-      upiId.value = orderResponse.upiId;
-    }
-  } catch (err) {
-    error.value =
-      err.message || "Failed to generate QR code. Please try again.";
-    console.error("Error generating QR code:", err);
-  } finally {
-    loadingQR.value = false;
-  }
+		if (orderResponse.upiId) {
+			upiId.value = orderResponse.upiId;
+		}
+	} catch (err) {
+		error.value =
+			err.message || "Failed to generate QR code. Please try again.";
+		console.error("Error generating QR code:", err);
+	} finally {
+		loadingQR.value = false;
+	}
 }
 
 // Copy UPI ID to clipboard
 async function copyUPIId() {
-  try {
-    await navigator.clipboard.writeText(upiId.value);
-    // Show toast notification (you can add a toast library)
-    alert("UPI ID copied to clipboard!");
-  } catch (err) {
-    console.error("Failed to copy UPI ID:", err);
-  }
+	try {
+		await navigator.clipboard.writeText(upiId.value);
+		// Show toast notification (you can add a toast library)
+		alert("UPI ID copied to clipboard!");
+	} catch (err) {
+		console.error("Failed to copy UPI ID:", err);
+	}
 }
 
 // Verify payment manually
 async function verifyPayment() {
-  processing.value = true;
-  error.value = "";
-  paymentStatus.value = "pending";
+	processing.value = true;
+	error.value = "";
+	paymentStatus.value = "pending";
 
-  try {
-    console.log("Verifying payment...", {
-      planId: props.plan.id,
-      amount: props.plan.price,
-    });
+	try {
+		console.log("Verifying payment...", {
+			planId: props.plan.id,
+			amount: props.plan.price,
+		});
 
-    // Verify payment with backend - this saves to DB
-    const verifyResponse = await subscriptionApi.verifyUPIPayment({
-      planId: props.plan.id,
-      type:
-        props.plan.id === "lifetime"
-          ? "lifetime"
-          : props.plan.id === "yearly"
-          ? "yearly"
-          : "monthly",
-      amount: props.plan.price,
-      orderId: orderId.value,
-    });
+		// Verify payment with backend - this saves to DB
+		const verifyResponse = await subscriptionApi.verifyUPIPayment({
+			planId: props.plan.id,
+			type:
+				props.plan.id === "lifetime"
+					? "lifetime"
+					: props.plan.id === "yearly"
+						? "yearly"
+						: "monthly",
+			amount: props.plan.price,
+			orderId: orderId.value,
+		});
 
-    console.log("Payment verification response:", verifyResponse);
+		console.log("Payment verification response:", verifyResponse);
 
-    if (verifyResponse.success && verifyResponse.subscription) {
-      // Payment verified and subscription saved to DB
-      paymentStatus.value = "success";
-      console.log(
-        "Payment verified, subscription saved:",
-        verifyResponse.subscription
-      );
+		if (verifyResponse.success && verifyResponse.subscription) {
+			// Payment verified and subscription saved to DB
+			paymentStatus.value = "success";
+			console.log(
+				"Payment verified, subscription saved:",
+				verifyResponse.subscription,
+			);
 
-      // Refresh premium status from DB
-      await checkPremiumStatus();
+			// Refresh premium status from DB
+			await checkPremiumStatus();
 
-      // Wait a moment to show success message
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+			// Wait a moment to show success message
+			await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Emit success event and close modal
-      emit("success", verifyResponse.subscription);
+			// Emit success event and close modal
+			emit("success", verifyResponse.subscription);
 
-      // Close modal after a short delay
-      setTimeout(() => {
-        emit("close");
-      }, 500);
-    } else {
-      paymentStatus.value = "failed";
-      error.value =
-        verifyResponse.error ||
-        "Payment verification failed. Please contact support.";
-      console.error("Payment verification failed:", verifyResponse);
-    }
-  } catch (err) {
-    paymentStatus.value = "failed";
-    error.value =
-      err.response?.data?.error ||
-      err.message ||
-      "Payment verification failed. Please try again.";
-    console.error("Payment verification error:", err);
-  } finally {
-    processing.value = false;
-  }
+			// Close modal after a short delay
+			setTimeout(() => {
+				emit("close");
+			}, 500);
+		} else {
+			paymentStatus.value = "failed";
+			error.value =
+				verifyResponse.error ||
+				"Payment verification failed. Please contact support.";
+			console.error("Payment verification failed:", verifyResponse);
+		}
+	} catch (err) {
+		paymentStatus.value = "failed";
+		error.value =
+			err.response?.data?.error ||
+			err.message ||
+			"Payment verification failed. Please try again.";
+		console.error("Payment verification error:", err);
+	} finally {
+		processing.value = false;
+	}
 }
 
 onMounted(async () => {
-  // Auto-generate QR code on mount
-  await generateQRCode();
+	// Auto-generate QR code on mount
+	await generateQRCode();
 });
 </script>
 

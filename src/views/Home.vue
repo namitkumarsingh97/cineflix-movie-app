@@ -187,241 +187,241 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
 import axios from "axios";
 import {
-  Film,
-  Play,
-  X,
-  AlertTriangle,
-  Grid3x3,
-  List,
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  RefreshCw,
-  Loader2,
+	AlertTriangle,
+	Calendar,
+	ChevronLeft,
+	ChevronRight,
+	Film,
+	Grid3x3,
+	List,
+	Loader2,
+	Play,
+	RefreshCw,
+	X,
 } from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
 
 const API_URL = import.meta.env.DEV
-  ? "https://cineflix-api-rho.vercel.app/api"
-  : import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+	? "https://cineflix-api-rho.vercel.app/api"
+	: import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default {
-  name: "Home",
-  setup() {
-    const searchQuery = ref("");
-    const sortBy = ref("date");
-    const currentPage = ref(1);
-    const loading = ref(false);
-    const viewMode = ref("grid");
-    const hoveredMovie = ref(null);
-    const playingMovie = ref(null);
-    const ITEMS_PER_PAGE = 40;
+	name: "Home",
+	setup() {
+		const searchQuery = ref("");
+		const sortBy = ref("date");
+		const currentPage = ref(1);
+		const loading = ref(false);
+		const viewMode = ref("grid");
+		const hoveredMovie = ref(null);
+		const playingMovie = ref(null);
+		const ITEMS_PER_PAGE = 40;
 
-    const movies = ref([]);
+		const movies = ref([]);
 
-    async function loadMovies() {
-      loading.value = true;
-      try {
-        const response = await axios.get(`${API_URL}/movies`);
-        movies.value = response.data.data || response.data;
-      } catch (error) {
-        console.error("Error loading movies:", error);
-        alert(`Failed to load movies: ${error.message}`);
-      } finally {
-        loading.value = false;
-      }
-    }
+		async function loadMovies() {
+			loading.value = true;
+			try {
+				const response = await axios.get(`${API_URL}/movies`);
+				movies.value = response.data.data || response.data;
+			} catch (error) {
+				console.error("Error loading movies:", error);
+				alert(`Failed to load movies: ${error.message}`);
+			} finally {
+				loading.value = false;
+			}
+		}
 
-    function formatDate(date) {
-      if (!date) return "";
-      const d = new Date(date);
-      return d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    }
+		function formatDate(date) {
+			if (!date) return "";
+			const d = new Date(date);
+			return d.toLocaleDateString("en-US", {
+				month: "short",
+				day: "numeric",
+				year: "numeric",
+			});
+		}
 
-    function getMovieIndex(id) {
-      return filteredMovies.value.findIndex((m) => m._id === id);
-    }
+		function getMovieIndex(id) {
+			return filteredMovies.value.findIndex((m) => m._id === id);
+		}
 
-    function playMovieInCard(movieId) {
-      playingMovie.value = movieId;
-      const element = document.getElementById(`movie-${movieId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }
+		function playMovieInCard(movieId) {
+			playingMovie.value = movieId;
+			const element = document.getElementById(`movie-${movieId}`);
+			if (element) {
+				element.scrollIntoView({ behavior: "smooth", block: "center" });
+			}
+		}
 
-    function stopPlaying() {
-      playingMovie.value = null;
-    }
+		function stopPlaying() {
+			playingMovie.value = null;
+		}
 
-    function handleMouseLeave(movieId) {
-      if (playingMovie.value !== movieId) {
-        hoveredMovie.value = null;
-      }
-    }
+		function handleMouseLeave(movieId) {
+			if (playingMovie.value !== movieId) {
+				hoveredMovie.value = null;
+			}
+		}
 
-    function getThumbnail(movie) {
-      if (movie.thumbnail) {
-        return movie.thumbnail;
-      }
-      const src = movie.iframeSrc || "";
-      if (src.includes("youtube.com") || src.includes("youtu.be")) {
-        const videoId = extractYouTubeId(src);
-        if (videoId) {
-          return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-        }
-      }
-      return null;
-    }
+		function getThumbnail(movie) {
+			if (movie.thumbnail) {
+				return movie.thumbnail;
+			}
+			const src = movie.iframeSrc || "";
+			if (src.includes("youtube.com") || src.includes("youtu.be")) {
+				const videoId = extractYouTubeId(src);
+				if (videoId) {
+					return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+				}
+			}
+			return null;
+		}
 
-    function extractYouTubeId(url) {
-      const regExp =
-        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.match(regExp);
-      return match && match[2].length === 11 ? match[2] : null;
-    }
+		function extractYouTubeId(url) {
+			const regExp =
+				/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+			const match = url.match(regExp);
+			return match && match[2].length === 11 ? match[2] : null;
+		}
 
-    function handleThumbnailError(event) {
-      event.target.style.display = "none";
-      event.target.parentElement.style.background = "var(--gradient-hero)";
-    }
+		function handleThumbnailError(event) {
+			event.target.style.display = "none";
+			event.target.parentElement.style.background = "var(--gradient-hero)";
+		}
 
-    function retryIframe(movie) {
-      movie.error = false;
-    }
+		function retryIframe(movie) {
+			movie.error = false;
+		}
 
-    function openExternal(url) {
-      window.open(url, "_blank");
-    }
+		function openExternal(url) {
+			window.open(url, "_blank");
+		}
 
-    function sortMovies() {
-      // Sorting is handled by computed property
-    }
+		function sortMovies() {
+			// Sorting is handled by computed property
+		}
 
-    function scrollToMovie(movieId) {
-      const element = document.getElementById(`movie-${movieId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-        setTimeout(() => {
-          playMovieInCard(movieId);
-        }, 500);
-      }
-    }
+		function scrollToMovie(movieId) {
+			const element = document.getElementById(`movie-${movieId}`);
+			if (element) {
+				element.scrollIntoView({ behavior: "smooth", block: "center" });
+				setTimeout(() => {
+					playMovieInCard(movieId);
+				}, 500);
+			}
+		}
 
-    const filteredMovies = computed(() => {
-      let filtered = movies.value;
-      if (searchQuery.value.trim()) {
-        const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter((movie) =>
-          movie.title.toLowerCase().includes(query)
-        );
-      }
-      if (sortBy.value === "title") {
-        filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
-      } else if (sortBy.value === "date") {
-        filtered = [...filtered].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-      }
-      return filtered;
-    });
+		const filteredMovies = computed(() => {
+			let filtered = movies.value;
+			if (searchQuery.value.trim()) {
+				const query = searchQuery.value.toLowerCase();
+				filtered = filtered.filter((movie) =>
+					movie.title.toLowerCase().includes(query),
+				);
+			}
+			if (sortBy.value === "title") {
+				filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+			} else if (sortBy.value === "date") {
+				filtered = [...filtered].sort(
+					(a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+				);
+			}
+			return filtered;
+		});
 
-    const featuredMovie = computed(() => {
-      return filteredMovies.value.length > 0 ? filteredMovies.value[0] : null;
-    });
+		const featuredMovie = computed(() => {
+			return filteredMovies.value.length > 0 ? filteredMovies.value[0] : null;
+		});
 
-    const totalPages = computed(() => {
-      return Math.ceil(filteredMovies.value.length / ITEMS_PER_PAGE);
-    });
+		const totalPages = computed(() => {
+			return Math.ceil(filteredMovies.value.length / ITEMS_PER_PAGE);
+		});
 
-    const paginatedMovies = computed(() => {
-      const start = (currentPage.value - 1) * ITEMS_PER_PAGE;
-      const end = start + ITEMS_PER_PAGE;
-      return filteredMovies.value.slice(start, end);
-    });
+		const paginatedMovies = computed(() => {
+			const start = (currentPage.value - 1) * ITEMS_PER_PAGE;
+			const end = start + ITEMS_PER_PAGE;
+			return filteredMovies.value.slice(start, end);
+		});
 
-    const visiblePages = computed(() => {
-      const pages = [];
-      const total = totalPages.value;
-      const current = currentPage.value;
-      if (total <= 7) {
-        for (let i = 1; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        if (current <= 3) {
-          for (let i = 1; i <= 5; i++) pages.push(i);
-          pages.push("...");
-          pages.push(total);
-        } else if (current >= total - 2) {
-          pages.push(1);
-          pages.push("...");
-          for (let i = total - 4; i <= total; i++) pages.push(i);
-        } else {
-          pages.push(1);
-          pages.push("...");
-          for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-          pages.push("...");
-          pages.push(total);
-        }
-      }
-      return pages;
-    });
+		const visiblePages = computed(() => {
+			const pages = [];
+			const total = totalPages.value;
+			const current = currentPage.value;
+			if (total <= 7) {
+				for (let i = 1; i <= total; i++) {
+					pages.push(i);
+				}
+			} else {
+				if (current <= 3) {
+					for (let i = 1; i <= 5; i++) pages.push(i);
+					pages.push("...");
+					pages.push(total);
+				} else if (current >= total - 2) {
+					pages.push(1);
+					pages.push("...");
+					for (let i = total - 4; i <= total; i++) pages.push(i);
+				} else {
+					pages.push(1);
+					pages.push("...");
+					for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+					pages.push("...");
+					pages.push(total);
+				}
+			}
+			return pages;
+		});
 
-    watch(currentPage, () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+		watch(currentPage, () => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		});
 
-    onMounted(() => {
-      loadMovies();
-    });
+		onMounted(() => {
+			loadMovies();
+		});
 
-    return {
-      searchQuery,
-      sortBy,
-      currentPage,
-      loading,
-      movies,
-      filteredMovies,
-      featuredMovie,
-      paginatedMovies,
-      totalPages,
-      visiblePages,
-      viewMode,
-      hoveredMovie,
-      playingMovie,
-      loadMovies,
-      sortMovies,
-      formatDate,
-      getMovieIndex,
-      playMovieInCard,
-      stopPlaying,
-      handleMouseLeave,
-      getThumbnail,
-      extractYouTubeId,
-      handleThumbnailError,
-      retryIframe,
-      openExternal,
-      scrollToMovie,
-      Film,
-      Play,
-      X,
-      AlertTriangle,
-      Grid3x3,
-      List,
-      ChevronLeft,
-      ChevronRight,
-      Calendar,
-      RefreshCw,
-      Loader2,
-    };
-  },
+		return {
+			searchQuery,
+			sortBy,
+			currentPage,
+			loading,
+			movies,
+			filteredMovies,
+			featuredMovie,
+			paginatedMovies,
+			totalPages,
+			visiblePages,
+			viewMode,
+			hoveredMovie,
+			playingMovie,
+			loadMovies,
+			sortMovies,
+			formatDate,
+			getMovieIndex,
+			playMovieInCard,
+			stopPlaying,
+			handleMouseLeave,
+			getThumbnail,
+			extractYouTubeId,
+			handleThumbnailError,
+			retryIframe,
+			openExternal,
+			scrollToMovie,
+			Film,
+			Play,
+			X,
+			AlertTriangle,
+			Grid3x3,
+			List,
+			ChevronLeft,
+			ChevronRight,
+			Calendar,
+			RefreshCw,
+			Loader2,
+		};
+	},
 };
 </script>
 

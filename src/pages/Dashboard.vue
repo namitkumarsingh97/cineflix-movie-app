@@ -347,175 +347,175 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
 import {
-  Crown,
-  Settings,
-  User,
-  LogOut,
-  Loader2,
-  Layout,
-  Calendar,
-  BarChart3,
+	BarChart3,
+	Calendar,
+	Crown,
+	Layout,
+	Loader2,
+	LogOut,
+	Settings,
+	User,
 } from "lucide-vue-next";
-import { useAuth } from "../composables/useAuth";
-import { useSubscription } from "../composables/useSubscription";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AccountSettings from "../components/AccountSettings.vue";
 import PaymentScreenshotUpload from "../components/PaymentScreenshotUpload.vue";
 import WatchAnalytics from "../components/WatchAnalytics.vue";
+import { useAuth } from "../composables/useAuth";
+import { useSubscription } from "../composables/useSubscription";
 import { formatDate } from "../utils/date";
 
 const router = useRouter();
 const route = useRoute();
 const { user, logout, checkAuth } = useAuth();
 const {
-  subscription,
-  loading: subscriptionLoading,
-  cancelSubscription,
-  checkPremiumStatus,
+	subscription,
+	loading: subscriptionLoading,
+	cancelSubscription,
+	checkPremiumStatus,
 } = useSubscription();
 
 // Tab management
 const activeTab = ref("overview");
 
 const tabs = [
-  { id: "overview", label: "Overview", icon: Layout },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "profile", label: "Profile", icon: User },
-  { id: "settings", label: "Settings", icon: Settings },
-  { id: "subscription", label: "Subscription", icon: Crown },
+	{ id: "overview", label: "Overview", icon: Layout },
+	{ id: "analytics", label: "Analytics", icon: BarChart3 },
+	{ id: "profile", label: "Profile", icon: User },
+	{ id: "settings", label: "Settings", icon: Settings },
+	{ id: "subscription", label: "Subscription", icon: Crown },
 ];
 
 // Check for tab query parameter
 onMounted(async () => {
-  await checkAuth();
-  await checkPremiumStatus();
+	await checkAuth();
+	await checkPremiumStatus();
 
-  // Set active tab from query parameter
-  if (route.query.tab && tabs.find((t) => t.id === route.query.tab)) {
-    activeTab.value = route.query.tab;
-  }
+	// Set active tab from query parameter
+	if (route.query.tab && tabs.find((t) => t.id === route.query.tab)) {
+		activeTab.value = route.query.tab;
+	}
 
-  // Refresh subscription when page becomes visible (e.g., after payment)
-  document.addEventListener("visibilitychange", handleVisibilityChange);
+	// Refresh subscription when page becomes visible (e.g., after payment)
+	document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  // Also refresh when window gains focus (user comes back from payment page)
-  window.addEventListener("focus", refreshSubscription);
+	// Also refresh when window gains focus (user comes back from payment page)
+	window.addEventListener("focus", refreshSubscription);
 
-  // Listen for subscription update events (from payment success)
-  window.addEventListener("subscription-updated", handleSubscriptionUpdate);
+	// Listen for subscription update events (from payment success)
+	window.addEventListener("subscription-updated", handleSubscriptionUpdate);
 });
 
 // Cleanup listeners
 onUnmounted(() => {
-  document.removeEventListener("visibilitychange", handleVisibilityChange);
-  window.removeEventListener("focus", refreshSubscription);
-  window.removeEventListener("subscription-updated", handleSubscriptionUpdate);
+	document.removeEventListener("visibilitychange", handleVisibilityChange);
+	window.removeEventListener("focus", refreshSubscription);
+	window.removeEventListener("subscription-updated", handleSubscriptionUpdate);
 });
 
 // Handle page visibility change
 function handleVisibilityChange() {
-  if (!document.hidden) {
-    // Page became visible, refresh subscription
-    refreshSubscription();
-  }
+	if (!document.hidden) {
+		// Page became visible, refresh subscription
+		refreshSubscription();
+	}
 }
 
 // Refresh subscription status
 async function refreshSubscription() {
-  console.log("Refreshing subscription status...");
-  await checkPremiumStatus();
+	console.log("Refreshing subscription status...");
+	await checkPremiumStatus();
 }
 
 // Handle subscription update event
 function handleSubscriptionUpdate(event) {
-  console.log("Subscription update event received:", event.detail);
-  refreshSubscription();
+	console.log("Subscription update event received:", event.detail);
+	refreshSubscription();
 }
 
 // Watch for route query changes to update active tab when navigating from profile menu
 watch(
-  () => route.query.tab,
-  (newTab) => {
-    if (newTab && tabs.find((t) => t.id === newTab)) {
-      activeTab.value = newTab;
-      // Refresh subscription when switching to subscription tab
-      if (newTab === "subscription") {
-        refreshSubscription();
-      }
-    } else if (!newTab) {
-      // If no tab in query, default to overview
-      activeTab.value = "overview";
-    }
-  },
-  { immediate: true }
+	() => route.query.tab,
+	(newTab) => {
+		if (newTab && tabs.find((t) => t.id === newTab)) {
+			activeTab.value = newTab;
+			// Refresh subscription when switching to subscription tab
+			if (newTab === "subscription") {
+				refreshSubscription();
+			}
+		} else if (!newTab) {
+			// If no tab in query, default to overview
+			activeTab.value = "overview";
+		}
+	},
+	{ immediate: true },
 );
 
 // Watch route path to refresh when navigating to dashboard
 watch(
-  () => route.path,
-  (newPath) => {
-    if (newPath === "/dashboard") {
-      refreshSubscription();
-    }
-  }
+	() => route.path,
+	(newPath) => {
+		if (newPath === "/dashboard") {
+			refreshSubscription();
+		}
+	},
 );
 
 // Watch activeTab to refresh when subscription tab is selected
 watch(activeTab, (newTab) => {
-  if (newTab === "subscription") {
-    console.log("Subscription tab selected, refreshing status...");
-    refreshSubscription();
-  }
+	if (newTab === "subscription") {
+		console.log("Subscription tab selected, refreshing status...");
+		refreshSubscription();
+	}
 });
 
 const isPremium = computed(() => {
-  return subscription.value && subscription.value.status === "active";
+	return subscription.value && subscription.value.status === "active";
 });
 
 function formatDateShort(date) {
-  if (!date) return "N/A";
-  const d = new Date(date);
-  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+	if (!date) return "N/A";
+	const d = new Date(date);
+	return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
 function formatPlanType(type) {
-  const types = {
-    monthly: "Monthly",
-    yearly: "Yearly",
-    lifetime: "Lifetime",
-  };
-  return types[type] || type;
+	const types = {
+		monthly: "Monthly",
+		yearly: "Yearly",
+		lifetime: "Lifetime",
+	};
+	return types[type] || type;
 }
 
 async function handleCancelSubscription() {
-  if (
-    confirm(
-      "Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period."
-    )
-  ) {
-    try {
-      await cancelSubscription();
-      await checkPremiumStatus();
-      alert("Subscription cancelled successfully.");
-    } catch (error) {
-      console.error("Error cancelling subscription:", error);
-      alert("Failed to cancel subscription. Please try again.");
-    }
-  }
+	if (
+		confirm(
+			"Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.",
+		)
+	) {
+		try {
+			await cancelSubscription();
+			await checkPremiumStatus();
+			alert("Subscription cancelled successfully.");
+		} catch (error) {
+			console.error("Error cancelling subscription:", error);
+			alert("Failed to cancel subscription. Please try again.");
+		}
+	}
 }
 
 function handleProfileUpdate() {
-  // Refresh user data
-  checkAuth();
+	// Refresh user data
+	checkAuth();
 }
 
 async function handleLogout() {
-  if (confirm("Are you sure you want to sign out?")) {
-    await logout();
-    router.push("/");
-  }
+	if (confirm("Are you sure you want to sign out?")) {
+		await logout();
+		router.push("/");
+	}
 }
 </script>
 

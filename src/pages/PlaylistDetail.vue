@@ -57,13 +57,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { usePlaylists } from '../composables/usePlaylists';
-import VideoCard from '../components/VideoCard.vue';
-import MovieCard from '../components/MovieCard.vue';
-import Loader from '../components/Loader.vue';
-import { Share2, Trash2, ListMusic } from 'lucide-vue-next';
+import { ListMusic, Share2, Trash2 } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Loader from "../components/Loader.vue";
+import MovieCard from "../components/MovieCard.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { usePlaylists } from "../composables/usePlaylists";
 
 const route = useRoute();
 const router = useRouter();
@@ -75,36 +75,40 @@ const playlist = ref(null);
 const loading = ref(true);
 
 const formatDate = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+	if (!date) return "";
+	const d = new Date(date);
+	return d.toLocaleDateString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
 };
 
 const handleShare = () => {
-  if (playlist.value.shareableLink) {
-    navigator.clipboard.writeText(playlist.value.shareableLink);
-    alert('Playlist link copied to clipboard!');
-  }
+	if (playlist.value.shareableLink) {
+		navigator.clipboard.writeText(playlist.value.shareableLink);
+		alert("Playlist link copied to clipboard!");
+	}
 };
 
 const handleDelete = () => {
-  if (confirm('Are you sure you want to delete this playlist?')) {
-    deletePlaylist(playlistId.value);
-    router.push('/playlists');
-  }
+	if (confirm("Are you sure you want to delete this playlist?")) {
+		deletePlaylist(playlistId.value);
+		router.push("/playlists");
+	}
 };
 
 const navigateToVideo = (item) => {
-  if (item._id) {
-    router.push(`/watch/${item._id}`);
-  } else if (item.id) {
-    router.push(`/watch/${item.id}?source=eporner`);
-  }
+	if (item._id) {
+		router.push(`/watch/${item._id}`);
+	} else if (item.id) {
+		router.push(`/watch/${item.id}?source=eporner`);
+	}
 };
 
 onMounted(() => {
-  playlist.value = getPlaylist(playlistId.value);
-  loading.value = false;
+	playlist.value = getPlaylist(playlistId.value);
+	loading.value = false;
 });
 </script>
 

@@ -90,69 +90,65 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { usePlaylists } from '../composables/usePlaylists';
-import { useMovies } from '../composables/useMovies';
-import { useEporner } from '../composables/useEporner';
-import { useVideos } from '../composables/useVideos';
-import PlaylistCard from '../components/PlaylistCard.vue';
-import MoodMixCard from '../components/MoodMixCard.vue';
-import { ListMusic, Plus } from 'lucide-vue-next';
+import { ListMusic, Plus } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import MoodMixCard from "../components/MoodMixCard.vue";
+import PlaylistCard from "../components/PlaylistCard.vue";
+import { useEporner } from "../composables/useEporner";
+import { useMovies } from "../composables/useMovies";
+import { usePlaylists } from "../composables/usePlaylists";
+import { useVideos } from "../composables/useVideos";
 
 const router = useRouter();
-const {
-  playlists,
-  moodMixes,
-  createPlaylist,
-  generateAllMoodMixes,
-} = usePlaylists();
+const { playlists, moodMixes, createPlaylist, generateAllMoodMixes } =
+	usePlaylists();
 
 const { movies } = useMovies();
 const { videos: epornerVideos } = useEporner();
 const { videos } = useVideos();
 
 const showCreateModal = ref(false);
-const newPlaylistName = ref('');
-const newPlaylistDescription = ref('');
+const newPlaylistName = ref("");
+const newPlaylistDescription = ref("");
 const newPlaylistIsPublic = ref(false);
 
 const viewPlaylist = (playlist) => {
-  router.push(`/playlist/${playlist.id}`);
+	router.push(`/playlist/${playlist.id}`);
 };
 
 const viewMoodMix = (mood) => {
-  router.push(`/mood-mix/${mood}`);
+	router.push(`/mood-mix/${mood}`);
 };
 
 const createNewPlaylist = () => {
-  if (!newPlaylistName.value.trim()) return;
-  
-  createPlaylist(
-    newPlaylistName.value.trim(),
-    newPlaylistDescription.value.trim(),
-    newPlaylistIsPublic.value
-  );
-  
-  // Reset form
-  newPlaylistName.value = '';
-  newPlaylistDescription.value = '';
-  newPlaylistIsPublic.value = false;
-  showCreateModal.value = false;
+	if (!newPlaylistName.value.trim()) return;
+
+	createPlaylist(
+		newPlaylistName.value.trim(),
+		newPlaylistDescription.value.trim(),
+		newPlaylistIsPublic.value,
+	);
+
+	// Reset form
+	newPlaylistName.value = "";
+	newPlaylistDescription.value = "";
+	newPlaylistIsPublic.value = false;
+	showCreateModal.value = false;
 };
 
 onMounted(async () => {
-  // Generate mood mixes from all available content
-  const allItems = [
-    ...movies.value,
-    ...epornerVideos.value,
-    ...(videos.value || []),
-  ];
-  
-  // Only generate if we have items
-  if (allItems.length > 0) {
-    generateAllMoodMixes(allItems);
-  }
+	// Generate mood mixes from all available content
+	const allItems = [
+		...movies.value,
+		...epornerVideos.value,
+		...(videos.value || []),
+	];
+
+	// Only generate if we have items
+	if (allItems.length > 0) {
+		generateAllMoodMixes(allItems);
+	}
 });
 </script>
 

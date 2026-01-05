@@ -165,45 +165,45 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
 import {
-  Star,
-  Image,
-  Upload,
-  Link,
-  Save,
-  Loader2,
-  X,
-  AlertCircle,
-  FileText,
-  Calendar,
-  Globe,
+	AlertCircle,
+	Calendar,
+	FileText,
+	Globe,
+	Image,
+	Link,
+	Loader2,
+	Save,
+	Star,
+	Upload,
+	X,
 } from "lucide-vue-next";
+import { ref, watch } from "vue";
 import { starsApi } from "../api/stars";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  starName: {
-    type: String,
-    required: true,
-  },
-  starProfile: {
-    type: Object,
-    default: null,
-  },
+	show: {
+		type: Boolean,
+		default: false,
+	},
+	starName: {
+		type: String,
+		required: true,
+	},
+	starProfile: {
+		type: Object,
+		default: null,
+	},
 });
 
 const emit = defineEmits(["close", "saved"]);
 
 const starData = ref({
-  photoFile: null,
-  photoUrl: "",
-  bio: "",
-  birthDate: "",
-  nationality: "",
+	photoFile: null,
+	photoUrl: "",
+	bio: "",
+	birthDate: "",
+	nationality: "",
 });
 
 const photoType = ref("url");
@@ -213,104 +213,104 @@ const saving = ref(false);
 const error = ref("");
 
 watch(
-  () => props.starProfile,
-  (newProfile) => {
-    if (newProfile) {
-      starData.value = {
-        photoFile: null,
-        photoUrl: newProfile.photo || "",
-        bio: newProfile.bio || "",
-        birthDate: newProfile.birthDate
-          ? new Date(newProfile.birthDate).toISOString().split("T")[0]
-          : "",
-        nationality: newProfile.nationality || "",
-      };
-      photoType.value = newProfile.photo ? "url" : "upload";
-      photoPreview.value = null;
-      urlPreview.value = true;
-    }
-  },
-  { immediate: true }
+	() => props.starProfile,
+	(newProfile) => {
+		if (newProfile) {
+			starData.value = {
+				photoFile: null,
+				photoUrl: newProfile.photo || "",
+				bio: newProfile.bio || "",
+				birthDate: newProfile.birthDate
+					? new Date(newProfile.birthDate).toISOString().split("T")[0]
+					: "",
+				nationality: newProfile.nationality || "",
+			};
+			photoType.value = newProfile.photo ? "url" : "upload";
+			photoPreview.value = null;
+			urlPreview.value = true;
+		}
+	},
+	{ immediate: true },
 );
 
 watch(
-  () => props.show,
-  (newVal) => {
-    if (!newVal) {
-      resetForm();
-    }
-  }
+	() => props.show,
+	(newVal) => {
+		if (!newVal) {
+			resetForm();
+		}
+	},
 );
 
 function handlePhotoChange(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 5 * 1024 * 1024) {
-      error.value = "Photo size should be less than 5MB";
-      return;
-    }
-    starData.value.photoFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      photoPreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    error.value = "";
-  }
+	const file = event.target.files[0];
+	if (file) {
+		if (file.size > 5 * 1024 * 1024) {
+			error.value = "Photo size should be less than 5MB";
+			return;
+		}
+		starData.value.photoFile = file;
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			photoPreview.value = e.target.result;
+		};
+		reader.readAsDataURL(file);
+		error.value = "";
+	}
 }
 
 function removePhoto() {
-  starData.value.photoFile = null;
-  photoPreview.value = null;
-  const fileInput = document.getElementById("starPhoto");
-  if (fileInput) fileInput.value = "";
+	starData.value.photoFile = null;
+	photoPreview.value = null;
+	const fileInput = document.getElementById("starPhoto");
+	if (fileInput) fileInput.value = "";
 }
 
 function resetForm() {
-  starData.value = {
-    photoFile: null,
-    photoUrl: "",
-    bio: "",
-    birthDate: "",
-    nationality: "",
-  };
-  photoType.value = "url";
-  photoPreview.value = null;
-  urlPreview.value = true;
-  error.value = "";
+	starData.value = {
+		photoFile: null,
+		photoUrl: "",
+		bio: "",
+		birthDate: "",
+		nationality: "",
+	};
+	photoType.value = "url";
+	photoPreview.value = null;
+	urlPreview.value = true;
+	error.value = "";
 }
 
 async function handleSave() {
-  error.value = "";
-  saving.value = true;
+	error.value = "";
+	saving.value = true;
 
-  try {
-    const updateData = {
-      bio: starData.value.bio || "",
-      nationality: starData.value.nationality || "",
-    };
+	try {
+		const updateData = {
+			bio: starData.value.bio || "",
+			nationality: starData.value.nationality || "",
+		};
 
-    if (starData.value.birthDate) {
-      updateData.birthDate = new Date(starData.value.birthDate).toISOString();
-    }
+		if (starData.value.birthDate) {
+			updateData.birthDate = new Date(starData.value.birthDate).toISOString();
+		}
 
-    if (photoType.value === "upload" && starData.value.photoFile) {
-      updateData.photoFile = starData.value.photoFile;
-    } else if (photoType.value === "url" && starData.value.photoUrl) {
-      updateData.photo = starData.value.photoUrl.trim();
-    }
+		if (photoType.value === "upload" && starData.value.photoFile) {
+			updateData.photoFile = starData.value.photoFile;
+		} else if (photoType.value === "url" && starData.value.photoUrl) {
+			updateData.photo = starData.value.photoUrl.trim();
+		}
 
-    await starsApi.updateProfile(props.starName, updateData);
-    emit("saved");
-    emit("close");
-  } catch (err) {
-    error.value =
-      err.response?.data?.error ||
-      err.response?.data?.message ||
-      "Failed to update star profile. Please try again.";
-  } finally {
-    saving.value = false;
-  }
+		await starsApi.updateProfile(props.starName, updateData);
+		emit("saved");
+		emit("close");
+	} catch (err) {
+		error.value =
+			err.response?.data?.error ||
+			err.response?.data?.message ||
+			"Failed to update star profile. Please try again.";
+	} finally {
+		saving.value = false;
+	}
 }
 </script>
 

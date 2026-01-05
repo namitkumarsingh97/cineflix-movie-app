@@ -100,11 +100,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { FolderOpen } from 'lucide-vue-next';
-import { videosApi } from '../api/videos';
-import Loader from '../components/Loader.vue';
+import { FolderOpen } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { videosApi } from "../api/videos";
+import Loader from "../components/Loader.vue";
 
 const router = useRouter();
 
@@ -116,115 +116,121 @@ const totalPages = ref(1);
 const totalCount = ref(0);
 
 onMounted(async () => {
-  await loadCategories();
+	await loadCategories();
 });
 
 async function loadCategories(page = 1) {
-  loading.value = true;
-  currentPage.value = page;
+	loading.value = true;
+	currentPage.value = page;
 
-  try {
-    // Derive categories from paginated videos list (avoid broken /videos/categories endpoint)
-    const { data } = await videosApi.getAll({
-      params: {
-        page,
-        limit: pageSize.value,
-      },
-    });
+	try {
+		// Derive categories from paginated videos list (avoid broken /videos/categories endpoint)
+		const { data } = await videosApi.getAll({
+			params: {
+				page,
+				limit: pageSize.value,
+			},
+		});
 
-    // Try multiple shapes to ensure we capture the video list
-    let videos = data?.data || data?.videos || data || [];
-    if (Array.isArray(data) && videos === data) {
-      // data might be the array itself
-      videos = data;
-    }
-    if (!Array.isArray(videos) && data?.results) {
-      // Some APIs use results wrapper
-      videos = data.results;
-    }
-    if (!Array.isArray(videos)) {
-      videos = [];
-    }
+		// Try multiple shapes to ensure we capture the video list
+		let videos = data?.data || data?.videos || data || [];
+		if (Array.isArray(data) && videos === data) {
+			// data might be the array itself
+			videos = data;
+		}
+		if (!Array.isArray(videos) && data?.results) {
+			// Some APIs use results wrapper
+			videos = data.results;
+		}
+		if (!Array.isArray(videos)) {
+			videos = [];
+		}
 
-    // Debug: log videos retrieved for this page to console
-    console.log('[Categories] Videos page', page, 'count', videos.length, videos);
+		// Debug: log videos retrieved for this page to console
+		console.log(
+			"[Categories] Videos page",
+			page,
+			"count",
+			videos.length,
+			videos,
+		);
 
-    const counts = new Map();
-    videos.forEach((video) => {
-      (video.categories || []).forEach((cat) => {
-        if (!cat || !cat.trim()) return;
-        const name = cat.trim();
-        const current = counts.get(name) || {
-          name,
-          videoCount: 0,
-          thumbnail: video.thumbnail || null,
-        };
-        current.videoCount += 1;
-        if (!current.thumbnail && video.thumbnail) {
-          current.thumbnail = video.thumbnail;
-        }
-        counts.set(name, current);
-      });
-    });
+		const counts = new Map();
+		videos.forEach((video) => {
+			(video.categories || []).forEach((cat) => {
+				if (!cat || !cat.trim()) return;
+				const name = cat.trim();
+				const current = counts.get(name) || {
+					name,
+					videoCount: 0,
+					thumbnail: video.thumbnail || null,
+				};
+				current.videoCount += 1;
+				if (!current.thumbnail && video.thumbnail) {
+					current.thumbnail = video.thumbnail;
+				}
+				counts.set(name, current);
+			});
+		});
 
-    const categoryData = Array.from(counts.values());
-    const metaTotal = data?.meta?.total || data?.total || categoryData.length;
-    const metaTotalPages =
-      data?.meta?.totalPages ||
-      data?.totalPages ||
-      Math.max(1, Math.ceil(metaTotal / pageSize.value));
+		const categoryData = Array.from(counts.values());
+		const metaTotal = data?.meta?.total || data?.total || categoryData.length;
+		const metaTotalPages =
+			data?.meta?.totalPages ||
+			data?.totalPages ||
+			Math.max(1, Math.ceil(metaTotal / pageSize.value));
 
-    // Debug: show categories/tags derived from API response
-    console.log(
-      '[Categories] Derived category sample:',
-      categoryData
-        .slice(0, 10)
-        .map((c) => c.name || c.category),
-      'total:',
-      categoryData.length
-    );
+		// Debug: show categories/tags derived from API response
+		console.log(
+			"[Categories] Derived category sample:",
+			categoryData.slice(0, 10).map((c) => c.name || c.category),
+			"total:",
+			categoryData.length,
+		);
 
-    categories.value = categoryData
-      .map((cat) => {
-        const name = cat.name || cat.category;
-        if (!name) return null;
-        const videoCount = cat.count || cat.videoCount || 0;
-        return {
-          name,
-          movieCount: 0,
-          videoCount,
-          count: videoCount,
-          thumbnail: cat.thumbnail || null,
-        };
-      })
-      .filter(Boolean)
-      .filter((cat) => cat.count > 0)
-      .sort((a, b) => b.count - a.count);
+		categories.value = categoryData
+			.map((cat) => {
+				const name = cat.name || cat.category;
+				if (!name) return null;
+				const videoCount = cat.count || cat.videoCount || 0;
+				return {
+					name,
+					movieCount: 0,
+					videoCount,
+					count: videoCount,
+					thumbnail: cat.thumbnail || null,
+				};
+			})
+			.filter(Boolean)
+			.filter((cat) => cat.count > 0)
+			.sort((a, b) => b.count - a.count);
 
-    totalPages.value = metaTotalPages;
-    totalCount.value = metaTotal || categories.value.length;
-  } catch (error) {
-    console.error('Failed to load categories:', error);
-  } finally {
-    loading.value = false;
-  }
+		totalPages.value = metaTotalPages;
+		totalCount.value = metaTotal || categories.value.length;
+	} catch (error) {
+		console.error("Failed to load categories:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function navigateToCategory(categoryName) {
-  router.push(`/category/${encodeURIComponent(categoryName)}`);
+	router.push(`/category/${encodeURIComponent(categoryName)}`);
 }
 
 function handlePageChange(page) {
-  if (page < 1 || page > totalPages.value || page === currentPage.value) return;
-  loadCategories(page);
+	if (page < 1 || page > totalPages.value || page === currentPage.value) return;
+	loadCategories(page);
 }
 
 function handleThumbnailError(event) {
-  event.target.style.display = 'none';
-  const placeholder = event.target.parentElement.querySelector('.category-thumbnail-placeholder');
-  if (placeholder) {
-    placeholder.style.display = 'flex';
-  }
+	event.target.style.display = "none";
+	const placeholder = event.target.parentElement.querySelector(
+		".category-thumbnail-placeholder",
+	);
+	if (placeholder) {
+		placeholder.style.display = "flex";
+	}
 }
 </script>
 

@@ -134,19 +134,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { Film, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-vue-next';
-import { useAuth } from '../composables/useAuth';
+import { AlertCircle, Eye, EyeOff, Film, Loader2 } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
 const { register, loginWithGoogle, loading, error } = useAuth();
 
 const formData = ref({
-  name: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
+	name: "",
+	email: "",
+	password: "",
+	confirmPassword: "",
 });
 
 const showPassword = ref(false);
@@ -154,49 +154,49 @@ const showConfirmPassword = ref(false);
 const acceptTerms = ref(false);
 
 async function handleSignup() {
-  // Validate passwords match
-  if (formData.value.password !== formData.value.confirmPassword) {
-    error.value = 'Passwords do not match';
-    return;
-  }
+	// Validate passwords match
+	if (formData.value.password !== formData.value.confirmPassword) {
+		error.value = "Passwords do not match";
+		return;
+	}
 
-  // Validate password length
-  if (formData.value.password.length < 8) {
-    error.value = 'Password must be at least 8 characters long';
-    return;
-  }
+	// Validate password length
+	if (formData.value.password.length < 8) {
+		error.value = "Password must be at least 8 characters long";
+		return;
+	}
 
-  const result = await register({
-    name: formData.value.name,
-    email: formData.value.email,
-    password: formData.value.password,
-  });
+	const result = await register({
+		name: formData.value.name,
+		email: formData.value.email,
+		password: formData.value.password,
+	});
 
-  if (result.success) {
-    router.push('/dashboard');
-  }
+	if (result.success) {
+		router.push("/dashboard");
+	}
 }
 
 async function handleGoogleLogin() {
-  const result = await loginWithGoogle();
-  if (result && result.success) {
-    router.push('/dashboard');
-  }
+	const result = await loginWithGoogle();
+	if (result && result.success) {
+		router.push("/dashboard");
+	}
 }
 
 onMounted(() => {
-  // Wait for Google Sign-In library to load
-  const checkGoogleLoaded = setInterval(() => {
-    if (window.google && window.google.accounts) {
-      clearInterval(checkGoogleLoaded);
-      // Library is loaded, button will work on click
-    }
-  }, 100);
+	// Wait for Google Sign-In library to load
+	const checkGoogleLoaded = setInterval(() => {
+		if (window.google && window.google.accounts) {
+			clearInterval(checkGoogleLoaded);
+			// Library is loaded, button will work on click
+		}
+	}, 100);
 
-  // Clear interval after 10 seconds
-  setTimeout(() => {
-    clearInterval(checkGoogleLoaded);
-  }, 10000);
+	// Clear interval after 10 seconds
+	setTimeout(() => {
+		clearInterval(checkGoogleLoaded);
+	}, 10000);
 });
 </script>
 

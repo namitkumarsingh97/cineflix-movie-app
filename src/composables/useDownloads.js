@@ -1,122 +1,121 @@
-import { ref, computed } from 'vue';
+import { computed, ref } from "vue";
 
-const DOWNLOADS_KEY = 'downloads';
+const DOWNLOADS_KEY = "downloads";
 const MAX_DOWNLOADS = 50;
 
 export function useDownloads() {
-  const downloads = ref(getDownloads());
+	const downloads = ref(getDownloads());
 
-  function getDownloads() {
-    try {
-      const stored = localStorage.getItem(DOWNLOADS_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error('Error reading downloads:', error);
-      return [];
-    }
-  }
+	function getDownloads() {
+		try {
+			const stored = localStorage.getItem(DOWNLOADS_KEY);
+			return stored ? JSON.parse(stored) : [];
+		} catch (error) {
+			console.error("Error reading downloads:", error);
+			return [];
+		}
+	}
 
-  function addDownload(item) {
-    try {
-      const { id, title, url, thumbnail, type } = item;
-      
-      // Check if already downloaded
-      if (downloads.value.find(d => d.id === id)) {
-        return downloads.value;
-      }
+	function addDownload(item) {
+		try {
+			const { id, title, url, thumbnail, type } = item;
 
-      const downloadItem = {
-        id,
-        title,
-        url,
-        thumbnail,
-        type, // 'movie' or 'video'
-        downloadedAt: new Date().toISOString(),
-        status: 'completed',
-        progress: 100
-      };
+			// Check if already downloaded
+			if (downloads.value.find((d) => d.id === id)) {
+				return downloads.value;
+			}
 
-      downloads.value.unshift(downloadItem);
-      
-      // Keep only last MAX_DOWNLOADS
-      if (downloads.value.length > MAX_DOWNLOADS) {
-        downloads.value = downloads.value.slice(0, MAX_DOWNLOADS);
-      }
+			const downloadItem = {
+				id,
+				title,
+				url,
+				thumbnail,
+				type, // 'movie' or 'video'
+				downloadedAt: new Date().toISOString(),
+				status: "completed",
+				progress: 100,
+			};
 
-      localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(downloads.value));
-      return downloads.value;
-    } catch (error) {
-      console.error('Error adding download:', error);
-      return downloads.value;
-    }
-  }
+			downloads.value.unshift(downloadItem);
 
-  function removeDownload(id) {
-    try {
-      downloads.value = downloads.value.filter(d => d.id !== id);
-      localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(downloads.value));
-      return downloads.value;
-    } catch (error) {
-      console.error('Error removing download:', error);
-      return downloads.value;
-    }
-  }
+			// Keep only last MAX_DOWNLOADS
+			if (downloads.value.length > MAX_DOWNLOADS) {
+				downloads.value = downloads.value.slice(0, MAX_DOWNLOADS);
+			}
 
-  function clearDownloads() {
-    try {
-      downloads.value = [];
-      localStorage.removeItem(DOWNLOADS_KEY);
-      return [];
-    } catch (error) {
-      console.error('Error clearing downloads:', error);
-      return [];
-    }
-  }
+			localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(downloads.value));
+			return downloads.value;
+		} catch (error) {
+			console.error("Error adding download:", error);
+			return downloads.value;
+		}
+	}
 
-  function downloadFile(item) {
-    return new Promise((resolve, reject) => {
-      try {
-        const { id, title, url } = item;
-        
-        if (!url) {
-          reject(new Error('No download URL available'));
-          return;
-        }
+	function removeDownload(id) {
+		try {
+			downloads.value = downloads.value.filter((d) => d.id !== id);
+			localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(downloads.value));
+			return downloads.value;
+		} catch (error) {
+			console.error("Error removing download:", error);
+			return downloads.value;
+		}
+	}
 
-        // Create download link
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = title || 'download';
-        link.target = '_blank';
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+	function clearDownloads() {
+		try {
+			downloads.value = [];
+			localStorage.removeItem(DOWNLOADS_KEY);
+			return [];
+		} catch (error) {
+			console.error("Error clearing downloads:", error);
+			return [];
+		}
+	}
 
-        // Add to downloads list
-        addDownload(item);
-        resolve();
-      } catch (error) {
-        console.error('Error downloading file:', error);
-        reject(error);
-      }
-    });
-  }
+	function downloadFile(item) {
+		return new Promise((resolve, reject) => {
+			try {
+				const { id, title, url } = item;
 
-  function downloadForOffline(item) {
-    // For videos/movies, we'll use the browser's download functionality
-    // In a real app, you might want to use IndexedDB or Cache API for offline storage
-    return downloadFile(item);
-  }
+				if (!url) {
+					reject(new Error("No download URL available"));
+					return;
+				}
 
-  return {
-    downloads: computed(() => downloads.value),
-    addDownload,
-    removeDownload,
-    clearDownloads,
-    downloadFile,
-    downloadForOffline
-  };
+				// Create download link
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = title || "download";
+				link.target = "_blank";
+
+				// Trigger download
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+
+				// Add to downloads list
+				addDownload(item);
+				resolve();
+			} catch (error) {
+				console.error("Error downloading file:", error);
+				reject(error);
+			}
+		});
+	}
+
+	function downloadForOffline(item) {
+		// For videos/movies, we'll use the browser's download functionality
+		// In a real app, you might want to use IndexedDB or Cache API for offline storage
+		return downloadFile(item);
+	}
+
+	return {
+		downloads: computed(() => downloads.value),
+		addDownload,
+		removeDownload,
+		clearDownloads,
+		downloadFile,
+		downloadForOffline,
+	};
 }
-

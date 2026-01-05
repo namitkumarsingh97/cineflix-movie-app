@@ -106,140 +106,140 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { X, CreditCard } from 'lucide-vue-next';
-import { useSubscription } from '../composables/useSubscription';
+import { CreditCard, X } from "lucide-vue-next";
+import { computed, ref } from "vue";
+import { useSubscription } from "../composables/useSubscription";
 
 const props = defineProps({
-  plan: {
-    type: Object,
-    required: true,
-  },
-  isPremium: {
-    type: Boolean,
-    default: false,
-  },
+	plan: {
+		type: Object,
+		required: true,
+	},
+	isPremium: {
+		type: Boolean,
+		default: false,
+	},
 });
 
-const emit = defineEmits(['close', 'success']);
+const emit = defineEmits(["close", "success"]);
 
 const { processPayment } = useSubscription();
 
-const cardNumber = ref('');
-const expiryDate = ref('');
-const cvv = ref('');
-const cardholderName = ref('');
+const cardNumber = ref("");
+const expiryDate = ref("");
+const cvv = ref("");
+const cardholderName = ref("");
 const processing = ref(false);
-const error = ref('');
+const error = ref("");
 
 const isFormValid = computed(() => {
-  return (
-    cardNumber.value.replace(/\s/g, '').length === 16 &&
-    expiryDate.value.length === 5 &&
-    cvv.value.length >= 3 &&
-    cardholderName.value.trim().length > 0
-  );
+	return (
+		cardNumber.value.replace(/\s/g, "").length === 16 &&
+		expiryDate.value.length === 5 &&
+		cvv.value.length >= 3 &&
+		cardholderName.value.trim().length > 0
+	);
 });
 
 function formatCardNumber(event) {
-  let value = event.target.value.replace(/\s/g, '');
-  value = value.replace(/\D/g, '');
-  value = value.slice(0, 16);
-  value = value.match(/.{1,4}/g)?.join(' ') || value;
-  cardNumber.value = value;
+	let value = event.target.value.replace(/\s/g, "");
+	value = value.replace(/\D/g, "");
+	value = value.slice(0, 16);
+	value = value.match(/.{1,4}/g)?.join(" ") || value;
+	cardNumber.value = value;
 }
 
 function formatExpiry(event) {
-  let value = event.target.value.replace(/\D/g, '');
-  if (value.length >= 2) {
-    value = value.slice(0, 2) + '/' + value.slice(2, 4);
-  }
-  expiryDate.value = value.slice(0, 5);
+	let value = event.target.value.replace(/\D/g, "");
+	if (value.length >= 2) {
+		value = value.slice(0, 2) + "/" + value.slice(2, 4);
+	}
+	expiryDate.value = value.slice(0, 5);
 }
 
 function formatCVV(event) {
-  cvv.value = event.target.value.replace(/\D/g, '').slice(0, 4);
+	cvv.value = event.target.value.replace(/\D/g, "").slice(0, 4);
 }
 
 async function handlePayment() {
-  if (!isFormValid.value) return;
+	if (!isFormValid.value) return;
 
-  processing.value = true;
-  error.value = '';
+	processing.value = true;
+	error.value = "";
 
-  try {
-    // Process payment through subscription composable
-    const result = await processPayment({
-      planId: props.plan.id,
-      amount: props.plan.price,
-      paymentMethod: 'stripe', // Use Stripe for real payments
-      cardDetails: {
-        number: cardNumber.value.replace(/\s/g, ''),
-        expiry: expiryDate.value,
-        cvv: cvv.value,
-        name: cardholderName.value,
-      },
-    });
+	try {
+		// Process payment through subscription composable
+		const result = await processPayment({
+			planId: props.plan.id,
+			amount: props.plan.price,
+			paymentMethod: "stripe", // Use Stripe for real payments
+			cardDetails: {
+				number: cardNumber.value.replace(/\s/g, ""),
+				expiry: expiryDate.value,
+				cvv: cvv.value,
+				name: cardholderName.value,
+			},
+		});
 
-    // If Stripe payment intent is required, handle it
-    if (result && result.requiresPayment && result.clientSecret) {
-      // For now, we'll use mock payment confirmation
-      // In production, you would use Stripe.js Elements to confirm the payment
-      // This requires installing @stripe/stripe-js and using Stripe Elements
-      
-      // Simulate payment confirmation (replace with actual Stripe confirmation)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Confirm payment on backend
-      const confirmResult = await processPayment({
-        planId: props.plan.id,
-        amount: props.plan.price,
-        paymentMethod: 'stripe',
-        paymentIntentId: result.paymentIntentId,
-      });
+		// If Stripe payment intent is required, handle it
+		if (result && result.requiresPayment && result.clientSecret) {
+			// For now, we'll use mock payment confirmation
+			// In production, you would use Stripe.js Elements to confirm the payment
+			// This requires installing @stripe/stripe-js and using Stripe Elements
 
-      if (confirmResult === true || !confirmResult.requiresPayment) {
-        emit('success');
-      } else {
-        error.value = 'Payment confirmation failed. Please try again.';
-      }
-    } else if (result === true) {
-      // Mock payment succeeded
-      emit('success');
-    } else {
-      error.value = 'Payment failed. Please try again.';
-    }
-  } catch (err) {
-    error.value = err.message || 'Payment processing failed. Please try again.';
-  } finally {
-    processing.value = false;
-  }
+			// Simulate payment confirmation (replace with actual Stripe confirmation)
+			await new Promise((resolve) => setTimeout(resolve, 2000));
+
+			// Confirm payment on backend
+			const confirmResult = await processPayment({
+				planId: props.plan.id,
+				amount: props.plan.price,
+				paymentMethod: "stripe",
+				paymentIntentId: result.paymentIntentId,
+			});
+
+			if (confirmResult === true || !confirmResult.requiresPayment) {
+				emit("success");
+			} else {
+				error.value = "Payment confirmation failed. Please try again.";
+			}
+		} else if (result === true) {
+			// Mock payment succeeded
+			emit("success");
+		} else {
+			error.value = "Payment failed. Please try again.";
+		}
+	} catch (err) {
+		error.value = err.message || "Payment processing failed. Please try again.";
+	} finally {
+		processing.value = false;
+	}
 }
 
 async function handleMockPayment(method) {
-  processing.value = true;
-  error.value = '';
+	processing.value = true;
+	error.value = "";
 
-  try {
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
+	try {
+		// Simulate payment processing
+		await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    const success = await processPayment({
-      planId: props.plan.id,
-      amount: props.plan.price,
-      paymentMethod: method,
-    });
+		const success = await processPayment({
+			planId: props.plan.id,
+			amount: props.plan.price,
+			paymentMethod: method,
+		});
 
-    if (success) {
-      emit('success');
-    } else {
-      error.value = 'Payment failed. Please try again.';
-    }
-  } catch (err) {
-    error.value = err.message || 'Payment processing failed. Please try again.';
-  } finally {
-    processing.value = false;
-  }
+		if (success) {
+			emit("success");
+		} else {
+			error.value = "Payment failed. Please try again.";
+		}
+	} catch (err) {
+		error.value = err.message || "Payment processing failed. Please try again.";
+	} finally {
+		processing.value = false;
+	}
 }
 </script>
 

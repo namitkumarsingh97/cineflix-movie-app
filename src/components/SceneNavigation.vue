@@ -33,42 +33,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { Film, Search } from 'lucide-vue-next';
-import SceneMarker from './SceneMarker.vue';
+import { Film, Search } from "lucide-vue-next";
+import { computed, ref } from "vue";
+import SceneMarker from "./SceneMarker.vue";
 
 const props = defineProps({
-  scenes: {
-    type: Array,
-    default: () => [],
-  },
-  currentScene: {
-    type: Object,
-    default: null,
-  },
+	scenes: {
+		type: Array,
+		default: () => [],
+	},
+	currentScene: {
+		type: Object,
+		default: null,
+	},
 });
 
-const emit = defineEmits(['scene-click']);
+const emit = defineEmits(["scene-click"]);
 
-const searchQuery = ref('');
+const searchQuery = ref("");
 
 const filteredScenes = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return props.scenes;
-  }
-  
-  const query = searchQuery.value.toLowerCase();
-  return props.scenes.filter(scene => {
-    return (
-      scene.label.toLowerCase().includes(query) ||
-      scene.participants.some(p => p.toLowerCase().includes(query)) ||
-      scene.vibe.toLowerCase().includes(query)
-    );
-  });
+	if (!searchQuery.value.trim()) {
+		return props.scenes;
+	}
+
+	const query = searchQuery.value.toLowerCase();
+	return props.scenes.filter((scene) => {
+		return (
+			scene.label.toLowerCase().includes(query) ||
+			scene.participants.some((p) => p.toLowerCase().includes(query)) ||
+			scene.vibe.toLowerCase().includes(query)
+		);
+	});
 });
 
 const handleSceneClick = (scene) => {
-  emit('scene-click', scene);
+	emit("scene-click", scene);
 };
 </script>
 

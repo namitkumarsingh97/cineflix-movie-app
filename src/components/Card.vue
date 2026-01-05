@@ -6,13 +6,13 @@
 
 <script setup>
 defineProps({
-  hover: {
-    type: Boolean,
-    default: true,
-  },
+	hover: {
+		type: Boolean,
+		default: true,
+	},
 });
 
-defineEmits(['click']);
+defineEmits(["click"]);
 </script>
 
 <style scoped>

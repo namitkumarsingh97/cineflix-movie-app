@@ -242,7 +242,7 @@
             <router-link
               v-if="!isAuthenticated && !isAdminLoggedIn"
               to="/login"
-              class="navbar-btn login-btn"
+              class="navbar-btn login-btn hide-on-sm"
               title="Sign In"
             >
               <LogIn :size="18" />
@@ -364,7 +364,11 @@
             <Film :size="24" />
             <span>MovieHub</span>
           </div>
-          <button class="mobile-menu-close" @click="closeMobileMenu" aria-label="Close mobile menu">
+          <button
+            class="mobile-menu-close"
+            @click="closeMobileMenu"
+            aria-label="Close mobile menu"
+          >
             <X :size="24" />
           </button>
         </div>
@@ -449,301 +453,554 @@
           <div class="mobile-menu-section">
             <h3 class="mobile-menu-section-header">CATEGORIES</h3>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/hd-4k' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                'mobile-featured-item-divider',
+                { active: route.path === '/hd-4k' },
+              ]"
               @click="navigateToMobileHD4K"
             >
               <span>4K/HD Only</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/amateur' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                'mobile-featured-item-divider',
+                { active: route.path === '/amateur' },
+              ]"
               @click="navigateToMobileAmateur"
             >
               <span>Amateur</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', 'mobile-featured-item-divider', { active: route.path === '/anal' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                'mobile-featured-item-divider',
+                { active: route.path === '/anal' },
+              ]"
               @click="navigateToMobileAnal"
             >
               <span>Anal</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/asian' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/asian' },
+              ]"
               @click="navigateToMobileAsian"
             >
               <span>Asian</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/behind-the-scenes' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/behind-the-scenes' },
+              ]"
               @click="navigateToMobileBehindTheScenes"
             >
               <span>Behind the Scenes</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bdsm' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/bdsm' },
+              ]"
               @click="navigateToMobileBdsm"
             >
               <span>BDSM</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-ass' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/big-ass' },
+              ]"
               @click="navigateToMobileBigAss"
             >
               <span>Big Ass</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-dick' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/big-dick' },
+              ]"
               @click="navigateToMobileBigDick"
             >
               <span>Big Dick</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/big-tits' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/big-tits' },
+              ]"
               @click="navigateToMobileBigTits"
             >
               <span>Big Tits</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bisexual' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/bisexual' },
+              ]"
               @click="navigateToMobileBisexual"
             >
               <span>Bisexual</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/blonde' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/blonde' },
+              ]"
               @click="navigateToMobileBlonde"
             >
               <span>Blonde</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/blowjob' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/blowjob' },
+              ]"
               @click="navigateToMobileBlowjob"
             >
               <span>Blowjob</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/brunette' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/brunette' },
+              ]"
               @click="navigateToMobileBrunette"
             >
               <span>Brunette</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/bukkake' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/bukkake' },
+              ]"
               @click="navigateToMobileBukkake"
             >
               <span>Bukkake</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/compilations' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/compilations' },
+              ]"
               @click="navigateToMobileCompilations"
             >
               <span>Compilations</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/creampie' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/creampie' },
+              ]"
               @click="navigateToMobileCreampie"
             >
               <span>Creampie</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/cumshot' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/cumshot' },
+              ]"
               @click="navigateToMobileCumshot"
             >
               <span>Cumshot</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/documentaries' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/documentaries' },
+              ]"
               @click="navigateToMobileDocumentaries"
             >
               <span>Documentaries</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/double-penetration' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/double-penetration' },
+              ]"
               @click="navigateToMobileDoublePenetration"
             >
               <span>Double Penetration</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/ebony' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/ebony' },
+              ]"
               @click="navigateToMobileEbony"
             >
               <span>Ebony</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/for-women' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/for-women' },
+              ]"
               @click="navigateToMobileForWomen"
             >
               <span>For Women</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/group-sex' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/group-sex' },
+              ]"
               @click="navigateToMobileGroupSex"
             >
               <span>Group Sex</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/handjob' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/handjob' },
+              ]"
               @click="navigateToMobileHandjob"
             >
               <span>Handjob</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hardcore' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/hardcore' },
+              ]"
               @click="navigateToMobileHardcore"
             >
               <span>Hardcore</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hentai' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/hentai' },
+              ]"
               @click="navigateToMobileHentai"
             >
               <span>Hentai</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/homemade' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/homemade' },
+              ]"
               @click="navigateToMobileHomemade"
             >
               <span>Homemade</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/hotel' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/hotel' },
+              ]"
               @click="navigateToMobileHotel"
             >
               <span>Hotel</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/housewives' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/housewives' },
+              ]"
               @click="navigateToMobileHousewives"
             >
               <span>Housewives</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/interracial' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/interracial' },
+              ]"
               @click="navigateToMobileInterracial"
             >
               <span>Interracial</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/interviews' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/interviews' },
+              ]"
               @click="navigateToMobileInterviews"
             >
               <span>Interviews</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/latina' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/latina' },
+              ]"
               @click="navigateToMobileLatina"
             >
               <span>Latina</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/lesbian' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/lesbian' },
+              ]"
               @click="navigateToMobileLesbian"
             >
               <span>Lesbian</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/live-cams' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/live-cams' },
+              ]"
               @click="navigateToMobileLiveCams"
             >
               <span>Live Cams</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/massage' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/massage' },
+              ]"
               @click="navigateToMobileMassage"
             >
               <span>Massage</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/masturbation' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/masturbation' },
+              ]"
               @click="navigateToMobileMasturbation"
             >
               <span>Masturbation</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/mature' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/mature' },
+              ]"
               @click="navigateToMobileMature"
             >
               <span>Mature</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/milf' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/milf' },
+              ]"
               @click="navigateToMobileMILF"
             >
               <span>MILF</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/nurse' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/nurse' },
+              ]"
               @click="navigateToMobileNurse"
             >
               <span>Nurse</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/office' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/office' },
+              ]"
               @click="navigateToMobileOffice"
             >
               <span>Office</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/outdoor' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/outdoor' },
+              ]"
               @click="navigateToMobileOutdoor"
             >
               <span>Outdoor</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/parodies' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/parodies' },
+              ]"
               @click="navigateToMobileParodies"
             >
               <span>Parodies</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/pov' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/pov' },
+              ]"
               @click="navigateToMobilePOV"
             >
               <span>POV</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/public' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/public' },
+              ]"
               @click="navigateToMobilePublic"
             >
               <span>Public</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/shemale' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/shemale' },
+              ]"
               @click="navigateToMobileShemale"
             >
               <span>Shemale</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/sleep' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/sleep' },
+              ]"
               @click="navigateToMobileSleep"
             >
               <span>Sleep</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/small-tits' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/small-tits' },
+              ]"
               @click="navigateToMobileSmallTits"
             >
               <span>Small Tits</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/squirt' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/squirt' },
+              ]"
               @click="navigateToMobileSquirt"
             >
               <span>Squirt</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/verified-amateur' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/verified-amateur' },
+              ]"
               @click="navigateToMobileVerifiedAmateur"
             >
               <span>Verified Amateur</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/vr-360' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/vr-360' },
+              ]"
               @click="navigateToMobileVR360"
             >
               <span>VR/360° Videos</span>
             </button>
             <button
-              :class="['mobile-menu-link', 'mobile-menu-button', 'mobile-featured-item', { active: route.path === '/webcam' }]"
+              :class="[
+                'mobile-menu-link',
+                'mobile-menu-button',
+                'mobile-featured-item',
+                { active: route.path === '/webcam' },
+              ]"
               @click="navigateToMobileWebcam"
             >
               <span>Webcam</span>
@@ -889,54 +1146,54 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, inject, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useMovies } from "../composables/useMovies";
-import { useEporner } from "../composables/useEporner";
 import {
-  Film,
-  Search,
-  RefreshCw,
-  Home,
-  TrendingUp,
-  Languages,
-  Image,
-  FolderOpen,
-  Star,
-  Heart,
-  FileText,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
-  Menu,
-  X,
-  Shield,
-  User,
-  LogOut,
-  Settings,
   Accessibility,
-  Clock,
-  ListMusic,
-  Crown,
-  LogIn,
-  Layout,
   ChevronDown,
-  RotateCcw,
-  Play,
-  ThumbsUp,
-  Eye,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  Crown,
+  Eye,
+  Facebook,
+  FileText,
+  Film,
+  FolderOpen,
+  Heart,
+  Home,
+  Image,
+  Instagram,
+  Languages,
+  Layout,
+  ListMusic,
+  LogIn,
+  LogOut,
+  Menu,
+  Play,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  Settings,
+  Shield,
+  Star,
+  ThumbsUp,
+  TrendingUp,
+  Twitter,
+  User,
+  X,
+  Youtube,
 } from "lucide-vue-next";
-import PreferencesModal from "../components/PreferencesModal.vue";
+import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AccessibilitySettings from "../components/AccessibilitySettings.vue";
-import PWAInstallPrompt from "../components/PWAInstallPrompt.vue";
 import BadgeCount from "../components/BadgeCount.vue";
+import PreferencesModal from "../components/PreferencesModal.vue";
+import PWAInstallPrompt from "../components/PWAInstallPrompt.vue";
 import { useAccessibility } from "../composables/useAccessibility";
-import { useBadgeCounts } from "../composables/useBadgeCounts";
-import { usePushNotifications } from "../composables/usePushNotifications";
 import { useAuth } from "../composables/useAuth";
+import { useBadgeCounts } from "../composables/useBadgeCounts";
+import { useEporner } from "../composables/useEporner";
+import { useMovies } from "../composables/useMovies";
+import { usePushNotifications } from "../composables/usePushNotifications";
 
 const router = useRouter();
 const route = useRoute();
@@ -1804,3 +2061,11 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+@media (max-width: 640px) {
+  .hide-on-sm {
+    display: none !important;
+  }
+}
+</style>

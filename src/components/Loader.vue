@@ -6,17 +6,17 @@
 </template>
 
 <script setup>
-import { Loader2 } from 'lucide-vue-next';
+import { Loader2 } from "lucide-vue-next";
 
 defineProps({
-  size: {
-    type: Number,
-    default: 50,
-  },
-  message: {
-    type: String,
-    default: '',
-  },
+	size: {
+		type: Number,
+		default: 50,
+	},
+	message: {
+		type: String,
+		default: "",
+	},
 });
 </script>
 

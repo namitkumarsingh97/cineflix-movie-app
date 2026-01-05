@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import WatchAnalytics from '../components/WatchAnalytics.vue';
+import WatchAnalytics from "../components/WatchAnalytics.vue";
 </script>
 
 <style scoped>

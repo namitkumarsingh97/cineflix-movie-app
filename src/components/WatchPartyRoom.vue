@@ -81,89 +81,96 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
-import { Users, Share2, X, Send } from 'lucide-vue-next';
-import { useSocialWatchParty } from '../composables/useSocialWatchParty';
+import { Send, Share2, Users, X } from "lucide-vue-next";
+import { computed, nextTick, ref, watch } from "vue";
+import { useSocialWatchParty } from "../composables/useSocialWatchParty";
 
 const props = defineProps({
-  roomId: {
-    type: String,
-    required: true,
-  },
+	roomId: {
+		type: String,
+		required: true,
+	},
 });
 
-const emit = defineEmits(['leave']);
+const emit = defineEmits(["leave"]);
 
 const {
-  participants,
-  chatMessages,
-  isHost,
-  sendMessage,
-  leaveRoom,
-  getRoomInfo,
+	participants,
+	chatMessages,
+	isHost,
+	sendMessage,
+	leaveRoom,
+	getRoomInfo,
 } = useSocialWatchParty();
 
-const chatInput = ref('');
+const chatInput = ref("");
 const chatMessagesRef = ref(null);
 
 const participantCount = computed(() => participants.value.length + 1); // +1 for current user
 
 function sendChatMessage() {
-  if (!chatInput.value.trim()) return;
+	if (!chatInput.value.trim()) return;
 
-  sendMessage(chatInput.value, 'You');
-  chatInput.value = '';
+	sendMessage(chatInput.value, "You");
+	chatInput.value = "";
 
-  // Scroll to bottom
-  nextTick(() => {
-    if (chatMessagesRef.value) {
-      chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
-    }
-  });
+	// Scroll to bottom
+	nextTick(() => {
+		if (chatMessagesRef.value) {
+			chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
+		}
+	});
 }
 
 function copyInviteLink() {
-  const roomInfo = getRoomInfo();
-  const inviteLink = `${window.location.origin}/watch-party/${roomInfo.roomId}`;
-  
-  navigator.clipboard.writeText(inviteLink).then(() => {
-    // Show toast notification (would implement toast system)
-    alert('Invite link copied to clipboard!');
-  }).catch(err => {
-    console.error('Failed to copy:', err);
-  });
+	const roomInfo = getRoomInfo();
+	const inviteLink = `${window.location.origin}/watch-party/${roomInfo.roomId}`;
+
+	navigator.clipboard
+		.writeText(inviteLink)
+		.then(() => {
+			// Show toast notification (would implement toast system)
+			alert("Invite link copied to clipboard!");
+		})
+		.catch((err) => {
+			console.error("Failed to copy:", err);
+		});
 }
 
 function handleLeave() {
-  leaveRoom();
-  emit('leave');
+	leaveRoom();
+	emit("leave");
 }
 
 function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+	if (!name) return "?";
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 }
 
 function formatTime(timestamp) {
-  const date = new Date(timestamp);
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+	const date = new Date(timestamp);
+	const hours = date.getHours();
+	const minutes = date.getMinutes();
+	return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }
 
 // Auto-scroll chat when new messages arrive
-watch(chatMessages, () => {
-  nextTick(() => {
-    if (chatMessagesRef.value) {
-      chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
-    }
-  });
-}, { deep: true });
+watch(
+	chatMessages,
+	() => {
+		nextTick(() => {
+			if (chatMessagesRef.value) {
+				chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight;
+			}
+		});
+	},
+	{ deep: true },
+);
 </script>
 
 <style scoped>

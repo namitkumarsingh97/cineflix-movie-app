@@ -197,20 +197,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
 import {
-  RefreshCw,
-  Loader2,
-  CheckCircle,
-  XCircle,
-  User,
-  Image,
-  FileText,
-  X,
-  AlertTriangle,
-} from 'lucide-vue-next';
-import { paymentVerificationApi } from '../api/paymentVerification';
-import apiClient from '../plugins/axios';
+	AlertTriangle,
+	CheckCircle,
+	FileText,
+	Image,
+	Loader2,
+	RefreshCw,
+	User,
+	X,
+	XCircle,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { paymentVerificationApi } from "../api/paymentVerification";
+import apiClient from "../plugins/axios";
 
 const verifications = ref([]);
 const loading = ref(false);
@@ -218,176 +218,190 @@ const processing = ref({});
 const showRejectDialog = ref(false);
 const selectedVerification = ref(null);
 const rejectionForm = ref({
-  reason: '',
-  notes: '',
+	reason: "",
+	notes: "",
 });
 const showImageModal = ref(false);
-const modalImageUrl = ref('');
+const modalImageUrl = ref("");
 
 const pendingCount = computed(() => {
-  return verifications.value.filter(v => v.status === 'pending').length;
+	return verifications.value.filter((v) => v.status === "pending").length;
 });
 
 const planTypes = {
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-  lifetime: 'Lifetime',
+	monthly: "Monthly",
+	yearly: "Yearly",
+	lifetime: "Lifetime",
 };
 
 function formatPlanType(type) {
-  return planTypes[type] || type;
+	return planTypes[type] || type;
 }
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+	return new Date(date).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
 }
 
 function getImageUrl(path) {
-  if (!path) return '';
-  // If it's already a data URL (base64), return as is
-  if (path.startsWith('data:')) return path;
-  // If it's already a full URL, return as is
-  if (path.startsWith('http')) return path;
-  // If it's an API endpoint URL, return as is
-  if (path.includes('/api/payment-verification/') && path.includes('/screenshot')) return path;
-  // Otherwise, construct the API endpoint URL
-  const baseUrl = import.meta.env.DEV 
-    ? 'http://localhost:5000'
-    : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
-  // Extract verification ID from path if it's a file path, or use the verification ID
-  // For now, if it's a relative path, we'll need the verification ID
-  // This will be handled by the parent component passing the full URL
-  return `${baseUrl}${path}`;
+	if (!path) return "";
+	// If it's already a data URL (base64), return as is
+	if (path.startsWith("data:")) return path;
+	// If it's already a full URL, return as is
+	if (path.startsWith("http")) return path;
+	// If it's an API endpoint URL, return as is
+	if (
+		path.includes("/api/payment-verification/") &&
+		path.includes("/screenshot")
+	)
+		return path;
+	// Otherwise, construct the API endpoint URL
+	const baseUrl = import.meta.env.DEV
+		? "http://localhost:5000"
+		: import.meta.env.VITE_API_URL || "http://localhost:5000";
+	// Extract verification ID from path if it's a file path, or use the verification ID
+	// For now, if it's a relative path, we'll need the verification ID
+	// This will be handled by the parent component passing the full URL
+	return `${baseUrl}${path}`;
 }
 
 function isImage(path) {
-  if (!path) return false;
-  // Check if it's a base64 data URL (image)
-  if (path.startsWith('data:image/')) return true;
-  // Check if it's an API endpoint (assume images unless PDF)
-  if (path.includes('/screenshot') && !path.includes('.pdf')) return true;
-  // Check file extension
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-  return imageExtensions.some(ext => path.toLowerCase().includes(ext));
+	if (!path) return false;
+	// Check if it's a base64 data URL (image)
+	if (path.startsWith("data:image/")) return true;
+	// Check if it's an API endpoint (assume images unless PDF)
+	if (path.includes("/screenshot") && !path.includes(".pdf")) return true;
+	// Check file extension
+	const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+	return imageExtensions.some((ext) => path.toLowerCase().includes(ext));
 }
 
 function openImageModal(imageUrl) {
-  modalImageUrl.value = getImageUrl(imageUrl);
-  showImageModal.value = true;
+	modalImageUrl.value = getImageUrl(imageUrl);
+	showImageModal.value = true;
 }
 
 function closeImageModal() {
-  showImageModal.value = false;
-  modalImageUrl.value = '';
+	showImageModal.value = false;
+	modalImageUrl.value = "";
 }
 
 async function loadVerifications() {
-  loading.value = true;
-  try {
-    const response = await paymentVerificationApi.getPendingVerifications();
-    if (response.success) {
-      verifications.value = response.verifications || [];
-      // Initialize notes for each verification
-      verifications.value.forEach(v => {
-        if (!v.notes) {
-          v.notes = '';
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error loading verifications:', error);
-    alert('Failed to load pending payments. Please try again.');
-  } finally {
-    loading.value = false;
-  }
+	loading.value = true;
+	try {
+		const response = await paymentVerificationApi.getPendingVerifications();
+		if (response.success) {
+			verifications.value = response.verifications || [];
+			// Initialize notes for each verification
+			verifications.value.forEach((v) => {
+				if (!v.notes) {
+					v.notes = "";
+				}
+			});
+		}
+	} catch (error) {
+		console.error("Error loading verifications:", error);
+		alert("Failed to load pending payments. Please try again.");
+	} finally {
+		loading.value = false;
+	}
 }
 
 async function handleApprove(verification) {
-  if (!confirm(`Approve payment verification for ${verification.userName}?`)) {
-    return;
-  }
+	if (!confirm(`Approve payment verification for ${verification.userName}?`)) {
+		return;
+	}
 
-  processing.value[verification._id] = true;
+	processing.value[verification._id] = true;
 
-  try {
-    const notes = verification.notes || '';
-    const response = await paymentVerificationApi.approveVerification(
-      verification._id,
-      notes
-    );
+	try {
+		const notes = verification.notes || "";
+		const response = await paymentVerificationApi.approveVerification(
+			verification._id,
+			notes,
+		);
 
-    if (response.success) {
-      alert(`✅ Payment approved! Subscription activated for ${verification.userName}.`);
-      await loadVerifications();
-    } else {
-      alert(response.error || 'Failed to approve payment');
-    }
-  } catch (error) {
-    console.error('Error approving verification:', error);
-    alert(error.response?.data?.error || 'Failed to approve payment. Please try again.');
-  } finally {
-    processing.value[verification._id] = false;
-  }
+		if (response.success) {
+			alert(
+				`✅ Payment approved! Subscription activated for ${verification.userName}.`,
+			);
+			await loadVerifications();
+		} else {
+			alert(response.error || "Failed to approve payment");
+		}
+	} catch (error) {
+		console.error("Error approving verification:", error);
+		alert(
+			error.response?.data?.error ||
+				"Failed to approve payment. Please try again.",
+		);
+	} finally {
+		processing.value[verification._id] = false;
+	}
 }
 
 function showRejectModal(verification) {
-  selectedVerification.value = verification;
-  rejectionForm.value = {
-    reason: '',
-    notes: verification.notes || '',
-  };
-  showRejectDialog.value = true;
+	selectedVerification.value = verification;
+	rejectionForm.value = {
+		reason: "",
+		notes: verification.notes || "",
+	};
+	showRejectDialog.value = true;
 }
 
 function closeRejectModal() {
-  showRejectDialog.value = false;
-  selectedVerification.value = null;
-  rejectionForm.value = {
-    reason: '',
-    notes: '',
-  };
+	showRejectDialog.value = false;
+	selectedVerification.value = null;
+	rejectionForm.value = {
+		reason: "",
+		notes: "",
+	};
 }
 
 async function handleReject() {
-  if (!rejectionForm.value.reason.trim()) {
-    alert('Please provide a rejection reason');
-    return;
-  }
+	if (!rejectionForm.value.reason.trim()) {
+		alert("Please provide a rejection reason");
+		return;
+	}
 
-  if (!selectedVerification.value) return;
+	if (!selectedVerification.value) return;
 
-  processing.value[selectedVerification.value._id] = true;
+	processing.value[selectedVerification.value._id] = true;
 
-  try {
-    const response = await paymentVerificationApi.rejectVerification(
-      selectedVerification.value._id,
-      rejectionForm.value.reason,
-      rejectionForm.value.notes
-    );
+	try {
+		const response = await paymentVerificationApi.rejectVerification(
+			selectedVerification.value._id,
+			rejectionForm.value.reason,
+			rejectionForm.value.notes,
+		);
 
-    if (response.success) {
-      alert(`Payment verification rejected for ${selectedVerification.value.userName}.`);
-      closeRejectModal();
-      await loadVerifications();
-    } else {
-      alert(response.error || 'Failed to reject payment');
-    }
-  } catch (error) {
-    console.error('Error rejecting verification:', error);
-    alert(error.response?.data?.error || 'Failed to reject payment. Please try again.');
-  } finally {
-    processing.value[selectedVerification.value._id] = false;
-  }
+		if (response.success) {
+			alert(
+				`Payment verification rejected for ${selectedVerification.value.userName}.`,
+			);
+			closeRejectModal();
+			await loadVerifications();
+		} else {
+			alert(response.error || "Failed to reject payment");
+		}
+	} catch (error) {
+		console.error("Error rejecting verification:", error);
+		alert(
+			error.response?.data?.error ||
+				"Failed to reject payment. Please try again.",
+		);
+	} finally {
+		processing.value[selectedVerification.value._id] = false;
+	}
 }
 
 onMounted(() => {
-  loadVerifications();
+	loadVerifications();
 });
 </script>
 

@@ -47,44 +47,44 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
 const props = defineProps({
-  showFilters: {
-    type: Boolean,
-    default: false
-  },
-  categories: {
-    type: Array,
-    default: () => []
-  },
-  stars: {
-    type: Array,
-    default: () => []
-  }
+	showFilters: {
+		type: Boolean,
+		default: false,
+	},
+	categories: {
+		type: Array,
+		default: () => [],
+	},
+	stars: {
+		type: Array,
+		default: () => [],
+	},
 });
 
-const emit = defineEmits(['filter']);
+const emit = defineEmits(["filter"]);
 
 const filters = ref({
-  category: '',
-  star: '',
-  sortBy: 'date',
-  dateRange: ''
+	category: "",
+	star: "",
+	sortBy: "date",
+	dateRange: "",
 });
 
 function applyFilters() {
-  emit('filter', { ...filters.value });
+	emit("filter", { ...filters.value });
 }
 
 function clearFilters() {
-  filters.value = {
-    category: '',
-    star: '',
-    sortBy: 'date',
-    dateRange: ''
-  };
-  emit('filter', { ...filters.value });
+	filters.value = {
+		category: "",
+		star: "",
+		sortBy: "date",
+		dateRange: "",
+	};
+	emit("filter", { ...filters.value });
 }
 </script>
 

@@ -151,25 +151,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
 import {
-  BarChart3,
-  Clock,
-  Play,
-  Heart,
-  TrendingUp,
-  FolderOpen,
-  Activity,
-  Award,
-  X,
-} from 'lucide-vue-next';
-import { useWatchHistory } from '../composables/useWatchHistory';
-import { useFavorites } from '../composables/useWatchHistory';
-import { useGuestSession } from '../composables/useGuestSession';
-import { useAuth } from '../composables/useAuth';
-import { useRouter } from 'vue-router';
+	Activity,
+	Award,
+	BarChart3,
+	Clock,
+	FolderOpen,
+	Heart,
+	Play,
+	TrendingUp,
+	X,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuth } from "../composables/useAuth";
+import { useGuestSession } from "../composables/useGuestSession";
+import { useFavorites, useWatchHistory } from "../composables/useWatchHistory";
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const router = useRouter();
 const { getHistory } = useWatchHistory();
@@ -180,21 +179,23 @@ const { isAuthenticated } = useAuth();
 const watchHistory = ref([]);
 const favorites = ref([]);
 const isGuestUser = computed(() => isGuest() || !isAuthenticated.value);
-const guestSessionInfo = computed(() => isGuestUser.value ? getSessionInfo() : null);
+const guestSessionInfo = computed(() =>
+	isGuestUser.value ? getSessionInfo() : null,
+);
 const analytics = ref({
-  totalWatchTime: 0,
-  totalVideos: 0,
-  topCategories: [],
-  peakViewingTimes: [],
-  watchPatterns: {},
+	totalWatchTime: 0,
+	totalVideos: 0,
+	topCategories: [],
+	peakViewingTimes: [],
+	watchPatterns: {},
 });
 
 // Computed stats
 const totalWatchTime = computed(() => {
-  const totalSeconds = watchHistory.value.reduce((sum, item) => {
-    return sum + (item.duration || 0);
-  }, 0);
-  return formatDuration(totalSeconds);
+	const totalSeconds = watchHistory.value.reduce((sum, item) => {
+		return sum + (item.duration || 0);
+	}, 0);
+	return formatDuration(totalSeconds);
 });
 
 const totalVideosWatched = computed(() => watchHistory.value.length);
@@ -202,115 +203,181 @@ const totalVideosWatched = computed(() => watchHistory.value.length);
 const totalFavorites = computed(() => favorites.value.length);
 
 const averageWatchDuration = computed(() => {
-  if (watchHistory.value.length === 0) return '0:00';
-  const total = watchHistory.value.reduce((sum, item) => sum + (item.duration || 0), 0);
-  const avg = total / watchHistory.value.length;
-  return formatDuration(avg);
+	if (watchHistory.value.length === 0) return "0:00";
+	const total = watchHistory.value.reduce(
+		(sum, item) => sum + (item.duration || 0),
+		0,
+	);
+	const avg = total / watchHistory.value.length;
+	return formatDuration(avg);
 });
 
 const topCategories = computed(() => {
-  const categoryCount = new Map();
-  watchHistory.value.forEach(item => {
-    if (item.category) {
-      categoryCount.set(item.category, (categoryCount.get(item.category) || 0) + 1);
-    }
-  });
-  
-  return Array.from(categoryCount.entries())
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+	const categoryCount = new Map();
+	watchHistory.value.forEach((item) => {
+		if (item.category) {
+			categoryCount.set(
+				item.category,
+				(categoryCount.get(item.category) || 0) + 1,
+			);
+		}
+	});
+
+	return Array.from(categoryCount.entries())
+		.map(([name, count]) => ({ name, count }))
+		.sort((a, b) => b.count - a.count)
+		.slice(0, 5);
 });
 
 const peakViewingTimes = computed(() => {
-  const hourCount = new Map();
-  watchHistory.value.forEach(item => {
-    if (item.watchedAt) {
-      const hour = new Date(item.watchedAt).getHours();
-      hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
-    }
-  });
-  
-  return Array.from(hourCount.entries())
-    .map(([hour, count]) => ({ hour, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+	const hourCount = new Map();
+	watchHistory.value.forEach((item) => {
+		if (item.watchedAt) {
+			const hour = new Date(item.watchedAt).getHours();
+			hourCount.set(hour, (hourCount.get(hour) || 0) + 1);
+		}
+	});
+
+	return Array.from(hourCount.entries())
+		.map(([hour, count]) => ({ hour, count }))
+		.sort((a, b) => b.count - a.count)
+		.slice(0, 5);
 });
 
 const mostActiveDay = computed(() => {
-  const dayCount = new Map();
-  watchHistory.value.forEach(item => {
-    if (item.watchedAt) {
-      const day = new Date(item.watchedAt).toLocaleDateString('en-US', { weekday: 'long' });
-      dayCount.set(day, (dayCount.get(day) || 0) + 1);
-    }
-  });
-  
-  if (dayCount.size === 0) return 'N/A';
-  return Array.from(dayCount.entries())
-    .sort((a, b) => b[1] - a[1])[0][0];
+	const dayCount = new Map();
+	watchHistory.value.forEach((item) => {
+		if (item.watchedAt) {
+			const day = new Date(item.watchedAt).toLocaleDateString("en-US", {
+				weekday: "long",
+			});
+			dayCount.set(day, (dayCount.get(day) || 0) + 1);
+		}
+	});
+
+	if (dayCount.size === 0) return "N/A";
+	return Array.from(dayCount.entries()).sort((a, b) => b[1] - a[1])[0][0];
 });
 
 const weeklyAverage = computed(() => {
-  if (watchHistory.value.length === 0) return 0;
-  const weeks = Math.max(1, Math.ceil((Date.now() - new Date(watchHistory.value[watchHistory.value.length - 1].watchedAt).getTime()) / (7 * 24 * 60 * 60 * 1000)));
-  return Math.round(watchHistory.value.length / weeks);
+	if (watchHistory.value.length === 0) return 0;
+	const weeks = Math.max(
+		1,
+		Math.ceil(
+			(Date.now() -
+				new Date(
+					watchHistory.value[watchHistory.value.length - 1].watchedAt,
+				).getTime()) /
+				(7 * 24 * 60 * 60 * 1000),
+		),
+	);
+	return Math.round(watchHistory.value.length / weeks);
 });
 
 const longestSession = computed(() => {
-  if (watchHistory.value.length === 0) return '0:00';
-  const maxDuration = Math.max(...watchHistory.value.map(item => item.duration || 0));
-  return formatDuration(maxDuration);
+	if (watchHistory.value.length === 0) return "0:00";
+	const maxDuration = Math.max(
+		...watchHistory.value.map((item) => item.duration || 0),
+	);
+	return formatDuration(maxDuration);
 });
 
 const earnedBadges = computed(() => {
-  const badges = [
-    { id: 'first-watch', name: 'First Watch', icon: '🎬', description: 'Watched your first video', earned: watchHistory.value.length > 0 },
-    { id: 'night-owl', name: 'Night Owl', icon: '🦉', description: 'Watched videos after midnight', earned: peakViewingTimes.value.some(t => t.hour >= 0 && t.hour < 6) },
-    { id: 'early-bird', name: 'Early Bird', icon: '🐦', description: 'Watched videos before 8 AM', earned: peakViewingTimes.value.some(t => t.hour >= 5 && t.hour < 8) },
-    { id: 'marathon', name: 'Marathon', icon: '🏃', description: 'Watched 10+ videos in a day', earned: false }, // Would need daily tracking
-    { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Watched 5+ different categories', earned: topCategories.value.length >= 5 },
-    { id: 'collector', name: 'Collector', icon: '⭐', description: 'Added 10+ favorites', earned: favorites.value.length >= 10 },
-    { id: 'dedicated', name: 'Dedicated', icon: '💪', description: 'Watched 50+ videos', earned: watchHistory.value.length >= 50 },
-    { id: 'veteran', name: 'Veteran', icon: '👑', description: 'Watched 100+ videos', earned: watchHistory.value.length >= 100 },
-  ];
-  
-  return badges;
+	const badges = [
+		{
+			id: "first-watch",
+			name: "First Watch",
+			icon: "🎬",
+			description: "Watched your first video",
+			earned: watchHistory.value.length > 0,
+		},
+		{
+			id: "night-owl",
+			name: "Night Owl",
+			icon: "🦉",
+			description: "Watched videos after midnight",
+			earned: peakViewingTimes.value.some((t) => t.hour >= 0 && t.hour < 6),
+		},
+		{
+			id: "early-bird",
+			name: "Early Bird",
+			icon: "🐦",
+			description: "Watched videos before 8 AM",
+			earned: peakViewingTimes.value.some((t) => t.hour >= 5 && t.hour < 8),
+		},
+		{
+			id: "marathon",
+			name: "Marathon",
+			icon: "🏃",
+			description: "Watched 10+ videos in a day",
+			earned: false,
+		}, // Would need daily tracking
+		{
+			id: "explorer",
+			name: "Explorer",
+			icon: "🗺️",
+			description: "Watched 5+ different categories",
+			earned: topCategories.value.length >= 5,
+		},
+		{
+			id: "collector",
+			name: "Collector",
+			icon: "⭐",
+			description: "Added 10+ favorites",
+			earned: favorites.value.length >= 10,
+		},
+		{
+			id: "dedicated",
+			name: "Dedicated",
+			icon: "💪",
+			description: "Watched 50+ videos",
+			earned: watchHistory.value.length >= 50,
+		},
+		{
+			id: "veteran",
+			name: "Veteran",
+			icon: "👑",
+			description: "Watched 100+ videos",
+			earned: watchHistory.value.length >= 100,
+		},
+	];
+
+	return badges;
 });
 
 function formatDuration(seconds) {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+	if (!seconds || isNaN(seconds)) return "0:00";
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const secs = Math.floor(seconds % 60);
+
+	if (hours > 0) {
+		return `${hours}h ${minutes}m`;
+	}
+	return `${minutes}:${secs.toString().padStart(2, "0")}`;
 }
 
 function formatHour(hour) {
-  if (hour === 0) return '12 AM';
-  if (hour < 12) return `${hour} AM`;
-  if (hour === 12) return '12 PM';
-  return `${hour - 12} PM`;
+	if (hour === 0) return "12 AM";
+	if (hour < 12) return `${hour} AM`;
+	if (hour === 12) return "12 PM";
+	return `${hour - 12} PM`;
 }
 
 function calculateAnalytics() {
-  watchHistory.value = getHistory();
-  favorites.value = getFavorites();
+	watchHistory.value = getHistory();
+	favorites.value = getFavorites();
 }
 
 function handleSignupClick() {
-  if (emit) {
-    emit('close');
-  }
-  // Navigation handled by router-link
+	if (emit) {
+		emit("close");
+	}
+	// Navigation handled by router-link
 }
 
 onMounted(() => {
-  calculateAnalytics();
+	calculateAnalytics();
 });
 </script>
 

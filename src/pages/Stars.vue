@@ -50,12 +50,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { Star } from 'lucide-vue-next';
-import { moviesApi } from '../api/movies';
-import Loader from '../components/Loader.vue';
-import { useStarFollows } from '../composables/useStarFollows';
+import { Star } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { moviesApi } from "../api/movies";
+import Loader from "../components/Loader.vue";
+import { useStarFollows } from "../composables/useStarFollows";
 
 const router = useRouter();
 const route = useRoute();
@@ -63,47 +63,47 @@ const { stars: followedStars } = useStarFollows();
 
 const stars = ref([]);
 const loading = ref(true);
-const filter = computed(() => route.query.filter || '');
-const showingFollowed = computed(() => filter.value === 'followed');
+const filter = computed(() => route.query.filter || "");
+const showingFollowed = computed(() => filter.value === "followed");
 
 const displayedStars = computed(() => {
-  if (showingFollowed.value) {
-    return followedStars.value.map(name => ({
-      star: name,
-      count: null,
-    }));
-  }
-  return stars.value;
+	if (showingFollowed.value) {
+		return followedStars.value.map((name) => ({
+			star: name,
+			count: null,
+		}));
+	}
+	return stars.value;
 });
 
 onMounted(async () => {
-  if (showingFollowed.value) {
-    loading.value = false;
-  } else {
-    await loadStars();
-  }
+	if (showingFollowed.value) {
+		loading.value = false;
+	} else {
+		await loadStars();
+	}
 });
 
 async function loadStars() {
-  loading.value = true;
-  try {
-    const response = await moviesApi.getStars();
-    if (response.data.success) {
-      stars.value = response.data.data || [];
-    }
-  } catch (error) {
-    console.error('Failed to load stars:', error);
-  } finally {
-    loading.value = false;
-  }
+	loading.value = true;
+	try {
+		const response = await moviesApi.getStars();
+		if (response.data.success) {
+			stars.value = response.data.data || [];
+		}
+	} catch (error) {
+		console.error("Failed to load stars:", error);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function handleThumbnailError(event) {
-  event.target.style.display = 'none';
-  const placeholder = event.target.nextElementSibling;
-  if (placeholder) {
-    placeholder.style.display = 'flex';
-  }
+	event.target.style.display = "none";
+	const placeholder = event.target.nextElementSibling;
+	if (placeholder) {
+		placeholder.style.display = "flex";
+	}
 }
 </script>
 

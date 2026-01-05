@@ -328,59 +328,68 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from 'vue';
+import {
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	watch,
+} from "vue";
+
 // Lazy load HLS.js only when needed (saves 1MB+ on initial load)
 let Hls = null;
 const loadHls = async () => {
-  if (!Hls) {
-    const hlsModule = await import('hls.js');
-    Hls = hlsModule.default;
-  }
-  return Hls;
+	if (!Hls) {
+		const hlsModule = await import("hls.js");
+		Hls = hlsModule.default;
+	}
+	return Hls;
 };
-import { useRoute, useRouter } from 'vue-router';
-import { generateSlug, generateWatchUrl } from '../utils/slug';
-import { videosApi } from '../api/videos';
-import { moviesApi } from '../api/movies';
-import { useEporner } from '../composables/useEporner';
-import { useVideos } from '../composables/useVideos';
-import { useMovies } from '../composables/useMovies';
-import { useWatchHistory, useFavorites } from '../composables/useWatchHistory';
-import { useSmartQueue } from '../composables/useSmartQueue';
-import { useDownloads } from '../composables/useDownloads';
-import { useWatchLater } from '../composables/useWatchLater';
-import { useStarFollows } from '../composables/useStarFollows';
-import { useNetworkQuality } from '../composables/useNetworkQuality';
-import { useRecommendations } from '../composables/useRecommendations';
-import { useScenes } from '../composables/useScenes';
-import { useSceneDetection } from '../composables/useSceneDetection';
-import { useInteractiveVideo } from '../composables/useInteractiveVideo';
-import { useSocialWatchParty } from '../composables/useSocialWatchParty';
-import { useVRIntegration } from '../composables/useVRIntegration';
-import { useCreators } from '../composables/useCreators';
-import { useSubscription } from '../composables/useSubscription';
-import VideoCard from '../components/VideoCard.vue';
-import MovieCard from '../components/MovieCard.vue';
-import SceneNavigation from '../components/SceneNavigation.vue';
-import BecauseYouWatched from '../components/BecauseYouWatched.vue';
-import Loader from '../components/Loader.vue';
-import ModernVideoPlayer from '../components/ModernVideoPlayer.vue';
-import InteractiveChoiceOverlay from '../components/InteractiveChoiceOverlay.vue';
-import WatchPartyRoom from '../components/WatchPartyRoom.vue';
+
 import {
-  ThumbsUp,
-  ThumbsDown,
-  Share2,
-  Download,
-  MoreVertical,
-  Heart,
-  Clock,
-  Star,
-  Users,
-  Link,
-  Copy,
-  Code,
-} from 'lucide-vue-next';
+	Clock,
+	Code,
+	Copy,
+	Download,
+	Heart,
+	Link,
+	MoreVertical,
+	Share2,
+	Star,
+	ThumbsDown,
+	ThumbsUp,
+	Users,
+} from "lucide-vue-next";
+import { useRoute, useRouter } from "vue-router";
+import { moviesApi } from "../api/movies";
+import { videosApi } from "../api/videos";
+import BecauseYouWatched from "../components/BecauseYouWatched.vue";
+import InteractiveChoiceOverlay from "../components/InteractiveChoiceOverlay.vue";
+import Loader from "../components/Loader.vue";
+import ModernVideoPlayer from "../components/ModernVideoPlayer.vue";
+import MovieCard from "../components/MovieCard.vue";
+import SceneNavigation from "../components/SceneNavigation.vue";
+import VideoCard from "../components/VideoCard.vue";
+import WatchPartyRoom from "../components/WatchPartyRoom.vue";
+import { useCreators } from "../composables/useCreators";
+import { useDownloads } from "../composables/useDownloads";
+import { useEporner } from "../composables/useEporner";
+import { useInteractiveVideo } from "../composables/useInteractiveVideo";
+import { useMovies } from "../composables/useMovies";
+import { useNetworkQuality } from "../composables/useNetworkQuality";
+import { useRecommendations } from "../composables/useRecommendations";
+import { useSceneDetection } from "../composables/useSceneDetection";
+import { useScenes } from "../composables/useScenes";
+import { useSmartQueue } from "../composables/useSmartQueue";
+import { useSocialWatchParty } from "../composables/useSocialWatchParty";
+import { useStarFollows } from "../composables/useStarFollows";
+import { useSubscription } from "../composables/useSubscription";
+import { useVideos } from "../composables/useVideos";
+import { useVRIntegration } from "../composables/useVRIntegration";
+import { useFavorites, useWatchHistory } from "../composables/useWatchHistory";
+import { useWatchLater } from "../composables/useWatchLater";
+import { generateSlug, generateWatchUrl } from "../utils/slug";
 
 const route = useRoute();
 const router = useRouter();
@@ -393,33 +402,33 @@ const { initializeSmartQueue, predictedVideos, isPreloading } = useSmartQueue();
 
 // Get video ID from query param (for lookup) or from slug (backward compatibility)
 const videoId = computed(() => {
-  // Priority 1: ID from query param (most reliable)
-  if (route.query.id) {
-    return route.query.id;
-  }
-  // Priority 2: Slug might be an ID (backward compatibility)
-  const slug = route.params.slug;
-  // Check if slug looks like an ID (alphanumeric, no hyphens, or specific format)
-  if (slug && /^[A-Za-z0-9]+$/.test(slug) && slug.length > 10) {
-    return slug;
-  }
-  return null;
+	// Priority 1: ID from query param (most reliable)
+	if (route.query.id) {
+		return route.query.id;
+	}
+	// Priority 2: Slug might be an ID (backward compatibility)
+	const slug = route.params.slug;
+	// Check if slug looks like an ID (alphanumeric, no hyphens, or specific format)
+	if (slug && /^[A-Za-z0-9]+$/.test(slug) && slug.length > 10) {
+		return slug;
+	}
+	return null;
 });
 
 // Get slug from route
 const routeSlug = computed(() => route.params.slug);
 const isMovie = ref(false);
-const isEporner = computed(() => route.query.source === 'eporner');
+const isEporner = computed(() => route.query.source === "eporner");
 const isHlsSource = computed(() => {
-  const url = video.value?.url || '';
-  return /\.m3u8($|\?)/i.test(url) || url.includes('format=m3u8');
+	const url = video.value?.url || "";
+	return /\.m3u8($|\?)/i.test(url) || url.includes("format=m3u8");
 });
 const isLiked = ref(false);
 const isDisliked = ref(false);
 const comments = ref([]);
 const loadingComments = ref(false);
-const commentText = ref('');
-const commentAuthor = ref('');
+const commentText = ref("");
+const commentAuthor = ref("");
 const submittingComment = ref(false);
 const videoPlayer = ref(null);
 const playbackSpeed = ref(1);
@@ -427,204 +436,229 @@ const hlsInstance = ref(null);
 const { addToHistory, updateProgress } = useWatchHistory();
 const { isFavorited, toggleFavorite } = useFavorites();
 const { downloadForOffline: downloadOffline } = useDownloads();
-const { add: addWatchLater, remove: removeWatchLater, isSaved: isInWatchLater } = useWatchLater();
+const {
+	add: addWatchLater,
+	remove: removeWatchLater,
+	isSaved: isInWatchLater,
+} = useWatchLater();
 const { follow, unfollow, isFollowed } = useStarFollows();
-const { shouldAutoplay, playerBitrate, videoQuality, shouldDeferRecommendations } = useNetworkQuality();
+const {
+	shouldAutoplay,
+	playerBitrate,
+	videoQuality,
+	shouldDeferRecommendations,
+} = useNetworkQuality();
 const { getBecauseYouWatched, updateSession } = useRecommendations();
-const { scenes, currentScene, generateScenes, jumpToScene, getSceneAtTime } = useScenes();
-const { 
-  detectedScenes, 
-  detectScenes: detectScenesAI, 
-  getRecommendedSkipTime, 
-  scenePreferences,
-  setPreferences: setScenePreferences 
+const { scenes, currentScene, generateScenes, jumpToScene, getSceneAtTime } =
+	useScenes();
+const {
+	detectedScenes,
+	detectScenes: detectScenesAI,
+	getRecommendedSkipTime,
+	scenePreferences,
+	setPreferences: setScenePreferences,
 } = useSceneDetection();
 const {
-  isInteractive,
-  currentSegment,
-  choicePoints,
-  selectedChoices,
-  initializeInteractiveVideo,
-  getCurrentSegmentUrl,
-  getChoicesAtTime,
-  makeChoice,
+	isInteractive,
+	currentSegment,
+	choicePoints,
+	selectedChoices,
+	initializeInteractiveVideo,
+	getCurrentSegmentUrl,
+	getChoicesAtTime,
+	makeChoice,
 } = useInteractiveVideo();
 const {
-  isHost,
-  roomId,
-  participants,
-  isConnected: isPartyConnected,
-  chatMessages,
-  createRoom,
-  joinRoom,
-  broadcastState,
-  synchronizePlayback,
-  sendMessage: sendPartyMessage,
-  leaveRoom,
+	isHost,
+	roomId,
+	participants,
+	isConnected: isPartyConnected,
+	chatMessages,
+	createRoom,
+	joinRoom,
+	broadcastState,
+	synchronizePlayback,
+	sendMessage: sendPartyMessage,
+	leaveRoom,
 } = useSocialWatchParty();
 const {
-  isVRSupported,
-  isVRActive,
-  enterVRPreview,
-  enterFullVR,
-  exitVR,
-  hasVRContent,
+	isVRSupported,
+	isVRActive,
+	enterVRPreview,
+	enterFullVR,
+	exitVR,
+	hasVRContent,
 } = useVRIntegration();
-const { extractCreator, followCreator, unfollowCreator, isCreatorFollowed: checkCreatorFollowed } = useCreators();
+const {
+	extractCreator,
+	followCreator,
+	unfollowCreator,
+	isCreatorFollowed: checkCreatorFollowed,
+} = useCreators();
 const { isPremium, checkPremiumStatus } = useSubscription();
 
-const isFavorite = computed(() => video.value ? isFavorited(video.value._id || video.value.id) : false);
-const isWatchLater = computed(() => video.value ? isInWatchLater(video.value._id || video.value.id) : false);
+const isFavorite = computed(() =>
+	video.value ? isFavorited(video.value._id || video.value.id) : false,
+);
+const isWatchLater = computed(() =>
+	video.value ? isInWatchLater(video.value._id || video.value.id) : false,
+);
 
 // Creator follow status
 const creatorInfo = computed(() => {
-  if (!video.value) return null;
-  return extractCreator(video.value);
+	if (!video.value) return null;
+	return extractCreator(video.value);
 });
 
 const isCreatorFollowed = computed(() => {
-  if (!creatorInfo.value) return false;
-  return checkCreatorFollowed(creatorInfo.value.id);
+	if (!creatorInfo.value) return false;
+	return checkCreatorFollowed(creatorInfo.value.id);
 });
 
 // Get video tags/categories for display
 const videoTags = computed(() => {
-  if (!video.value) return [];
-  // Combine categories and tags, remove duplicates
-  const allTags = [
-    ...(video.value.categories || []),
-    ...(video.value.category ? [video.value.category] : []),
-    ...(video.value.tags || [])
-  ];
-  // Remove duplicates and empty values
-  return [...new Set(allTags.filter(tag => tag && tag.trim()))];
+	if (!video.value) return [];
+	// Combine categories and tags, remove duplicates
+	const allTags = [
+		...(video.value.categories || []),
+		...(video.value.category ? [video.value.category] : []),
+		...(video.value.tags || []),
+	];
+	// Remove duplicates and empty values
+	return [...new Set(allTags.filter((tag) => tag && tag.trim()))];
 });
 
 const primaryStar = computed(() => {
-  if (!video.value) return '';
-  if (Array.isArray(video.value.stars) && video.value.stars.length) return video.value.stars[0];
-  if (video.value.channel) return video.value.channel;
-  return '';
+	if (!video.value) return "";
+	if (Array.isArray(video.value.stars) && video.value.stars.length)
+		return video.value.stars[0];
+	if (video.value.channel) return video.value.channel;
+	return "";
 });
 
 const followTarget = computed(() => {
-  if (primaryStar.value) return primaryStar.value;
-  if (video.value?.title) return `${video.value.title} (creator)`;
-  return '';
+	if (primaryStar.value) return primaryStar.value;
+	if (video.value?.title) return `${video.value.title} (creator)`;
+	return "";
 });
 
-const isFollowingStar = computed(() => followTarget.value ? isFollowed(followTarget.value) : false);
+const isFollowingStar = computed(() =>
+	followTarget.value ? isFollowed(followTarget.value) : false,
+);
 
 function getHlsConfig() {
-  const connection =
-    navigator.connection ||
-    navigator.mozConnection ||
-    navigator.webkitConnection ||
-    {};
-  const saveData = Boolean(connection.saveData);
-  const effectiveType = connection.effectiveType || '';
-  const isSlow = effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g';
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-  const bitrate = playerBitrate.value;
+	const connection =
+		navigator.connection ||
+		navigator.mozConnection ||
+		navigator.webkitConnection ||
+		{};
+	const saveData = Boolean(connection.saveData);
+	const effectiveType = connection.effectiveType || "";
+	const isSlow =
+		effectiveType === "slow-2g" ||
+		effectiveType === "2g" ||
+		effectiveType === "3g";
+	const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+	const bitrate = playerBitrate.value;
 
-  // Adjust buffer based on network quality
-  const maxBufferLength = saveData || isSlow || isMobile ? 4 : 6;
-  const liveSync = saveData || isSlow ? 2 : 3;
-  
-  // Set start level based on bitrate preference
-  let startLevel = -1; // Auto-select
-  if (bitrate === 'low') {
-    startLevel = 0; // Start with lowest quality
-  } else if (bitrate === 'medium') {
-    startLevel = -1; // Let ABR decide
-  }
+	// Adjust buffer based on network quality
+	const maxBufferLength = saveData || isSlow || isMobile ? 4 : 6;
+	const liveSync = saveData || isSlow ? 2 : 3;
 
-  return {
-    enableWorker: true,
-    lowLatencyMode: true,
-    backBufferLength: 30,
-    maxBufferLength,
-    maxMaxBufferLength: maxBufferLength + 4,
-    maxBufferSize: bitrate === 'low' ? 15 * 1000 * 1000 : 30 * 1000 * 1000,
-    startLevel,
-    liveSyncDurationCount: liveSync,
-    liveMaxLatencyDurationCount: liveSync + 2,
-    fragLoadingTimeOut: isSlow ? 12000 : 8000,
-    manifestLoadingTimeOut: isSlow ? 12000 : 8000,
-    progressive: true,
-    capLevelOnFPSDrop: true,
-    nudgeMaxRetry: 3,
-    abrEwmaDefaultEstimate: bitrate === 'low' ? 500000 : undefined, // Lower initial estimate for slow networks
-  };
+	// Set start level based on bitrate preference
+	let startLevel = -1; // Auto-select
+	if (bitrate === "low") {
+		startLevel = 0; // Start with lowest quality
+	} else if (bitrate === "medium") {
+		startLevel = -1; // Let ABR decide
+	}
+
+	return {
+		enableWorker: true,
+		lowLatencyMode: true,
+		backBufferLength: 30,
+		maxBufferLength,
+		maxMaxBufferLength: maxBufferLength + 4,
+		maxBufferSize: bitrate === "low" ? 15 * 1000 * 1000 : 30 * 1000 * 1000,
+		startLevel,
+		liveSyncDurationCount: liveSync,
+		liveMaxLatencyDurationCount: liveSync + 2,
+		fragLoadingTimeOut: isSlow ? 12000 : 8000,
+		manifestLoadingTimeOut: isSlow ? 12000 : 8000,
+		progressive: true,
+		capLevelOnFPSDrop: true,
+		nudgeMaxRetry: 3,
+		abrEwmaDefaultEstimate: bitrate === "low" ? 500000 : undefined, // Lower initial estimate for slow networks
+	};
 }
 
 function destroyHls() {
-  if (hlsInstance.value) {
-    hlsInstance.value.destroy();
-    hlsInstance.value = null;
-  }
+	if (hlsInstance.value) {
+		hlsInstance.value.destroy();
+		hlsInstance.value = null;
+	}
 }
 
 async function setupStreaming() {
-  if (!videoPlayer.value || !video.value) return;
+	if (!videoPlayer.value || !video.value) return;
 
-  destroyHls();
+	destroyHls();
 
-  if (!isHlsSource.value) {
-    // Non-HLS: use native playback
-    videoPlayer.value.src = video.value.url || '';
-    return;
-  }
+	if (!isHlsSource.value) {
+		// Non-HLS: use native playback
+		videoPlayer.value.src = video.value.url || "";
+		return;
+	}
 
-  // HLS playback
-  const HlsClass = await loadHls();
-  if (HlsClass.isSupported()) {
-    hlsInstance.value = new HlsClass(getHlsConfig());
-    hlsInstance.value.loadSource(video.value.url);
-    hlsInstance.value.attachMedia(videoPlayer.value);
-    hlsInstance.value.on(HlsClass.Events.ERROR, (_event, data) => {
-      if (!hlsInstance.value) return;
-      if (data.fatal) {
-        if (data.type === HlsClass.ErrorTypes.NETWORK_ERROR) {
-          hlsInstance.value.startLoad();
-        } else if (data.type === HlsClass.ErrorTypes.MEDIA_ERROR) {
-          hlsInstance.value.recoverMediaError();
-        } else {
-          destroyHls();
-        }
-      }
-    });
-  } else if (videoPlayer.value.canPlayType('application/vnd.apple.mpegurl')) {
-    // Safari
-    videoPlayer.value.src = video.value.url;
-    videoPlayer.value.load();
-  } else {
-    // Fallback
-    videoPlayer.value.src = video.value.url || '';
-  }
+	// HLS playback
+	const HlsClass = await loadHls();
+	if (HlsClass.isSupported()) {
+		hlsInstance.value = new HlsClass(getHlsConfig());
+		hlsInstance.value.loadSource(video.value.url);
+		hlsInstance.value.attachMedia(videoPlayer.value);
+		hlsInstance.value.on(HlsClass.Events.ERROR, (_event, data) => {
+			if (!hlsInstance.value) return;
+			if (data.fatal) {
+				if (data.type === HlsClass.ErrorTypes.NETWORK_ERROR) {
+					hlsInstance.value.startLoad();
+				} else if (data.type === HlsClass.ErrorTypes.MEDIA_ERROR) {
+					hlsInstance.value.recoverMediaError();
+				} else {
+					destroyHls();
+				}
+			}
+		});
+	} else if (videoPlayer.value.canPlayType("application/vnd.apple.mpegurl")) {
+		// Safari
+		videoPlayer.value.src = video.value.url;
+		videoPlayer.value.load();
+	} else {
+		// Fallback
+		videoPlayer.value.src = video.value.url || "";
+	}
 }
 
 // Debug computed for iframe rendering
 const shouldShowIframe = computed(() => {
-  if (!video.value) return false;
-  const hasIframe = !!video.value.iframe;
-  const isEpornerVideo = isEporner.value || video.value._source === 'eporner';
-  const hasEmbedUrl = !!(video.value.embedUrl || video.value.url);
-  const result = hasIframe || (isEpornerVideo && hasEmbedUrl);
-  
-  console.log('Iframe rendering check:', {
-    hasVideo: !!video.value,
-    hasIframe,
-    isEpornerVideo,
-    hasEmbedUrl,
-    embedUrl: video.value.embedUrl,
-    url: video.value.url,
-    _source: video.value._source,
-    isEporner: isEporner.value,
-    shouldShow: result
-  });
-  
-  return result;
+	if (!video.value) return false;
+	const hasIframe = !!video.value.iframe;
+	const isEpornerVideo = isEporner.value || video.value._source === "eporner";
+	const hasEmbedUrl = !!(video.value.embedUrl || video.value.url);
+	const result = hasIframe || (isEpornerVideo && hasEmbedUrl);
+
+	console.log("Iframe rendering check:", {
+		hasVideo: !!video.value,
+		hasIframe,
+		isEpornerVideo,
+		hasEmbedUrl,
+		embedUrl: video.value.embedUrl,
+		url: video.value.url,
+		_source: video.value._source,
+		isEporner: isEporner.value,
+		shouldShow: result,
+	});
+
+	return result;
 });
 
 // Tag-based recommendations
@@ -633,1060 +667,1135 @@ const loadingTagRecommendations = ref(false);
 
 // Load recommendations based on video tags
 async function loadTagBasedRecommendations() {
-  if (!video.value || loadingTagRecommendations.value) return;
-  
-  loadingTagRecommendations.value = true;
-  try {
-    // Get tags/categories from current video
-    const tags = video.value.categories || 
-                 (video.value.category ? [video.value.category] : []) ||
-                 (video.value.tags || []);
-    
-    if (tags.length === 0) {
-      // Fallback to general recommendations if no tags
-      tagBasedRecommendations.value = [];
-      loadingTagRecommendations.value = false;
-      return;
-    }
-    
-    // Use the first tag/category for search
-    const primaryTag = tags[0];
-    const limit = shouldDeferRecommendations.value ? 5 : 10;
-    
-    if (isEporner.value || video.value._source === 'eporner') {
-      // Search Eporner videos by tag
-      await searchVideos(primaryTag, 1, { perPage: limit + 1, order: 'most-popular' });
-      // Filter out current video and limit results
-      tagBasedRecommendations.value = epornerVideos.value
-        .filter(v => v.id !== videoId.value)
-        .slice(0, limit);
-    } else if (isMovie.value) {
-      // For movies, filter by category
-      const related = movies.value.filter(m => 
-        m._id !== videoId.value && 
-        (m.category === primaryTag || (m.tags && m.tags.includes(primaryTag)))
-      );
-      // If not enough, add random movies
-      if (related.length < limit) {
-        const random = movies.value
-          .filter(m => m._id !== videoId.value && m.category !== primaryTag)
-          .slice(0, limit - related.length);
-        tagBasedRecommendations.value = [...related, ...random].slice(0, limit);
-      } else {
-        tagBasedRecommendations.value = related.slice(0, limit);
-      }
-    } else {
-      // For backend videos, filter by category
-      const related = videos.value.filter(v => 
-        v.id !== videoId.value && 
-        (v.category === primaryTag || (v.tags && v.tags.includes(primaryTag)))
-      );
-      // If not enough, add random videos
-      if (related.length < limit) {
-        const random = videos.value
-          .filter(v => v.id !== videoId.value && v.category !== primaryTag)
-          .slice(0, limit - related.length);
-        tagBasedRecommendations.value = [...related, ...random].slice(0, limit);
-      } else {
-        tagBasedRecommendations.value = related.slice(0, limit);
-      }
-    }
-  } catch (error) {
-    console.error('Error loading tag-based recommendations:', error);
-    tagBasedRecommendations.value = [];
-  } finally {
-    loadingTagRecommendations.value = false;
-  }
+	if (!video.value || loadingTagRecommendations.value) return;
+
+	loadingTagRecommendations.value = true;
+	try {
+		// Get tags/categories from current video
+		const tags =
+			video.value.categories ||
+			(video.value.category ? [video.value.category] : []) ||
+			video.value.tags ||
+			[];
+
+		if (tags.length === 0) {
+			// Fallback to general recommendations if no tags
+			tagBasedRecommendations.value = [];
+			loadingTagRecommendations.value = false;
+			return;
+		}
+
+		// Use the first tag/category for search
+		const primaryTag = tags[0];
+		const limit = shouldDeferRecommendations.value ? 5 : 10;
+
+		if (isEporner.value || video.value._source === "eporner") {
+			// Search Eporner videos by tag
+			await searchVideos(primaryTag, 1, {
+				perPage: limit + 1,
+				order: "most-popular",
+			});
+			// Filter out current video and limit results
+			tagBasedRecommendations.value = epornerVideos.value
+				.filter((v) => v.id !== videoId.value)
+				.slice(0, limit);
+		} else if (isMovie.value) {
+			// For movies, filter by category
+			const related = movies.value.filter(
+				(m) =>
+					m._id !== videoId.value &&
+					(m.category === primaryTag ||
+						(m.tags && m.tags.includes(primaryTag))),
+			);
+			// If not enough, add random movies
+			if (related.length < limit) {
+				const random = movies.value
+					.filter((m) => m._id !== videoId.value && m.category !== primaryTag)
+					.slice(0, limit - related.length);
+				tagBasedRecommendations.value = [...related, ...random].slice(0, limit);
+			} else {
+				tagBasedRecommendations.value = related.slice(0, limit);
+			}
+		} else {
+			// For backend videos, filter by category
+			const related = videos.value.filter(
+				(v) =>
+					v.id !== videoId.value &&
+					(v.category === primaryTag ||
+						(v.tags && v.tags.includes(primaryTag))),
+			);
+			// If not enough, add random videos
+			if (related.length < limit) {
+				const random = videos.value
+					.filter((v) => v.id !== videoId.value && v.category !== primaryTag)
+					.slice(0, limit - related.length);
+				tagBasedRecommendations.value = [...related, ...random].slice(0, limit);
+			} else {
+				tagBasedRecommendations.value = related.slice(0, limit);
+			}
+		}
+	} catch (error) {
+		console.error("Error loading tag-based recommendations:", error);
+		tagBasedRecommendations.value = [];
+	} finally {
+		loadingTagRecommendations.value = false;
+	}
 }
 
 const recommendations = computed(() => {
-  // If we have tag-based recommendations, use those
-  if (tagBasedRecommendations.value.length > 0) {
-    return tagBasedRecommendations.value;
-  }
-  
-  // Fallback to general recommendations
-  const limit = shouldDeferRecommendations.value ? 5 : 10;
-  
-  if (isEporner.value) {
-    // Show other Eporner videos as recommendations
-    return epornerVideos.value.filter(v => v.id !== videoId.value).slice(0, limit);
-  } else if (isMovie.value) {
-    // Show other movies as recommendations
-    return movies.value.filter(m => m._id !== videoId.value).slice(0, limit);
-  } else {
-    // Show other videos as recommendations
-    return videos.value.filter(v => v.id !== videoId.value).slice(0, limit);
-  }
+	// If we have tag-based recommendations, use those
+	if (tagBasedRecommendations.value.length > 0) {
+		return tagBasedRecommendations.value;
+	}
+
+	// Fallback to general recommendations
+	const limit = shouldDeferRecommendations.value ? 5 : 10;
+
+	if (isEporner.value) {
+		// Show other Eporner videos as recommendations
+		return epornerVideos.value
+			.filter((v) => v.id !== videoId.value)
+			.slice(0, limit);
+	} else if (isMovie.value) {
+		// Show other movies as recommendations
+		return movies.value.filter((m) => m._id !== videoId.value).slice(0, limit);
+	} else {
+		// Show other videos as recommendations
+		return videos.value.filter((v) => v.id !== videoId.value).slice(0, limit);
+	}
 });
 
 // Because you watched recommendations
 const becauseYouWatched = computed(() => {
-  if (!video.value) return [];
-  
-  const allItems = isEporner.value 
-    ? [...epornerVideos.value, ...videos.value]
-    : isMovie.value
-    ? movies.value
-    : [...videos.value, ...movies.value];
-  
-  try {
-    return getBecauseYouWatched(video.value, allItems, 12) || [];
-  } catch (error) {
-    console.warn('Error getting recommendations:', error);
-    return [];
-  }
+	if (!video.value) return [];
+
+	const allItems = isEporner.value
+		? [...epornerVideos.value, ...videos.value]
+		: isMovie.value
+			? movies.value
+			: [...videos.value, ...movies.value];
+
+	try {
+		return getBecauseYouWatched(video.value, allItems, 12) || [];
+	} catch (error) {
+		console.warn("Error getting recommendations:", error);
+		return [];
+	}
 });
 
 // Related content (same category or similar)
 const relatedContent = computed(() => {
-  if (!video.value || !isMovie.value) return [];
-  
-  const currentCategory = video.value.category;
-  const related = movies.value.filter(m => 
-    m._id !== videoId.value && 
-    m.category === currentCategory
-  );
-  
-  // If not enough in same category, add random movies
-  if (related.length < 6) {
-    const random = movies.value
-      .filter(m => m._id !== videoId.value && m.category !== currentCategory)
-      .slice(0, 6 - related.length);
-    return [...related, ...random].slice(0, 6);
-  }
-  
-  return related.slice(0, 6);
+	if (!video.value || !isMovie.value) return [];
+
+	const currentCategory = video.value.category;
+	const related = movies.value.filter(
+		(m) => m._id !== videoId.value && m.category === currentCategory,
+	);
+
+	// If not enough in same category, add random movies
+	if (related.length < 6) {
+		const random = movies.value
+			.filter((m) => m._id !== videoId.value && m.category !== currentCategory)
+			.slice(0, 6 - related.length);
+		return [...related, ...random].slice(0, 6);
+	}
+
+	return related.slice(0, 6);
 });
 
 // Watch for route changes
-watch(() => route.params.slug, () => {
-  // Scroll to top when video changes
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  loadVideo();
-  // Reset states
-  isLiked.value = false;
-  isDisliked.value = false;
-  comments.value = [];
-  commentText.value = '';
-  commentAuthor.value = '';
-  tagBasedRecommendations.value = []; // Reset tag-based recommendations
-});
+watch(
+	() => route.params.slug,
+	() => {
+		// Scroll to top when video changes
+		window.scrollTo({ top: 0, behavior: "smooth" });
+		loadVideo();
+		// Reset states
+		isLiked.value = false;
+		isDisliked.value = false;
+		comments.value = [];
+		commentText.value = "";
+		commentAuthor.value = "";
+		tagBasedRecommendations.value = []; // Reset tag-based recommendations
+	},
+);
 
 // Watch for ID query param changes (for backward compatibility)
-watch(() => route.query.id, () => {
-  if (route.query.id && route.query.id !== videoId.value) {
-    loadVideo();
-  }
-});
+watch(
+	() => route.query.id,
+	() => {
+		if (route.query.id && route.query.id !== videoId.value) {
+			loadVideo();
+		}
+	},
+);
 
 // Helper function to check if ID looks like Eporner video ID (11 chars, alphanumeric)
 function isEpornerVideoId(id) {
-  if (!id) return false;
-  // Eporner IDs are typically 11 characters, alphanumeric
-  // MongoDB ObjectIds are 24 hex characters, so if it's 11 chars and not hex, it's likely Eporner
-  return /^[a-zA-Z0-9]{11}$/.test(id) && !/^[0-9a-fA-F]{24}$/.test(id);
+	if (!id) return false;
+	// Eporner IDs are typically 11 characters, alphanumeric
+	// MongoDB ObjectIds are 24 hex characters, so if it's 11 chars and not hex, it's likely Eporner
+	return /^[a-zA-Z0-9]{11}$/.test(id) && !/^[0-9a-fA-F]{24}$/.test(id);
 }
 
 // Helper function to check if ID looks like MongoDB ObjectId (24 hex chars)
 function isMongoObjectId(id) {
-  if (!id) return false;
-  return /^[0-9a-fA-F]{24}$/.test(id);
+	if (!id) return false;
+	return /^[0-9a-fA-F]{24}$/.test(id);
 }
 
 async function loadVideo() {
-  if (!videoId.value) return;
-  
-  loading.value = true;
-  destroyHls();
-  try {
-    // Determine video type based on ID format
-    const isEpornerId = isEpornerVideoId(videoId.value);
-    const isMongoId = isMongoObjectId(videoId.value);
-    
-    // Priority 1: If explicitly marked as Eporner OR ID matches Eporner format (and not MongoDB)
-    // Try Eporner API first and skip backend entirely
-    if (isEporner.value || (isEpornerId && !isMongoId)) {
-      console.log('Loading Eporner video:', {
-        videoId: videoId.value,
-        isEporner: isEporner.value,
-        isEpornerId,
-        isMongoId
-      });
-      
-      try {
-        const epornerVideo = await getVideoById(videoId.value);
-        console.log('Eporner API response:', epornerVideo);
-        
-        if (epornerVideo) {
-          video.value = epornerVideo;
-          isMovie.value = false;
-          loading.value = false;
-          
-          // Scroll to top when video loads
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          
-          console.log('Video set:', {
-            id: video.value.id,
-            title: video.value.title,
-            embedUrl: video.value.embedUrl,
-            url: video.value.url,
-            hasEmbedUrl: !!video.value.embedUrl,
-            hasUrl: !!video.value.url,
-            _source: video.value._source,
-            isEporner: isEporner.value
-          });
-          
-          // Add to watch history
-          addToHistory({
-            id: video.value.id,
-            title: video.value.title,
-            thumbnail: video.value.thumbnail,
-            type: 'eporner',
-            category: video.value.categories?.[0] || ''
-          });
-          
-          // Update session for recommendations
-          updateSession({
-            id: video.value.id,
-            title: video.value.title,
-            categories: video.value.categories || [],
-            stars: video.value.stars || [],
-            duration: video.value.duration || 0,
-          });
-          
-          // Load tag-based recommendations
-          if (video.value.categories && video.value.categories.length > 0) {
-            if (!shouldDeferRecommendations.value) {
-              await loadTagBasedRecommendations();
-            } else {
-              // Defer loading on slow networks
-              setTimeout(() => {
-                loadTagBasedRecommendations();
-              }, 2000);
-            }
-          }
-          return;
-        } else {
-          console.warn('Eporner video not found for ID:', videoId.value);
-        }
-      } catch (epornerError) {
-        console.error('Error loading Eporner video:', epornerError);
-      }
-      // If Eporner fails, don't try backend - it's clearly an Eporner ID
-      loading.value = false;
-      return;
-    }
-    
-    // Priority 2: Only try backend APIs if it looks like a MongoDB ObjectId
-    // Skip backend entirely if it's an Eporner ID format
-    if (isMongoId) {
-      // Try to load as video from backend
-      try {
-        const videoResponse = await videosApi.getById(videoId.value);
-        if (videoResponse.data && videoResponse.data.success) {
-          video.value = videoResponse.data.data;
-          isMovie.value = false;
-          loading.value = false;
-          // Scroll to top when video loads
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          // Add to watch history
-          addToHistory({
-            id: video.value.id,
-            title: video.value.title,
-            thumbnail: video.value.thumbnail,
-            type: 'video',
-            category: video.value.category
-          });
-          
-          // Update session for recommendations
-          updateSession({
-            id: video.value.id,
-            title: video.value.title,
-            categories: video.value.category ? [video.value.category] : [],
-            stars: video.value.stars || [],
-            duration: video.value.duration || 0,
-          });
-          // Increment view for videos
-          try {
-            await videosApi.incrementView?.(videoId.value);
-          } catch (e) {
-            console.log('View increment not available for videos');
-          }
-          // Detect scenes using AI
-          if (video.value) {
-            detectScenesAI(video.value, { useAI: true });
-            generateScenes(video.value);
-          }
-          
-          await nextTick();
-          await setupStreaming();
-          return;
-        }
-      } catch (videoError) {
-        // Only log if it's not a 404/400 (expected for wrong video type)
-        if (videoError.response && videoError.response.status !== 404 && videoError.response.status !== 400) {
-          console.error('Error loading video from backend:', videoError);
-        }
-        // Continue to try as movie
-      }
-      
-      // Try to load as movie from backend
-      try {
-        const movieResponse = await moviesApi.getById(videoId.value);
-        if (movieResponse.data && (movieResponse.data.success || movieResponse.data._id)) {
-          video.value = movieResponse.data.data || movieResponse.data;
-          isMovie.value = true;
-          loading.value = false;
-          // Scroll to top when video loads
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          // Add to watch history
-          addToHistory({
-            id: video.value._id,
-            title: video.value.title,
-            thumbnail: video.value.thumbnail,
-            type: 'movie',
-            category: video.value.category
-          });
-          
-          // Update session for recommendations
-          updateSession({
-            id: video.value._id,
-            title: video.value.title,
-            categories: video.value.category ? [video.value.category] : [],
-            stars: video.value.stars || [],
-            duration: video.value.duration || 0,
-          });
-          
-          // Increment view for movies
-          try {
-            await moviesApi.incrementView(videoId.value);
-            video.value.views = (video.value.views || 0) + 1;
-          } catch (e) {
-            console.error('Error incrementing view:', e);
-          }
-          // Detect scenes using AI
-          if (video.value) {
-            detectScenesAI(video.value, { useAI: true });
-            generateScenes(video.value);
-          }
-          
-          // Load comments
-          await loadComments();
-          await nextTick();
-          await setupStreaming();
-          return;
-        }
-      } catch (movieError) {
-        // Only log if it's not a 404/400 (expected for wrong video type)
-        if (movieError.response && movieError.response.status !== 404 && movieError.response.status !== 400) {
-          console.error('Error loading movie from backend:', movieError);
-        }
-      }
-    }
-    
-    // Priority 3: Final fallback - try Eporner API if not already tried and not a MongoDB ID
-    if (!isMongoId && !isEporner.value) {
-      try {
-        const epornerVideo = await getVideoById(videoId.value);
-        if (epornerVideo) {
-          video.value = epornerVideo;
-          isMovie.value = false;
-          loading.value = false;
-          // Scroll to top when video loads
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          // Add to watch history
-          addToHistory({
-            id: video.value.id,
-            title: video.value.title,
-            thumbnail: video.value.thumbnail,
-            type: 'eporner',
-            category: video.value.categories?.[0] || ''
-          });
-          
-          // Update session for recommendations
-          updateSession({
-            id: video.value.id,
-            title: video.value.title,
-            categories: video.value.categories || [],
-            stars: video.value.stars || [],
-            duration: video.value.duration || 0,
-          });
-          
-          // Load tag-based recommendations
-          if (video.value.categories && video.value.categories.length > 0) {
-            if (!shouldDeferRecommendations.value) {
-              await loadTagBasedRecommendations();
-            } else {
-              // Defer loading on slow networks
-              setTimeout(() => {
-                loadTagBasedRecommendations();
-              }, 2000);
-            }
-          }
-          return;
-        }
-      } catch (epornerError) {
-        console.error('Error loading Eporner video (fallback):', epornerError);
-      }
-    }
-    
-    // If we get here, video was not found in any source
-    console.warn('Video not found in any source:', videoId.value);
-  } catch (error) {
-    console.error('Unexpected error loading video:', error);
-  } finally {
-    loading.value = false;
-    
-    // Update URL to use slug if we have video title
-    if (video.value && video.value.title) {
-      const currentSlug = route.params.slug;
-      const expectedSlug = generateSlug(video.value.title);
-      const currentId = route.query.id || videoId.value;
-      
-      // Only update URL if slug doesn't match or ID is missing from query
-      if (currentSlug !== expectedSlug || !route.query.id) {
-        const newUrl = generateWatchUrl(video.value, { 
-          source: isEporner.value ? 'eporner' : undefined 
-        });
-        
-        // Use replace to avoid adding to history
-        router.replace(newUrl);
-      }
-    }
-  }
+	if (!videoId.value) return;
+
+	loading.value = true;
+	destroyHls();
+	try {
+		// Determine video type based on ID format
+		const isEpornerId = isEpornerVideoId(videoId.value);
+		const isMongoId = isMongoObjectId(videoId.value);
+
+		// Priority 1: If explicitly marked as Eporner OR ID matches Eporner format (and not MongoDB)
+		// Try Eporner API first and skip backend entirely
+		if (isEporner.value || (isEpornerId && !isMongoId)) {
+			console.log("Loading Eporner video:", {
+				videoId: videoId.value,
+				isEporner: isEporner.value,
+				isEpornerId,
+				isMongoId,
+			});
+
+			try {
+				const epornerVideo = await getVideoById(videoId.value);
+				console.log("Eporner API response:", epornerVideo);
+
+				if (epornerVideo) {
+					video.value = epornerVideo;
+					isMovie.value = false;
+					loading.value = false;
+
+					// Scroll to top when video loads
+					window.scrollTo({ top: 0, behavior: "smooth" });
+
+					console.log("Video set:", {
+						id: video.value.id,
+						title: video.value.title,
+						embedUrl: video.value.embedUrl,
+						url: video.value.url,
+						hasEmbedUrl: !!video.value.embedUrl,
+						hasUrl: !!video.value.url,
+						_source: video.value._source,
+						isEporner: isEporner.value,
+					});
+
+					// Add to watch history
+					addToHistory({
+						id: video.value.id,
+						title: video.value.title,
+						thumbnail: video.value.thumbnail,
+						type: "eporner",
+						category: video.value.categories?.[0] || "",
+					});
+
+					// Update session for recommendations
+					updateSession({
+						id: video.value.id,
+						title: video.value.title,
+						categories: video.value.categories || [],
+						stars: video.value.stars || [],
+						duration: video.value.duration || 0,
+					});
+
+					// Load tag-based recommendations
+					if (video.value.categories && video.value.categories.length > 0) {
+						if (!shouldDeferRecommendations.value) {
+							await loadTagBasedRecommendations();
+						} else {
+							// Defer loading on slow networks
+							setTimeout(() => {
+								loadTagBasedRecommendations();
+							}, 2000);
+						}
+					}
+					return;
+				} else {
+					console.warn("Eporner video not found for ID:", videoId.value);
+				}
+			} catch (epornerError) {
+				console.error("Error loading Eporner video:", epornerError);
+			}
+			// If Eporner fails, don't try backend - it's clearly an Eporner ID
+			loading.value = false;
+			return;
+		}
+
+		// Priority 2: Only try backend APIs if it looks like a MongoDB ObjectId
+		// Skip backend entirely if it's an Eporner ID format
+		if (isMongoId) {
+			// Try to load as video from backend
+			try {
+				const videoResponse = await videosApi.getById(videoId.value);
+				if (videoResponse.data && videoResponse.data.success) {
+					video.value = videoResponse.data.data;
+					isMovie.value = false;
+					loading.value = false;
+					// Scroll to top when video loads
+					window.scrollTo({ top: 0, behavior: "smooth" });
+					// Add to watch history
+					addToHistory({
+						id: video.value.id,
+						title: video.value.title,
+						thumbnail: video.value.thumbnail,
+						type: "video",
+						category: video.value.category,
+					});
+
+					// Update session for recommendations
+					updateSession({
+						id: video.value.id,
+						title: video.value.title,
+						categories: video.value.category ? [video.value.category] : [],
+						stars: video.value.stars || [],
+						duration: video.value.duration || 0,
+					});
+					// Increment view for videos
+					try {
+						await videosApi.incrementView?.(videoId.value);
+					} catch (e) {
+						console.log("View increment not available for videos");
+					}
+					// Detect scenes using AI
+					if (video.value) {
+						detectScenesAI(video.value, { useAI: true });
+						generateScenes(video.value);
+					}
+
+					await nextTick();
+					await setupStreaming();
+					return;
+				}
+			} catch (videoError) {
+				// Only log if it's not a 404/400 (expected for wrong video type)
+				if (
+					videoError.response &&
+					videoError.response.status !== 404 &&
+					videoError.response.status !== 400
+				) {
+					console.error("Error loading video from backend:", videoError);
+				}
+				// Continue to try as movie
+			}
+
+			// Try to load as movie from backend
+			try {
+				const movieResponse = await moviesApi.getById(videoId.value);
+				if (
+					movieResponse.data &&
+					(movieResponse.data.success || movieResponse.data._id)
+				) {
+					video.value = movieResponse.data.data || movieResponse.data;
+					isMovie.value = true;
+					loading.value = false;
+					// Scroll to top when video loads
+					window.scrollTo({ top: 0, behavior: "smooth" });
+					// Add to watch history
+					addToHistory({
+						id: video.value._id,
+						title: video.value.title,
+						thumbnail: video.value.thumbnail,
+						type: "movie",
+						category: video.value.category,
+					});
+
+					// Update session for recommendations
+					updateSession({
+						id: video.value._id,
+						title: video.value.title,
+						categories: video.value.category ? [video.value.category] : [],
+						stars: video.value.stars || [],
+						duration: video.value.duration || 0,
+					});
+
+					// Increment view for movies
+					try {
+						await moviesApi.incrementView(videoId.value);
+						video.value.views = (video.value.views || 0) + 1;
+					} catch (e) {
+						console.error("Error incrementing view:", e);
+					}
+					// Detect scenes using AI
+					if (video.value) {
+						detectScenesAI(video.value, { useAI: true });
+						generateScenes(video.value);
+					}
+
+					// Load comments
+					await loadComments();
+					await nextTick();
+					await setupStreaming();
+					return;
+				}
+			} catch (movieError) {
+				// Only log if it's not a 404/400 (expected for wrong video type)
+				if (
+					movieError.response &&
+					movieError.response.status !== 404 &&
+					movieError.response.status !== 400
+				) {
+					console.error("Error loading movie from backend:", movieError);
+				}
+			}
+		}
+
+		// Priority 3: Final fallback - try Eporner API if not already tried and not a MongoDB ID
+		if (!isMongoId && !isEporner.value) {
+			try {
+				const epornerVideo = await getVideoById(videoId.value);
+				if (epornerVideo) {
+					video.value = epornerVideo;
+					isMovie.value = false;
+					loading.value = false;
+					// Scroll to top when video loads
+					window.scrollTo({ top: 0, behavior: "smooth" });
+					// Add to watch history
+					addToHistory({
+						id: video.value.id,
+						title: video.value.title,
+						thumbnail: video.value.thumbnail,
+						type: "eporner",
+						category: video.value.categories?.[0] || "",
+					});
+
+					// Update session for recommendations
+					updateSession({
+						id: video.value.id,
+						title: video.value.title,
+						categories: video.value.categories || [],
+						stars: video.value.stars || [],
+						duration: video.value.duration || 0,
+					});
+
+					// Load tag-based recommendations
+					if (video.value.categories && video.value.categories.length > 0) {
+						if (!shouldDeferRecommendations.value) {
+							await loadTagBasedRecommendations();
+						} else {
+							// Defer loading on slow networks
+							setTimeout(() => {
+								loadTagBasedRecommendations();
+							}, 2000);
+						}
+					}
+					return;
+				}
+			} catch (epornerError) {
+				console.error("Error loading Eporner video (fallback):", epornerError);
+			}
+		}
+
+		// If we get here, video was not found in any source
+		console.warn("Video not found in any source:", videoId.value);
+	} catch (error) {
+		console.error("Unexpected error loading video:", error);
+	} finally {
+		loading.value = false;
+
+		// Update URL to use slug if we have video title
+		if (video.value && video.value.title) {
+			const currentSlug = route.params.slug;
+			const expectedSlug = generateSlug(video.value.title);
+			const currentId = route.query.id || videoId.value;
+
+			// Only update URL if slug doesn't match or ID is missing from query
+			if (currentSlug !== expectedSlug || !route.query.id) {
+				const newUrl = generateWatchUrl(video.value, {
+					source: isEporner.value ? "eporner" : undefined,
+				});
+
+				// Use replace to avoid adding to history
+				router.replace(newUrl);
+			}
+		}
+	}
 }
 
 async function loadComments() {
-  if (!isMovie.value || !videoId.value) return;
-  
-  loadingComments.value = true;
-  try {
-    const response = await moviesApi.getComments(videoId.value);
-    if (response.data.success) {
-      comments.value = response.data.data || [];
-      // Sort by newest first
-      comments.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
-  } catch (error) {
-    console.error('Error loading comments:', error);
-  } finally {
-    loadingComments.value = false;
-  }
+	if (!isMovie.value || !videoId.value) return;
+
+	loadingComments.value = true;
+	try {
+		const response = await moviesApi.getComments(videoId.value);
+		if (response.data.success) {
+			comments.value = response.data.data || [];
+			// Sort by newest first
+			comments.value.sort(
+				(a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+			);
+		}
+	} catch (error) {
+		console.error("Error loading comments:", error);
+	} finally {
+		loadingComments.value = false;
+	}
 }
 
 async function handleLike() {
-  if (!isMovie.value || !videoId.value) return;
-  
-  try {
-    const response = await moviesApi.like(videoId.value);
-    if (response.data.success) {
-      video.value.likes = response.data.data.likes;
-      isLiked.value = true;
-      isDisliked.value = false;
-    }
-  } catch (error) {
-    console.error('Error liking movie:', error);
-  }
+	if (!isMovie.value || !videoId.value) return;
+
+	try {
+		const response = await moviesApi.like(videoId.value);
+		if (response.data.success) {
+			video.value.likes = response.data.data.likes;
+			isLiked.value = true;
+			isDisliked.value = false;
+		}
+	} catch (error) {
+		console.error("Error liking movie:", error);
+	}
 }
 
 async function handleDislike() {
-  if (!isMovie.value || !videoId.value) return;
-  
-  try {
-    const response = await moviesApi.dislike(videoId.value);
-    if (response.data.success) {
-      video.value.dislikes = response.data.data.dislikes;
-      isDisliked.value = true;
-      isLiked.value = false;
-    }
-  } catch (error) {
-    console.error('Error disliking movie:', error);
-  }
+	if (!isMovie.value || !videoId.value) return;
+
+	try {
+		const response = await moviesApi.dislike(videoId.value);
+		if (response.data.success) {
+			video.value.dislikes = response.data.data.dislikes;
+			isDisliked.value = true;
+			isLiked.value = false;
+		}
+	} catch (error) {
+		console.error("Error disliking movie:", error);
+	}
 }
 
 const showSharePanel = ref(false);
 
 const pageUrl = computed(() => {
-  return window.location.href;
+	return window.location.href;
 });
 
 const embedCode = computed(() => {
-  if (!video.value) return '';
-  const videoId = video.value._id || video.value.id;
-  const embedUrl = isEporner.value 
-    ? `${window.location.origin}/embed/${videoId}?source=eporner`
-    : `${window.location.origin}/embed/${videoId}`;
-  return `<iframe src="${embedUrl}" frameborder="0" width="510" height="400" scrolling="no" allowfullscreen="allowfullscreen"></iframe>`;
+	if (!video.value) return "";
+	const videoId = video.value._id || video.value.id;
+	const embedUrl = isEporner.value
+		? `${window.location.origin}/embed/${videoId}?source=eporner`
+		: `${window.location.origin}/embed/${videoId}`;
+	return `<iframe src="${embedUrl}" frameborder="0" width="510" height="400" scrolling="no" allowfullscreen="allowfullscreen"></iframe>`;
 });
 
 function toggleSharePanel() {
-  showSharePanel.value = !showSharePanel.value;
+	showSharePanel.value = !showSharePanel.value;
 }
 
 async function copyPageLink() {
-  try {
-    await navigator.clipboard.writeText(pageUrl.value);
-    // Show feedback
-    const btn = document.querySelector('.share-section:first-child .copy-btn');
-    if (btn) {
-      const originalHTML = btn.innerHTML;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-      setTimeout(() => {
-        btn.innerHTML = originalHTML;
-      }, 2000);
-    }
-  } catch (err) {
-    console.error('Failed to copy:', err);
-  }
+	try {
+		await navigator.clipboard.writeText(pageUrl.value);
+		// Show feedback
+		const btn = document.querySelector(".share-section:first-child .copy-btn");
+		if (btn) {
+			const originalHTML = btn.innerHTML;
+			btn.innerHTML =
+				'<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+			setTimeout(() => {
+				btn.innerHTML = originalHTML;
+			}, 2000);
+		}
+	} catch (err) {
+		console.error("Failed to copy:", err);
+	}
 }
 
 async function copyEmbedCode() {
-  try {
-    await navigator.clipboard.writeText(embedCode.value);
-    // Show feedback
-    const btn = document.querySelector('.share-section:nth-child(2) .copy-btn');
-    if (btn) {
-      const originalHTML = btn.innerHTML;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-      setTimeout(() => {
-        btn.innerHTML = originalHTML;
-      }, 2000);
-    }
-  } catch (err) {
-    console.error('Failed to copy:', err);
-  }
+	try {
+		await navigator.clipboard.writeText(embedCode.value);
+		// Show feedback
+		const btn = document.querySelector(".share-section:nth-child(2) .copy-btn");
+		if (btn) {
+			const originalHTML = btn.innerHTML;
+			btn.innerHTML =
+				'<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+			setTimeout(() => {
+				btn.innerHTML = originalHTML;
+			}, 2000);
+		}
+	} catch (err) {
+		console.error("Failed to copy:", err);
+	}
 }
 
 function shareToTwitter() {
-  const url = encodeURIComponent(pageUrl.value);
-  const text = encodeURIComponent(video.value?.title || 'Check out this video');
-  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+	const url = encodeURIComponent(pageUrl.value);
+	const text = encodeURIComponent(video.value?.title || "Check out this video");
+	window.open(
+		`https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+		"_blank",
+	);
 }
 
 function shareToReddit() {
-  const url = encodeURIComponent(pageUrl.value);
-  const title = encodeURIComponent(video.value?.title || 'Check out this video');
-  window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank');
+	const url = encodeURIComponent(pageUrl.value);
+	const title = encodeURIComponent(
+		video.value?.title || "Check out this video",
+	);
+	window.open(`https://reddit.com/submit?url=${url}&title=${title}`, "_blank");
 }
 
 function shareToEmail() {
-  const subject = encodeURIComponent(video.value?.title || 'Check out this video');
-  const body = encodeURIComponent(`Check out this video: ${pageUrl.value}`);
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+	const subject = encodeURIComponent(
+		video.value?.title || "Check out this video",
+	);
+	const body = encodeURIComponent(`Check out this video: ${pageUrl.value}`);
+	window.location.href = `mailto:?subject=${subject}&body=${body}`;
 }
 
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    alert('Link copied to clipboard!');
-  }).catch(err => {
-    console.error('Failed to copy:', err);
-    // Fallback for older browsers
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('Link copied to clipboard!');
-  });
+	navigator.clipboard
+		.writeText(text)
+		.then(() => {
+			alert("Link copied to clipboard!");
+		})
+		.catch((err) => {
+			console.error("Failed to copy:", err);
+			// Fallback for older browsers
+			const textarea = document.createElement("textarea");
+			textarea.value = text;
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand("copy");
+			document.body.removeChild(textarea);
+			alert("Link copied to clipboard!");
+		});
 }
 
 const isDownloading = ref(false);
 const downloadProgress = ref(0);
 
 async function handleDownload() {
-  if (!video.value || isDownloading.value) return;
-  
-  isDownloading.value = true;
-  downloadProgress.value = 0;
-  
-  try {
-    // Check video source type
-    if (isEporner.value || video.value._source === 'eporner') {
-      // Eporner videos - try to extract direct URL or show message
-      await downloadEpornerVideo();
-    } else if (isHlsSource.value) {
-      // HLS stream - download segments and combine
-      await downloadHlsVideo();
-    } else if (video.value.url && hasDirectVideoUrl(video.value)) {
-      // Direct video URL - simple download
-      await downloadDirectVideo(video.value.url);
-    } else {
-      alert('Download not available for this video type.');
-    }
-  } catch (error) {
-    console.error('Download error:', error);
-    alert('Failed to download video. Please try again.');
-  } finally {
-    isDownloading.value = false;
-    downloadProgress.value = 0;
-  }
+	if (!video.value || isDownloading.value) return;
+
+	isDownloading.value = true;
+	downloadProgress.value = 0;
+
+	try {
+		// Check video source type
+		if (isEporner.value || video.value._source === "eporner") {
+			// Eporner videos - try to extract direct URL or show message
+			await downloadEpornerVideo();
+		} else if (isHlsSource.value) {
+			// HLS stream - download segments and combine
+			await downloadHlsVideo();
+		} else if (video.value.url && hasDirectVideoUrl(video.value)) {
+			// Direct video URL - simple download
+			await downloadDirectVideo(video.value.url);
+		} else {
+			alert("Download not available for this video type.");
+		}
+	} catch (error) {
+		console.error("Download error:", error);
+		alert("Failed to download video. Please try again.");
+	} finally {
+		isDownloading.value = false;
+		downloadProgress.value = 0;
+	}
 }
 
 async function downloadDirectVideo(url) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch video');
-    
-    const contentLength = response.headers.get('content-length');
-    const total = contentLength ? parseInt(contentLength, 10) : 0;
-    
-    const reader = response.body.getReader();
-    const chunks = [];
-    let received = 0;
-    
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      
-      chunks.push(value);
-      received += value.length;
-      
-      if (total > 0) {
-        downloadProgress.value = Math.round((received / total) * 100);
-      }
-    }
-    
-    // Combine chunks into blob
-    const blob = new Blob(chunks, { type: 'video/mp4' });
-    const blobUrl = URL.createObjectURL(blob);
-    
-    // Create download link
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = `${video.value.title || 'video'}.mp4`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Clean up
-    URL.revokeObjectURL(blobUrl);
-    
-    downloadProgress.value = 100;
-  } catch (error) {
-    console.error('Direct download error:', error);
-    // Fallback: try simple link download
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = video.value.title || 'video';
-    link.target = '_blank';
-    link.click();
-  }
+	try {
+		const response = await fetch(url);
+		if (!response.ok) throw new Error("Failed to fetch video");
+
+		const contentLength = response.headers.get("content-length");
+		const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+		const reader = response.body.getReader();
+		const chunks = [];
+		let received = 0;
+
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+
+			chunks.push(value);
+			received += value.length;
+
+			if (total > 0) {
+				downloadProgress.value = Math.round((received / total) * 100);
+			}
+		}
+
+		// Combine chunks into blob
+		const blob = new Blob(chunks, { type: "video/mp4" });
+		const blobUrl = URL.createObjectURL(blob);
+
+		// Create download link
+		const link = document.createElement("a");
+		link.href = blobUrl;
+		link.download = `${video.value.title || "video"}.mp4`;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Clean up
+		URL.revokeObjectURL(blobUrl);
+
+		downloadProgress.value = 100;
+	} catch (error) {
+		console.error("Direct download error:", error);
+		// Fallback: try simple link download
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = video.value.title || "video";
+		link.target = "_blank";
+		link.click();
+	}
 }
 
 async function downloadHlsVideo() {
-  try {
-    // Load HLS.js if needed
-    const HlsClass = await loadHls();
-    
-    const hlsUrl = video.value.url;
-    const hls = new HlsClass();
-    
-    // Load manifest
-    const manifestResponse = await fetch(hlsUrl);
-    const manifestText = await manifestResponse.text();
-    
-    // Parse manifest to get segment URLs
-    const baseUrl = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
-    const segmentUrls = [];
-    
-    manifestText.split('\n').forEach(line => {
-      if (line && !line.startsWith('#')) {
-        const segmentUrl = line.startsWith('http') ? line : baseUrl + line;
-        segmentUrls.push(segmentUrl);
-      }
-    });
-    
-    if (segmentUrls.length === 0) {
-      throw new Error('No segments found in HLS manifest');
-    }
-    
-    // Download all segments
-    const segments = [];
-    const total = segmentUrls.length;
-    
-    for (let i = 0; i < segmentUrls.length; i++) {
-      const response = await fetch(segmentUrls[i]);
-      const arrayBuffer = await response.arrayBuffer();
-      segments.push(arrayBuffer);
-      
-      downloadProgress.value = Math.round(((i + 1) / total) * 100);
-    }
-    
-    // Combine segments into single blob
-    const totalSize = segments.reduce((sum, seg) => sum + seg.byteLength, 0);
-    const combined = new Uint8Array(totalSize);
-    let offset = 0;
-    
-    segments.forEach(segment => {
-      combined.set(new Uint8Array(segment), offset);
-      offset += segment.byteLength;
-    });
-    
-    // Create blob and download
-    const blob = new Blob([combined], { type: 'video/mp4' });
-    const blobUrl = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = `${video.value.title || 'video'}.mp4`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    URL.revokeObjectURL(blobUrl);
-    downloadProgress.value = 100;
-  } catch (error) {
-    console.error('HLS download error:', error);
-    alert('Failed to download HLS video. The video may be protected or the format is not supported.');
-  }
+	try {
+		// Load HLS.js if needed
+		const HlsClass = await loadHls();
+
+		const hlsUrl = video.value.url;
+		const hls = new HlsClass();
+
+		// Load manifest
+		const manifestResponse = await fetch(hlsUrl);
+		const manifestText = await manifestResponse.text();
+
+		// Parse manifest to get segment URLs
+		const baseUrl = hlsUrl.substring(0, hlsUrl.lastIndexOf("/") + 1);
+		const segmentUrls = [];
+
+		manifestText.split("\n").forEach((line) => {
+			if (line && !line.startsWith("#")) {
+				const segmentUrl = line.startsWith("http") ? line : baseUrl + line;
+				segmentUrls.push(segmentUrl);
+			}
+		});
+
+		if (segmentUrls.length === 0) {
+			throw new Error("No segments found in HLS manifest");
+		}
+
+		// Download all segments
+		const segments = [];
+		const total = segmentUrls.length;
+
+		for (let i = 0; i < segmentUrls.length; i++) {
+			const response = await fetch(segmentUrls[i]);
+			const arrayBuffer = await response.arrayBuffer();
+			segments.push(arrayBuffer);
+
+			downloadProgress.value = Math.round(((i + 1) / total) * 100);
+		}
+
+		// Combine segments into single blob
+		const totalSize = segments.reduce((sum, seg) => sum + seg.byteLength, 0);
+		const combined = new Uint8Array(totalSize);
+		let offset = 0;
+
+		segments.forEach((segment) => {
+			combined.set(new Uint8Array(segment), offset);
+			offset += segment.byteLength;
+		});
+
+		// Create blob and download
+		const blob = new Blob([combined], { type: "video/mp4" });
+		const blobUrl = URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = blobUrl;
+		link.download = `${video.value.title || "video"}.mp4`;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		URL.revokeObjectURL(blobUrl);
+		downloadProgress.value = 100;
+	} catch (error) {
+		console.error("HLS download error:", error);
+		alert(
+			"Failed to download HLS video. The video may be protected or the format is not supported.",
+		);
+	}
 }
 
 async function downloadEpornerVideo() {
-  // Eporner videos are embedded, so direct download is not possible
-  // We can try to extract the video URL from the embed, but it's often protected
-  try {
-    // Try to get video URL from Eporner API if available
-    if (video.value.url && !video.value.url.includes('embed')) {
-      // If we have a direct URL (unlikely for Eporner), use it
-      await downloadDirectVideo(video.value.url);
-    } else {
-      // Show user-friendly message
-      alert('Direct download is not available for this video. You can:\n\n1. Use browser extensions for video downloading\n2. Right-click on the video player and select "Save video as..."\n3. Use the video URL in a download manager');
-      
-      // Copy video page URL to clipboard as alternative
-      try {
-        await navigator.clipboard.writeText(pageUrl.value);
-        console.log('Video page URL copied to clipboard');
-      } catch (e) {
-        console.error('Failed to copy URL:', e);
-      }
-    }
-  } catch (error) {
-    console.error('Eporner download error:', error);
-    alert('Download not available for embedded videos. Please use browser extensions or download managers.');
-  }
+	// Eporner videos are embedded, so direct download is not possible
+	// We can try to extract the video URL from the embed, but it's often protected
+	try {
+		// Try to get video URL from Eporner API if available
+		if (video.value.url && !video.value.url.includes("embed")) {
+			// If we have a direct URL (unlikely for Eporner), use it
+			await downloadDirectVideo(video.value.url);
+		} else {
+			// Show user-friendly message
+			alert(
+				'Direct download is not available for this video. You can:\n\n1. Use browser extensions for video downloading\n2. Right-click on the video player and select "Save video as..."\n3. Use the video URL in a download manager',
+			);
+
+			// Copy video page URL to clipboard as alternative
+			try {
+				await navigator.clipboard.writeText(pageUrl.value);
+				console.log("Video page URL copied to clipboard");
+			} catch (e) {
+				console.error("Failed to copy URL:", e);
+			}
+		}
+	} catch (error) {
+		console.error("Eporner download error:", error);
+		alert(
+			"Download not available for embedded videos. Please use browser extensions or download managers.",
+		);
+	}
 }
 
 async function downloadForOffline() {
-  if (!video.value || !video.value.url) {
-    alert(t('download.downloadFailed'));
-    return;
-  }
+	if (!video.value || !video.value.url) {
+		alert(t("download.downloadFailed"));
+		return;
+	}
 
-  try {
-    await downloadOffline({
-      id: video.value._id || video.value.id,
-      title: video.value.title,
-      url: video.value.url,
-      thumbnail: video.value.thumbnail,
-      type: isMovie.value ? 'movie' : 'video'
-    });
-    alert(t('download.downloadComplete'));
-  } catch (error) {
-    console.error('Download error:', error);
-    alert(t('download.downloadFailed'));
-  }
+	try {
+		await downloadOffline({
+			id: video.value._id || video.value.id,
+			title: video.value.title,
+			url: video.value.url,
+			thumbnail: video.value.thumbnail,
+			type: isMovie.value ? "movie" : "video",
+		});
+		alert(t("download.downloadComplete"));
+	} catch (error) {
+		console.error("Download error:", error);
+		alert(t("download.downloadFailed"));
+	}
 }
 
 function toggleWatchLater() {
-  if (!video.value) return;
-  const id = video.value._id || video.value.id;
-  if (!id) return;
-  const type = isMovie.value ? 'movie' : (isEporner.value ? 'eporner' : 'video');
-  if (isWatchLater.value) {
-    removeWatchLater(id, type);
-  } else {
-    addWatchLater({
-      id,
-      title: video.value.title,
-      thumbnail: video.value.thumbnail,
-      type,
-      category: video.value.category,
-    });
-  }
+	if (!video.value) return;
+	const id = video.value._id || video.value.id;
+	if (!id) return;
+	const type = isMovie.value ? "movie" : isEporner.value ? "eporner" : "video";
+	if (isWatchLater.value) {
+		removeWatchLater(id, type);
+	} else {
+		addWatchLater({
+			id,
+			title: video.value.title,
+			thumbnail: video.value.thumbnail,
+			type,
+			category: video.value.category,
+		});
+	}
 }
 
 function toggleFollowStar() {
-  const name = followTarget.value;
-  if (!name) return;
-  if (isFollowingStar.value) {
-    unfollow(name);
-  } else {
-    follow(name);
-  }
+	const name = followTarget.value;
+	if (!name) return;
+	if (isFollowingStar.value) {
+		unfollow(name);
+	} else {
+		follow(name);
+	}
 }
 
 // Handle scene jump
 function handleSceneJump(scene) {
-  if (videoPlayer.value) {
-    jumpToScene(scene.id, videoPlayer.value);
-  }
+	if (videoPlayer.value) {
+		jumpToScene(scene.id, videoPlayer.value);
+	}
 }
 
 // Handle follow creator
 function handleFollowCreator() {
-  if (!creatorInfo.value) return;
-  
-  if (isCreatorFollowed.value) {
-    unfollowCreator(creatorInfo.value.id);
-  } else {
-    followCreator(creatorInfo.value);
-  }
+	if (!creatorInfo.value) return;
+
+	if (isCreatorFollowed.value) {
+		unfollowCreator(creatorInfo.value.id);
+	} else {
+		followCreator(creatorInfo.value);
+	}
 }
 
 async function submitComment() {
-  if (!commentText.value.trim() || !isMovie.value || !videoId.value || submittingComment.value) return;
-  
-  submittingComment.value = true;
-  try {
-    const response = await moviesApi.addComment(videoId.value, {
-      text: commentText.value.trim(),
-      author: commentAuthor.value.trim() || undefined
-    });
-    
-    if (response.data.success) {
-      // Add comment to list
-      comments.value.unshift(response.data.data);
-      // Clear form
-      commentText.value = '';
-      commentAuthor.value = '';
-    }
-  } catch (error) {
-    console.error('Error submitting comment:', error);
-    alert('Failed to post comment. Please try again.');
-  } finally {
-    submittingComment.value = false;
-  }
+	if (
+		!commentText.value.trim() ||
+		!isMovie.value ||
+		!videoId.value ||
+		submittingComment.value
+	)
+		return;
+
+	submittingComment.value = true;
+	try {
+		const response = await moviesApi.addComment(videoId.value, {
+			text: commentText.value.trim(),
+			author: commentAuthor.value.trim() || undefined,
+		});
+
+		if (response.data.success) {
+			// Add comment to list
+			comments.value.unshift(response.data.data);
+			// Clear form
+			commentText.value = "";
+			commentAuthor.value = "";
+		}
+	} catch (error) {
+		console.error("Error submitting comment:", error);
+		alert("Failed to post comment. Please try again.");
+	} finally {
+		submittingComment.value = false;
+	}
 }
 
 function navigateToTag(tag) {
-  if (!tag) return;
-  // Navigate to tag page with encoded tag name
-  const encodedTag = encodeURIComponent(tag.trim());
-  router.push(`/tag/${encodedTag}`);
+	if (!tag) return;
+	// Navigate to tag page with encoded tag name
+	const encodedTag = encodeURIComponent(tag.trim());
+	router.push(`/tag/${encodedTag}`);
 }
 
 function navigateToVideo(video) {
-  const url = generateWatchUrl(video, {
-    source: video._source === 'eporner' ? 'eporner' : undefined
-  });
-  router.push(url);
+	const url = generateWatchUrl(video, {
+		source: video._source === "eporner" ? "eporner" : undefined,
+	});
+	router.push(url);
 }
 
 function goToPremium() {
-  router.push('/premium');
+	router.push("/premium");
 }
 
 // Check if video has a direct video URL (not an embed URL or page URL)
 function hasDirectVideoUrl(video) {
-  if (!video || !video.url) return false;
-  
-  // Don't use ModernVideoPlayer for Eporner videos (they only have embed URLs)
-  if (isEporner.value || video._source === 'eporner') {
-    return false;
-  }
-  
-  const url = video.url.toLowerCase();
-  
-  // Check if it's a direct video file URL
-  const isDirectVideo = url.endsWith('.mp4') || 
-                       url.endsWith('.webm') || 
-                       url.endsWith('.m3u8') ||
-                       url.endsWith('.m3u') ||
-                       url.includes('/video/') && !url.includes('/embed/') ||
-                       url.startsWith('blob:') ||
-                       url.startsWith('data:');
-  
-  // Check if it's NOT an embed URL or page URL
-  const isNotEmbed = !url.includes('/embed/') && 
-                    !url.includes('embed') &&
-                    !url.includes('youtube.com') &&
-                    !url.includes('vimeo.com') &&
-                    !url.includes('eporner.com/video/');
-  
-  return isDirectVideo && isNotEmbed;
+	if (!video || !video.url) return false;
+
+	// Don't use ModernVideoPlayer for Eporner videos (they only have embed URLs)
+	if (isEporner.value || video._source === "eporner") {
+		return false;
+	}
+
+	const url = video.url.toLowerCase();
+
+	// Check if it's a direct video file URL
+	const isDirectVideo =
+		url.endsWith(".mp4") ||
+		url.endsWith(".webm") ||
+		url.endsWith(".m3u8") ||
+		url.endsWith(".m3u") ||
+		(url.includes("/video/") && !url.includes("/embed/")) ||
+		url.startsWith("blob:") ||
+		url.startsWith("data:");
+
+	// Check if it's NOT an embed URL or page URL
+	const isNotEmbed =
+		!url.includes("/embed/") &&
+		!url.includes("embed") &&
+		!url.includes("youtube.com") &&
+		!url.includes("vimeo.com") &&
+		!url.includes("eporner.com/video/");
+
+	return isDirectVideo && isNotEmbed;
 }
 
 function formatViews(views) {
-  if (!views) return '0';
-  if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
-  if (views >= 1000) return `${(views / 1000).toFixed(1)}k`;
-  return views.toString();
+	if (!views) return "0";
+	if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+	if (views >= 1000) return `${(views / 1000).toFixed(1)}k`;
+	return views.toString();
 }
 
 function formatTimeAgo(date) {
-  if (!date) return '';
-  const now = new Date();
-  const uploadDate = new Date(date);
-  const diffInSeconds = Math.floor((now - uploadDate) / 1000);
-  
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
-  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} months ago`;
-  return `${Math.floor(diffInSeconds / 31536000)} years ago`;
+	if (!date) return "";
+	const now = new Date();
+	const uploadDate = new Date(date);
+	const diffInSeconds = Math.floor((now - uploadDate) / 1000);
+
+	if (diffInSeconds < 60) return "just now";
+	if (diffInSeconds < 3600)
+		return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+	if (diffInSeconds < 86400)
+		return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+	if (diffInSeconds < 604800)
+		return `${Math.floor(diffInSeconds / 86400)} days ago`;
+	if (diffInSeconds < 2592000)
+		return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+	if (diffInSeconds < 31536000)
+		return `${Math.floor(diffInSeconds / 2592000)} months ago`;
+	return `${Math.floor(diffInSeconds / 31536000)} years ago`;
 }
 
 function getInitials(name) {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+	if (!name) return "?";
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 }
 
 function handleVideoLoaded() {
-  // Video metadata loaded
-  if (videoPlayer.value) {
-    videoPlayer.value.playbackRate = playbackSpeed.value;
-  }
+	// Video metadata loaded
+	if (videoPlayer.value) {
+		videoPlayer.value.playbackRate = playbackSpeed.value;
+	}
 }
 
 function changePlaybackSpeed() {
-  if (videoPlayer.value) {
-    videoPlayer.value.playbackRate = parseFloat(playbackSpeed.value);
-  }
+	if (videoPlayer.value) {
+		videoPlayer.value.playbackRate = parseFloat(playbackSpeed.value);
+	}
 }
 
 function handleTimeUpdate(time) {
-  if (video.value) {
-    // Time can come from ModernVideoPlayer event or from videoPlayer ref
-    const currentTimeValue = time !== undefined ? time : (videoPlayer.value?.currentTime || 0);
-    const durationValue = videoPlayer.value?.duration || 0;
-    
-    if (durationValue > 0) {
-      const progress = Math.round((currentTimeValue / durationValue) * 100);
-      updateProgress(video.value._id || video.value.id, progress, durationValue);
-      
-      // Update current scene
-      const sceneAtTime = getSceneAtTime(currentTimeValue);
-      if (sceneAtTime && (!currentScene.value || sceneAtTime.id !== currentScene.value.id)) {
-        currentScene.value = sceneAtTime;
-      }
+	if (video.value) {
+		// Time can come from ModernVideoPlayer event or from videoPlayer ref
+		const currentTimeValue =
+			time !== undefined ? time : videoPlayer.value?.currentTime || 0;
+		const durationValue = videoPlayer.value?.duration || 0;
 
-      // Check for interactive video choices
-      if (isInteractive.value) {
-        const choices = getChoicesAtTime(currentTimeValue);
-        if (choices.length > 0 && !currentChoicePoint.value) {
-          currentChoicePoint.value = choices[0];
-        }
-      }
+		if (durationValue > 0) {
+			const progress = Math.round((currentTimeValue / durationValue) * 100);
+			updateProgress(
+				video.value._id || video.value.id,
+				progress,
+				durationValue,
+			);
 
-      // Synchronize playback for watch party
-      if (roomId.value && videoPlayer.value) {
-        synchronizePlayback(videoPlayer.value);
-      }
-    }
-  }
+			// Update current scene
+			const sceneAtTime = getSceneAtTime(currentTimeValue);
+			if (
+				sceneAtTime &&
+				(!currentScene.value || sceneAtTime.id !== currentScene.value.id)
+			) {
+				currentScene.value = sceneAtTime;
+			}
+
+			// Check for interactive video choices
+			if (isInteractive.value) {
+				const choices = getChoicesAtTime(currentTimeValue);
+				if (choices.length > 0 && !currentChoicePoint.value) {
+					currentChoicePoint.value = choices[0];
+				}
+			}
+
+			// Synchronize playback for watch party
+			if (roomId.value && videoPlayer.value) {
+				synchronizePlayback(videoPlayer.value);
+			}
+		}
+	}
 }
 
 async function handlePlay() {
-  // Video started playing - initialize smart queue
-  if (video.value) {
-    // Get all available videos for prediction
-    const allVideos = [
-      ...epornerVideos.value,
-      ...videos.value,
-      ...movies.value
-    ];
-    
-    // Initialize smart queue to predict and pre-load next videos
-    await initializeSmartQueue(video.value, allVideos);
-    
-    // Auto-skip based on preferences
-    const skipTime = getRecommendedSkipTime(video.value);
-    if (skipTime && videoPlayer.value) {
-      // Small delay to ensure player is ready
-      setTimeout(() => {
-        if (videoPlayer.value && typeof videoPlayer.value.currentTime !== 'undefined') {
-          videoPlayer.value.currentTime = skipTime;
-        }
-      }, 500);
-    }
-  }
+	// Video started playing - initialize smart queue
+	if (video.value) {
+		// Get all available videos for prediction
+		const allVideos = [
+			...epornerVideos.value,
+			...videos.value,
+			...movies.value,
+		];
+
+		// Initialize smart queue to predict and pre-load next videos
+		await initializeSmartQueue(video.value, allVideos);
+
+		// Auto-skip based on preferences
+		const skipTime = getRecommendedSkipTime(video.value);
+		if (skipTime && videoPlayer.value) {
+			// Small delay to ensure player is ready
+			setTimeout(() => {
+				if (
+					videoPlayer.value &&
+					typeof videoPlayer.value.currentTime !== "undefined"
+				) {
+					videoPlayer.value.currentTime = skipTime;
+				}
+			}, 500);
+		}
+	}
 }
 
 function handlePause() {
-  // Video paused
-  if (roomId.value && isHost.value) {
-    broadcastState({ isPlaying: false });
-  }
+	// Video paused
+	if (roomId.value && isHost.value) {
+		broadcastState({ isPlaying: false });
+	}
 }
 
 function handleFavorite() {
-  if (video.value) {
-    toggleFavorite({
-      id: video.value._id || video.value.id,
-      title: video.value.title,
-      thumbnail: video.value.thumbnail,
-      type: isMovie.value ? 'movie' : 'video',
-      category: video.value.category
-    });
-  }
+	if (video.value) {
+		toggleFavorite({
+			id: video.value._id || video.value.id,
+			title: video.value.title,
+			thumbnail: video.value.thumbnail,
+			type: isMovie.value ? "movie" : "video",
+			category: video.value.category,
+		});
+	}
 }
 
 function processIframe() {
-  // Process iframe after it's inserted via v-html
-  if (video.value && video.value.iframe) {
-    nextTick(() => {
-      const iframe = document.querySelector('.watch-iframe-player iframe');
-      if (iframe) {
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.maxWidth = '100%';
-        iframe.style.maxHeight = '100%';
-        iframe.style.border = 'none';
-        iframe.style.display = 'block';
-      }
-    });
-  }
+	// Process iframe after it's inserted via v-html
+	if (video.value && video.value.iframe) {
+		nextTick(() => {
+			const iframe = document.querySelector(".watch-iframe-player iframe");
+			if (iframe) {
+				iframe.style.width = "100%";
+				iframe.style.height = "100%";
+				iframe.style.maxWidth = "100%";
+				iframe.style.maxHeight = "100%";
+				iframe.style.border = "none";
+				iframe.style.display = "block";
+			}
+		});
+	}
 }
 
 // Watch for video changes to process iframe
-watch(() => video.value, () => {
-  processIframe();
-  
-  // Update page title when video loads
-  if (video.value && video.value.title) {
-    document.title = `${video.value.title} - Cineflix`;
-  }
-}, { deep: true });
+watch(
+	() => video.value,
+	() => {
+		processIframe();
+
+		// Update page title when video loads
+		if (video.value && video.value.title) {
+			document.title = `${video.value.title} - Cineflix`;
+		}
+	},
+	{ deep: true },
+);
 
 onMounted(async () => {
-  // Set default title while loading
-  document.title = 'Loading... - Cineflix';
-  
-  // Scroll to top on initial mount
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  
-  await checkPremiumStatus();
-  await Promise.all([loadVideos(), loadMovies()]);
-  await loadVideo();
-  processIframe();
-  
-  // Load tag-based recommendations after initial load if deferred
-  if (shouldDeferRecommendations.value && video.value) {
-    setTimeout(() => {
-      loadTagBasedRecommendations();
-    }, 2000); // Delay 2 seconds on slow networks
-  }
-  
-  // Update title if video loaded
-  if (video.value && video.value.title) {
-    document.title = `${video.value.title} - Cineflix`;
-  } else {
-    document.title = 'Video - Cineflix';
-  }
+	// Set default title while loading
+	document.title = "Loading... - Cineflix";
+
+	// Scroll to top on initial mount
+	window.scrollTo({ top: 0, behavior: "instant" });
+
+	await checkPremiumStatus();
+	await Promise.all([loadVideos(), loadMovies()]);
+	await loadVideo();
+	processIframe();
+
+	// Load tag-based recommendations after initial load if deferred
+	if (shouldDeferRecommendations.value && video.value) {
+		setTimeout(() => {
+			loadTagBasedRecommendations();
+		}, 2000); // Delay 2 seconds on slow networks
+	}
+
+	// Update title if video loaded
+	if (video.value && video.value.title) {
+		document.title = `${video.value.title} - Cineflix`;
+	} else {
+		document.title = "Video - Cineflix";
+	}
 });
 
 onBeforeUnmount(() => {
-  destroyHls();
+	destroyHls();
 });
 </script>
 

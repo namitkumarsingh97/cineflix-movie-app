@@ -178,11 +178,11 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted } from "vue";
 
 onMounted(() => {
-  document.title = 'About Us - MovieHub';
-  window.scrollTo(0, 0);
+	document.title = "About Us - MovieHub";
+	window.scrollTo(0, 0);
 });
 </script>
 

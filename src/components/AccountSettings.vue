@@ -165,33 +165,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { Eye, EyeOff, Loader2, Trash2, AlertTriangle } from 'lucide-vue-next';
-import { accountApi } from '../api/account';
-import { useAuth } from '../composables/useAuth';
+import { AlertTriangle, Eye, EyeOff, Loader2, Trash2 } from "lucide-vue-next";
+import { onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
+import { accountApi } from "../api/account";
+import { useAuth } from "../composables/useAuth";
 
 const props = defineProps({
-  user: {
-    type: Object,
-    default: null,
-  },
+	user: {
+		type: Object,
+		default: null,
+	},
 });
 
-const emit = defineEmits(['updated']);
+const emit = defineEmits(["updated"]);
 
 const router = useRouter();
 const { logout } = useAuth();
 
 const profileData = ref({
-  name: '',
-  email: '',
+	name: "",
+	email: "",
 });
 
 const passwordData = ref({
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: '',
+	currentPassword: "",
+	newPassword: "",
+	confirmPassword: "",
 });
 
 const showCurrentPassword = ref(false);
@@ -201,127 +201,141 @@ const updating = ref(false);
 const changingPassword = ref(false);
 const deleting = ref(false);
 const showDeleteModal = ref(false);
-const deletePassword = ref('');
+const deletePassword = ref("");
 const loading = ref(false);
 
 // Fetch profile data from backend
 async function loadProfile() {
-  loading.value = true;
-  try {
-    const response = await accountApi.getProfile();
-    if (response.success && response.user) {
-      profileData.value = {
-        name: response.user.name || '',
-        email: response.user.email || '',
-      };
-    }
-  } catch (error) {
-    console.error('Error loading profile:', error);
-    // Fallback to props if API fails
-    if (props.user) {
-      profileData.value = {
-        name: props.user.name || '',
-        email: props.user.email || '',
-      };
-    }
-  } finally {
-    loading.value = false;
-  }
+	loading.value = true;
+	try {
+		const response = await accountApi.getProfile();
+		if (response.success && response.user) {
+			profileData.value = {
+				name: response.user.name || "",
+				email: response.user.email || "",
+			};
+		}
+	} catch (error) {
+		console.error("Error loading profile:", error);
+		// Fallback to props if API fails
+		if (props.user) {
+			profileData.value = {
+				name: props.user.name || "",
+				email: props.user.email || "",
+			};
+		}
+	} finally {
+		loading.value = false;
+	}
 }
 
 onMounted(async () => {
-  // First try to load from backend
-  await loadProfile();
-  
-  // Fallback to props if backend data not available
-  if (!profileData.value.name && !profileData.value.email && props.user) {
-    profileData.value = {
-      name: props.user.name || '',
-      email: props.user.email || '',
-    };
-  }
+	// First try to load from backend
+	await loadProfile();
+
+	// Fallback to props if backend data not available
+	if (!profileData.value.name && !profileData.value.email && props.user) {
+		profileData.value = {
+			name: props.user.name || "",
+			email: props.user.email || "",
+		};
+	}
 });
 
 // Watch for user prop changes
-watch(() => props.user, (newUser) => {
-  if (newUser) {
-    profileData.value = {
-      name: newUser.name || '',
-      email: newUser.email || '',
-    };
-  }
-}, { deep: true });
+watch(
+	() => props.user,
+	(newUser) => {
+		if (newUser) {
+			profileData.value = {
+				name: newUser.name || "",
+				email: newUser.email || "",
+			};
+		}
+	},
+	{ deep: true },
+);
 
 async function handleUpdateProfile() {
-  updating.value = true;
-  try {
-    const response = await accountApi.updateProfile(profileData.value);
-    if (response.success) {
-      // Reload profile data from backend to get updated info
-      await loadProfile();
-      emit('updated');
-      alert('Profile updated successfully!');
-    } else {
-      throw new Error(response.message || 'Failed to update profile');
-    }
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    alert(error.response?.data?.message || error.message || 'Failed to update profile. Please try again.');
-  } finally {
-    updating.value = false;
-  }
+	updating.value = true;
+	try {
+		const response = await accountApi.updateProfile(profileData.value);
+		if (response.success) {
+			// Reload profile data from backend to get updated info
+			await loadProfile();
+			emit("updated");
+			alert("Profile updated successfully!");
+		} else {
+			throw new Error(response.message || "Failed to update profile");
+		}
+	} catch (error) {
+		console.error("Error updating profile:", error);
+		alert(
+			error.response?.data?.message ||
+				error.message ||
+				"Failed to update profile. Please try again.",
+		);
+	} finally {
+		updating.value = false;
+	}
 }
 
 async function handleChangePassword() {
-  if (passwordData.value.newPassword !== passwordData.value.confirmPassword) {
-    alert('New passwords do not match');
-    return;
-  }
+	if (passwordData.value.newPassword !== passwordData.value.confirmPassword) {
+		alert("New passwords do not match");
+		return;
+	}
 
-  if (passwordData.value.newPassword.length < 8) {
-    alert('Password must be at least 8 characters long');
-    return;
-  }
+	if (passwordData.value.newPassword.length < 8) {
+		alert("Password must be at least 8 characters long");
+		return;
+	}
 
-  changingPassword.value = true;
-  try {
-    await accountApi.changePassword({
-      currentPassword: passwordData.value.currentPassword,
-      newPassword: passwordData.value.newPassword,
-    });
-    alert('Password changed successfully!');
-    // Clear form
-    passwordData.value = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    };
-  } catch (error) {
-    console.error('Error changing password:', error);
-    alert(error.response?.data?.message || 'Failed to change password. Please try again.');
-  } finally {
-    changingPassword.value = false;
-  }
+	changingPassword.value = true;
+	try {
+		await accountApi.changePassword({
+			currentPassword: passwordData.value.currentPassword,
+			newPassword: passwordData.value.newPassword,
+		});
+		alert("Password changed successfully!");
+		// Clear form
+		passwordData.value = {
+			currentPassword: "",
+			newPassword: "",
+			confirmPassword: "",
+		};
+	} catch (error) {
+		console.error("Error changing password:", error);
+		alert(
+			error.response?.data?.message ||
+				"Failed to change password. Please try again.",
+		);
+	} finally {
+		changingPassword.value = false;
+	}
 }
 
 async function handleDeleteAccount() {
-  if (!confirm('Are you absolutely sure? This action cannot be undone!')) {
-    return;
-  }
+	if (!confirm("Are you absolutely sure? This action cannot be undone!")) {
+		return;
+	}
 
-  deleting.value = true;
-  try {
-    await accountApi.deleteAccount(deletePassword.value);
-    alert('Account deleted successfully');
-    await logout();
-    router.push('/');
-  } catch (error) {
-    console.error('Error deleting account:', error);
-    alert(error.response?.data?.message || 'Failed to delete account. Please try again.');
-  } finally {
-    deleting.value = false;
-    showDeleteModal.value = false;
-  }
+	deleting.value = true;
+	try {
+		await accountApi.deleteAccount(deletePassword.value);
+		alert("Account deleted successfully");
+		await logout();
+		router.push("/");
+	} catch (error) {
+		console.error("Error deleting account:", error);
+		alert(
+			error.response?.data?.message ||
+				"Failed to delete account. Please try again.",
+		);
+	} finally {
+		deleting.value = false;
+		showDeleteModal.value = false;
+	}
 }
 </script>
 

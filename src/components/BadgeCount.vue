@@ -6,14 +6,14 @@
 
 <script setup>
 defineProps({
-  count: {
-    type: Number,
-    default: 0,
-  },
-  pulse: {
-    type: Boolean,
-    default: false,
-  },
+	count: {
+		type: Number,
+		default: 0,
+	},
+	pulse: {
+		type: Boolean,
+		default: false,
+	},
 });
 </script>
 

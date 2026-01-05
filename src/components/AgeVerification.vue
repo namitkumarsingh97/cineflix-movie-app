@@ -68,153 +68,154 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { onMounted, ref, watch } from "vue";
 
 const isVerified = ref(false);
 
 function agreeAndEnter() {
-  // Store verification in localStorage
-  localStorage.setItem('ageVerified', 'true');
-  localStorage.setItem('ageVerifiedTimestamp', Date.now().toString());
-  isVerified.value = true;
-  
-  // Unlock body scroll
-  document.body.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.width = '';
-  
-  // Remove event listeners
-  document.removeEventListener('contextmenu', preventDefault);
-  document.removeEventListener('keydown', preventShortcuts);
-  document.removeEventListener('selectstart', preventDefault);
-  document.removeEventListener('dragstart', preventDefault);
+	// Store verification in localStorage
+	localStorage.setItem("ageVerified", "true");
+	localStorage.setItem("ageVerifiedTimestamp", Date.now().toString());
+	isVerified.value = true;
+
+	// Unlock body scroll
+	document.body.style.overflow = "";
+	document.body.style.position = "";
+	document.body.style.width = "";
+
+	// Remove event listeners
+	document.removeEventListener("contextmenu", preventDefault);
+	document.removeEventListener("keydown", preventShortcuts);
+	document.removeEventListener("selectstart", preventDefault);
+	document.removeEventListener("dragstart", preventDefault);
 }
 
 function exitSite() {
-  // Redirect to a safe page or close window
-  window.location.href = 'https://www.google.com';
+	// Redirect to a safe page or close window
+	window.location.href = "https://www.google.com";
 }
 
 function checkVerification() {
-  const verified = localStorage.getItem('ageVerified');
-  const timestamp = localStorage.getItem('ageVerifiedTimestamp');
-  
-  if (verified === 'true' && timestamp) {
-    // Check if verification is still valid (optional: expire after 30 days)
-    const verificationDate = parseInt(timestamp);
-    const daysSinceVerification = (Date.now() - verificationDate) / (1000 * 60 * 60 * 24);
-    
-    // Verification expires after 30 days (optional - remove if you want permanent)
-    if (daysSinceVerification < 30) {
-      isVerified.value = true;
-      // Remove event listeners when verified
-      document.removeEventListener('contextmenu', preventDefault);
-      document.removeEventListener('keydown', preventShortcuts);
-    } else {
-      // Expired - require re-verification
-      localStorage.removeItem('ageVerified');
-      localStorage.removeItem('ageVerifiedTimestamp');
-    }
-  }
+	const verified = localStorage.getItem("ageVerified");
+	const timestamp = localStorage.getItem("ageVerifiedTimestamp");
+
+	if (verified === "true" && timestamp) {
+		// Check if verification is still valid (optional: expire after 30 days)
+		const verificationDate = parseInt(timestamp);
+		const daysSinceVerification =
+			(Date.now() - verificationDate) / (1000 * 60 * 60 * 24);
+
+		// Verification expires after 30 days (optional - remove if you want permanent)
+		if (daysSinceVerification < 30) {
+			isVerified.value = true;
+			// Remove event listeners when verified
+			document.removeEventListener("contextmenu", preventDefault);
+			document.removeEventListener("keydown", preventShortcuts);
+		} else {
+			// Expired - require re-verification
+			localStorage.removeItem("ageVerified");
+			localStorage.removeItem("ageVerifiedTimestamp");
+		}
+	}
 }
 
 function preventDefault(e) {
-  e.preventDefault();
-  return false;
+	e.preventDefault();
+	return false;
 }
 
 function preventShortcuts(e) {
-  // Prevent F12, Ctrl+Shift+I, Ctrl+U, etc.
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-    (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-    (e.ctrlKey && e.key === 'U')
-  ) {
-    e.preventDefault();
-    return false;
-  }
+	// Prevent F12, Ctrl+Shift+I, Ctrl+U, etc.
+	if (
+		e.key === "F12" ||
+		(e.ctrlKey && e.shiftKey && e.key === "I") ||
+		(e.ctrlKey && e.shiftKey && e.key === "C") ||
+		(e.ctrlKey && e.key === "U")
+	) {
+		e.preventDefault();
+		return false;
+	}
 }
 
 onMounted(() => {
-  checkVerification();
-  
-  // Prevent right-click and other shortcuts when not verified
-  if (!isVerified.value) {
-    // Lock body scroll and hide all content
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
-    
-    // Hide app content
-    const appContent = document.querySelector('.app-content');
-    if (appContent) {
-      appContent.style.display = 'none';
-      appContent.style.visibility = 'hidden';
-    }
-    
-    document.addEventListener('contextmenu', preventDefault);
-    document.addEventListener('keydown', preventShortcuts);
-    document.addEventListener('selectstart', preventDefault);
-    document.addEventListener('dragstart', preventDefault);
-  } else {
-    // Unlock body scroll when verified
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.width = '';
-    document.body.style.height = '';
-    
-    // Show app content
-    const appContent = document.querySelector('.app-content');
-    if (appContent) {
-      appContent.style.display = '';
-      appContent.style.visibility = '';
-    }
-  }
+	checkVerification();
+
+	// Prevent right-click and other shortcuts when not verified
+	if (!isVerified.value) {
+		// Lock body scroll and hide all content
+		document.body.style.overflow = "hidden";
+		document.body.style.position = "fixed";
+		document.body.style.width = "100%";
+		document.body.style.height = "100%";
+
+		// Hide app content
+		const appContent = document.querySelector(".app-content");
+		if (appContent) {
+			appContent.style.display = "none";
+			appContent.style.visibility = "hidden";
+		}
+
+		document.addEventListener("contextmenu", preventDefault);
+		document.addEventListener("keydown", preventShortcuts);
+		document.addEventListener("selectstart", preventDefault);
+		document.addEventListener("dragstart", preventDefault);
+	} else {
+		// Unlock body scroll when verified
+		document.body.style.overflow = "";
+		document.body.style.position = "";
+		document.body.style.width = "";
+		document.body.style.height = "";
+
+		// Show app content
+		const appContent = document.querySelector(".app-content");
+		if (appContent) {
+			appContent.style.display = "";
+			appContent.style.visibility = "";
+		}
+	}
 });
 
 // Watch for verification changes
 watch(isVerified, (verified) => {
-  if (verified) {
-    // Unlock body scroll
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.width = '';
-    document.body.style.height = '';
-    
-    // Show app content
-    const appContent = document.querySelector('.app-content');
-    if (appContent) {
-      appContent.style.display = '';
-      appContent.style.visibility = '';
-    }
-    
-    // Remove event listeners
-    document.removeEventListener('contextmenu', preventDefault);
-    document.removeEventListener('keydown', preventShortcuts);
-    document.removeEventListener('selectstart', preventDefault);
-    document.removeEventListener('dragstart', preventDefault);
-  } else {
-    // Lock body scroll
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
-    
-    // Hide app content
-    const appContent = document.querySelector('.app-content');
-    if (appContent) {
-      appContent.style.display = 'none';
-      appContent.style.visibility = 'hidden';
-    }
-    
-    // Add event listeners
-    document.addEventListener('contextmenu', preventDefault);
-    document.addEventListener('keydown', preventShortcuts);
-    document.addEventListener('selectstart', preventDefault);
-    document.addEventListener('dragstart', preventDefault);
-  }
+	if (verified) {
+		// Unlock body scroll
+		document.body.style.overflow = "";
+		document.body.style.position = "";
+		document.body.style.width = "";
+		document.body.style.height = "";
+
+		// Show app content
+		const appContent = document.querySelector(".app-content");
+		if (appContent) {
+			appContent.style.display = "";
+			appContent.style.visibility = "";
+		}
+
+		// Remove event listeners
+		document.removeEventListener("contextmenu", preventDefault);
+		document.removeEventListener("keydown", preventShortcuts);
+		document.removeEventListener("selectstart", preventDefault);
+		document.removeEventListener("dragstart", preventDefault);
+	} else {
+		// Lock body scroll
+		document.body.style.overflow = "hidden";
+		document.body.style.position = "fixed";
+		document.body.style.width = "100%";
+		document.body.style.height = "100%";
+
+		// Hide app content
+		const appContent = document.querySelector(".app-content");
+		if (appContent) {
+			appContent.style.display = "none";
+			appContent.style.visibility = "hidden";
+		}
+
+		// Add event listeners
+		document.addEventListener("contextmenu", preventDefault);
+		document.addEventListener("keydown", preventShortcuts);
+		document.addEventListener("selectstart", preventDefault);
+		document.addEventListener("dragstart", preventDefault);
+	}
 });
 </script>
 

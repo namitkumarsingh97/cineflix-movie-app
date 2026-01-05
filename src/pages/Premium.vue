@@ -193,28 +193,29 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useSubscription } from '../composables/useSubscription';
-import { useEporner } from '../composables/useEporner';
-import PremiumVideoCard from '../components/PremiumVideoCard.vue';
-import UPIPaymentModal from '../components/UPIPaymentModal.vue';
-import Loader from '../components/Loader.vue';
 import {
-  Crown,
-  Check,
-  Film,
-  Lock,
-  Zap,
-  Shield,
-  Star,
-  Play,
-  X,
-  CheckCircle,
-} from 'lucide-vue-next';
+	Check,
+	CheckCircle,
+	Crown,
+	Film,
+	Lock,
+	Play,
+	Shield,
+	Star,
+	X,
+	Zap,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import Loader from "../components/Loader.vue";
+import PremiumVideoCard from "../components/PremiumVideoCard.vue";
+import UPIPaymentModal from "../components/UPIPaymentModal.vue";
+import { useEporner } from "../composables/useEporner";
+import { useSubscription } from "../composables/useSubscription";
 
 const router = useRouter();
-const { isPremium, subscription, checkPremiumStatus, cancelSubscription } = useSubscription();
+const { isPremium, subscription, checkPremiumStatus, cancelSubscription } =
+	useSubscription();
 const { videos: epornerVideos, loading, searchVideos } = useEporner();
 
 const premiumVideos = ref([]);
@@ -224,211 +225,227 @@ const showPaymentSuccess = ref(false);
 const selectedPlan = ref(null);
 
 const subscriptionPlans = [
-  {
-    id: 'monthly',
-    name: 'Monthly',
-    price: 9.99,
-    period: 'month',
-    featured: false,
-    features: [
-      'Access to all premium content',
-      'HD & 4K quality streaming',
-      'Ad-free experience',
-      'Download for offline viewing',
-      'Priority customer support',
-    ],
-  },
-  {
-    id: 'yearly',
-    name: 'Yearly',
-    price: 79.99,
-    period: 'year',
-    featured: true,
-    features: [
-      'Access to all premium content',
-      'HD & 4K quality streaming',
-      'Ad-free experience',
-      'Download for offline viewing',
-      'Priority customer support',
-      'Save 33% compared to monthly',
-    ],
-  },
-  {
-    id: 'lifetime',
-    name: 'Lifetime',
-    price: 199.99,
-    period: 'one-time',
-    featured: false,
-    features: [
-      'Lifetime access to all premium content',
-      'HD & 4K quality streaming',
-      'Ad-free experience',
-      'Download for offline viewing',
-      'Priority customer support',
-      'All future updates included',
-    ],
-  },
+	{
+		id: "monthly",
+		name: "Monthly",
+		price: 9.99,
+		period: "month",
+		featured: false,
+		features: [
+			"Access to all premium content",
+			"HD & 4K quality streaming",
+			"Ad-free experience",
+			"Download for offline viewing",
+			"Priority customer support",
+		],
+	},
+	{
+		id: "yearly",
+		name: "Yearly",
+		price: 79.99,
+		period: "year",
+		featured: true,
+		features: [
+			"Access to all premium content",
+			"HD & 4K quality streaming",
+			"Ad-free experience",
+			"Download for offline viewing",
+			"Priority customer support",
+			"Save 33% compared to monthly",
+		],
+	},
+	{
+		id: "lifetime",
+		name: "Lifetime",
+		price: 199.99,
+		period: "one-time",
+		featured: false,
+		features: [
+			"Lifetime access to all premium content",
+			"HD & 4K quality streaming",
+			"Ad-free experience",
+			"Download for offline viewing",
+			"Priority customer support",
+			"All future updates included",
+		],
+	},
 ];
 
 const premiumFeatures = [
-  {
-    title: 'Exclusive Content',
-    description: 'Access to premium-only videos and exclusive releases',
-    icon: Star,
-  },
-  {
-    title: 'HD & 4K Quality',
-    description: 'Stream in the highest quality available',
-    icon: Zap,
-  },
-  {
-    title: 'Ad-Free Experience',
-    description: 'Enjoy uninterrupted viewing without ads',
-    icon: Shield,
-  },
-  {
-    title: 'Offline Downloads',
-    description: 'Download videos to watch offline anytime',
-    icon: Lock,
-  },
+	{
+		title: "Exclusive Content",
+		description: "Access to premium-only videos and exclusive releases",
+		icon: Star,
+	},
+	{
+		title: "HD & 4K Quality",
+		description: "Stream in the highest quality available",
+		icon: Zap,
+	},
+	{
+		title: "Ad-Free Experience",
+		description: "Enjoy uninterrupted viewing without ads",
+		icon: Shield,
+	},
+	{
+		title: "Offline Downloads",
+		description: "Download videos to watch offline anytime",
+		icon: Lock,
+	},
 ];
 
 onMounted(async () => {
-  await checkPremiumStatus();
-  await loadPremiumContent();
-  console.log('Premium page mounted', { 
-    isPremium: isPremium.value, 
-    subscription: subscription.value 
-  });
+	await checkPremiumStatus();
+	await loadPremiumContent();
+	console.log("Premium page mounted", {
+		isPremium: isPremium.value,
+		subscription: subscription.value,
+	});
 });
 
 async function loadPremiumContent() {
-  try {
-    // Load premium-tagged videos
-    await searchVideos('premium', 1, { perPage: 20 });
-    premiumVideos.value = epornerVideos.value
-      .filter(video => video.isPremium || video.tags?.includes('premium'))
-      .slice(0, 12);
-  } catch (error) {
-    console.error('Error loading premium content:', error);
-  }
+	try {
+		// Load premium-tagged videos
+		await searchVideos("premium", 1, { perPage: 20 });
+		premiumVideos.value = epornerVideos.value
+			.filter((video) => video.isPremium || video.tags?.includes("premium"))
+			.slice(0, 12);
+	} catch (error) {
+		console.error("Error loading premium content:", error);
+	}
 }
 
 function selectPlan(plan) {
-  console.log('selectPlan called', { 
-    plan, 
-    isPremium: isPremium.value, 
-    subscription: subscription.value,
-    showSubscriptionDetails: showSubscriptionDetails.value
-  });
-  
-  if (isPremium.value) {
-    // If already premium, show subscription details
-    console.log('User is premium, showing subscription details');
-    showSubscriptionDetails.value = true;
-    console.log('showSubscriptionDetails set to:', showSubscriptionDetails.value);
-    return;
-  }
-  
-  console.log('User is not premium, showing payment modal');
-  selectedPlan.value = plan;
-  showPaymentModal.value = true;
+	console.log("selectPlan called", {
+		plan,
+		isPremium: isPremium.value,
+		subscription: subscription.value,
+		showSubscriptionDetails: showSubscriptionDetails.value,
+	});
+
+	if (isPremium.value) {
+		// If already premium, show subscription details
+		console.log("User is premium, showing subscription details");
+		showSubscriptionDetails.value = true;
+		console.log(
+			"showSubscriptionDetails set to:",
+			showSubscriptionDetails.value,
+		);
+		return;
+	}
+
+	console.log("User is not premium, showing payment modal");
+	selectedPlan.value = plan;
+	showPaymentModal.value = true;
 }
 
 function handleVideoClick(video) {
-  if (!isPremium.value) {
-    selectedPlan.value = subscriptionPlans[1]; // Default to yearly
-    showPaymentModal.value = true;
-    return;
-  }
-  router.push(`/watch/${video.id}`);
+	if (!isPremium.value) {
+		selectedPlan.value = subscriptionPlans[1]; // Default to yearly
+		showPaymentModal.value = true;
+		return;
+	}
+	router.push(`/watch/${video.id}`);
 }
 
 async function handlePaymentSuccess(subscriptionData) {
-  console.log('🎉 Payment success handler called with subscription:', subscriptionData);
-  
-  // Close payment modal immediately
-  showPaymentModal.value = false;
-  
-  // Refresh premium status from backend (with retry logic)
-  let retries = 3;
-  let subscriptionFound = false;
-  
-  while (retries > 0 && !subscriptionFound) {
-    await checkPremiumStatus();
-    
-    if (isPremium.value && subscription.value) {
-      subscriptionFound = true;
-      console.log('✅ Subscription found in DB:', subscription.value);
-      break;
-    }
-    
-    // Wait a bit before retrying
-    if (retries > 1) {
-      console.log(`⏳ Subscription not found yet, retrying... (${retries - 1} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    retries--;
-  }
-  
-  // Reload premium content
-  await loadPremiumContent();
-  
-  // Dispatch custom event to notify other components (like Dashboard)
-  window.dispatchEvent(new CustomEvent('subscription-updated', {
-    detail: { 
-      subscription: subscription.value || subscriptionData, 
-      isPremium: isPremium.value 
-    }
-  }));
-  
-  // Check if subscription is now active
-  if (isPremium.value && subscription.value) {
-    // Success - show success modal
-    console.log('✅ Showing success modal');
-    showPaymentSuccess.value = true;
-  } else {
-    // Fallback: Even if status check failed, show success if we have subscription data
-    if (subscriptionData) {
-      console.log('✅ Using subscription data from payment response');
-      showPaymentSuccess.value = true;
-    } else {
-      // Payment might still be processing
-      alert('✅ Payment received! Your subscription is being activated. Redirecting to dashboard to check status...');
-      setTimeout(() => {
-        router.push('/dashboard?tab=subscription');
-      }, 1500);
-    }
-  }
+	console.log(
+		"🎉 Payment success handler called with subscription:",
+		subscriptionData,
+	);
+
+	// Close payment modal immediately
+	showPaymentModal.value = false;
+
+	// Refresh premium status from backend (with retry logic)
+	let retries = 3;
+	let subscriptionFound = false;
+
+	while (retries > 0 && !subscriptionFound) {
+		await checkPremiumStatus();
+
+		if (isPremium.value && subscription.value) {
+			subscriptionFound = true;
+			console.log("✅ Subscription found in DB:", subscription.value);
+			break;
+		}
+
+		// Wait a bit before retrying
+		if (retries > 1) {
+			console.log(
+				`⏳ Subscription not found yet, retrying... (${retries - 1} attempts left)`,
+			);
+			await new Promise((resolve) => setTimeout(resolve, 2000));
+		}
+		retries--;
+	}
+
+	// Reload premium content
+	await loadPremiumContent();
+
+	// Dispatch custom event to notify other components (like Dashboard)
+	window.dispatchEvent(
+		new CustomEvent("subscription-updated", {
+			detail: {
+				subscription: subscription.value || subscriptionData,
+				isPremium: isPremium.value,
+			},
+		}),
+	);
+
+	// Check if subscription is now active
+	if (isPremium.value && subscription.value) {
+		// Success - show success modal
+		console.log("✅ Showing success modal");
+		showPaymentSuccess.value = true;
+	} else {
+		// Fallback: Even if status check failed, show success if we have subscription data
+		if (subscriptionData) {
+			console.log("✅ Using subscription data from payment response");
+			showPaymentSuccess.value = true;
+		} else {
+			// Payment might still be processing
+			alert(
+				"✅ Payment received! Your subscription is being activated. Redirecting to dashboard to check status...",
+			);
+			setTimeout(() => {
+				router.push("/dashboard?tab=subscription");
+			}, 1500);
+		}
+	}
 }
 
 function goToDashboard() {
-  showPaymentSuccess.value = false;
-  router.push('/dashboard?tab=subscription');
+	showPaymentSuccess.value = false;
+	router.push("/dashboard?tab=subscription");
 }
 
 function formatDate(dateString) {
-  if (!dateString) return 'N/A';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-IN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+	if (!dateString) return "N/A";
+	const date = new Date(dateString);
+	return date.toLocaleDateString("en-IN", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 }
 
 async function handleCancelSubscription() {
-  if (confirm('Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.')) {
-    try {
-      await cancelSubscription();
-      await checkPremiumStatus();
-      showSubscriptionDetails.value = false;
-      alert('Subscription cancelled successfully.');
-    } catch (error) {
-      console.error('Error cancelling subscription:', error);
-      alert('Failed to cancel subscription. Please try again.');
-    }
-  }
+	if (
+		confirm(
+			"Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.",
+		)
+	) {
+		try {
+			await cancelSubscription();
+			await checkPremiumStatus();
+			showSubscriptionDetails.value = false;
+			alert("Subscription cancelled successfully.");
+		} catch (error) {
+			console.error("Error cancelling subscription:", error);
+			alert("Failed to cancel subscription. Please try again.");
+		}
+	}
 }
 </script>
 

@@ -152,46 +152,46 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
 import {
-  Layout,
-  X,
-  Eye,
-  EyeOff,
-  ChevronUp,
-  ChevronDown,
-  RotateCcw,
-  Film,
-  Clock,
-  TrendingUp,
-  Calendar,
-  Crown,
-  Star,
-  Grid3x3,
-  Sidebar,
-  Menu,
-  FolderOpen,
-  Check,
-} from 'lucide-vue-next';
-import { useHomeLayout } from '../composables/useHomeLayout';
+	Calendar,
+	Check,
+	ChevronDown,
+	ChevronUp,
+	Clock,
+	Crown,
+	Eye,
+	EyeOff,
+	Film,
+	FolderOpen,
+	Grid3x3,
+	Layout,
+	Menu,
+	RotateCcw,
+	Sidebar,
+	Star,
+	TrendingUp,
+	X,
+} from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useHomeLayout } from "../composables/useHomeLayout";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false
-  }
+	show: {
+		type: Boolean,
+		default: false,
+	},
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const {
-  preferences,
-  availableSections,
-  toggleSection,
-  moveSectionUp,
-  moveSectionDown,
-  resetToDefaults: resetSectionsToDefaults,
-  isSectionEnabled
+	preferences,
+	availableSections,
+	toggleSection,
+	moveSectionUp,
+	moveSectionDown,
+	resetToDefaults: resetSectionsToDefaults,
+	isSectionEnabled,
 } = useHomeLayout();
 
 // Sidebar and Navbar preferences
@@ -200,147 +200,163 @@ const navbarEnabled = ref(true);
 
 // Featured categories
 const featuredCategories = ref([
-  { id: 'double-penetration', label: 'Double Penetration', enabled: true },
-  { id: 'amateur', label: 'Amateur', enabled: true },
-  { id: 'anal', label: 'Anal', enabled: true },
-  { id: 'asian', label: 'Asian', enabled: true },
-  { id: 'bdsm', label: 'BDSM', enabled: true },
-  { id: 'big-ass', label: 'Big Ass', enabled: true },
-  { id: 'big-dick', label: 'Big Dick', enabled: true },
-  { id: 'big-tits', label: 'Big Tits', enabled: true },
-  { id: 'bisexual', label: 'Bisexual', enabled: true },
-  { id: 'blonde', label: 'Blonde', enabled: true },
-  { id: 'blowjob', label: 'Blowjob', enabled: true },
-  { id: 'brunette', label: 'Brunette', enabled: true },
-  { id: 'bukkake', label: 'Bukkake', enabled: true },
-  { id: 'creampie', label: 'Creampie', enabled: true },
-  { id: 'cumshot', label: 'Cumshot', enabled: true },
-  { id: 'ebony', label: 'Ebony', enabled: true },
-  { id: 'for-women', label: 'For Women', enabled: true },
-  { id: 'group-sex', label: 'Group Sex', enabled: true },
-  { id: 'handjob', label: 'Handjob', enabled: true },
-  { id: 'hardcore', label: 'Hardcore', enabled: true },
-  { id: 'hentai', label: 'Hentai', enabled: true },
-  { id: 'homemade', label: 'Homemade', enabled: true },
-  { id: 'hotel', label: 'Hotel', enabled: true },
-  { id: 'housewives', label: 'Housewives', enabled: true },
-  { id: 'interracial', label: 'Interracial', enabled: true },
-  { id: 'latina', label: 'Latina', enabled: true },
-  { id: 'lesbian', label: 'Lesbian', enabled: true },
-  { id: 'massage', label: 'Massage', enabled: true },
-  { id: 'masturbation', label: 'Masturbation', enabled: true },
-  { id: 'mature', label: 'Mature', enabled: true },
-  { id: 'milf', label: 'MILF', enabled: true },
-  { id: 'nurse', label: 'Nurse', enabled: true },
-  { id: 'office', label: 'Office', enabled: true },
-  { id: 'outdoor', label: 'Outdoor', enabled: true },
-  { id: 'pov', label: 'POV', enabled: true },
-  { id: 'public', label: 'Public', enabled: true },
-  { id: 'shemale', label: 'Shemale', enabled: true },
-  { id: 'sleep', label: 'Sleep', enabled: true },
-  { id: 'small-tits', label: 'Small Tits', enabled: true },
-  { id: 'squirt', label: 'Squirt', enabled: true },
+	{ id: "double-penetration", label: "Double Penetration", enabled: true },
+	{ id: "amateur", label: "Amateur", enabled: true },
+	{ id: "anal", label: "Anal", enabled: true },
+	{ id: "asian", label: "Asian", enabled: true },
+	{ id: "bdsm", label: "BDSM", enabled: true },
+	{ id: "big-ass", label: "Big Ass", enabled: true },
+	{ id: "big-dick", label: "Big Dick", enabled: true },
+	{ id: "big-tits", label: "Big Tits", enabled: true },
+	{ id: "bisexual", label: "Bisexual", enabled: true },
+	{ id: "blonde", label: "Blonde", enabled: true },
+	{ id: "blowjob", label: "Blowjob", enabled: true },
+	{ id: "brunette", label: "Brunette", enabled: true },
+	{ id: "bukkake", label: "Bukkake", enabled: true },
+	{ id: "creampie", label: "Creampie", enabled: true },
+	{ id: "cumshot", label: "Cumshot", enabled: true },
+	{ id: "ebony", label: "Ebony", enabled: true },
+	{ id: "for-women", label: "For Women", enabled: true },
+	{ id: "group-sex", label: "Group Sex", enabled: true },
+	{ id: "handjob", label: "Handjob", enabled: true },
+	{ id: "hardcore", label: "Hardcore", enabled: true },
+	{ id: "hentai", label: "Hentai", enabled: true },
+	{ id: "homemade", label: "Homemade", enabled: true },
+	{ id: "hotel", label: "Hotel", enabled: true },
+	{ id: "housewives", label: "Housewives", enabled: true },
+	{ id: "interracial", label: "Interracial", enabled: true },
+	{ id: "latina", label: "Latina", enabled: true },
+	{ id: "lesbian", label: "Lesbian", enabled: true },
+	{ id: "massage", label: "Massage", enabled: true },
+	{ id: "masturbation", label: "Masturbation", enabled: true },
+	{ id: "mature", label: "Mature", enabled: true },
+	{ id: "milf", label: "MILF", enabled: true },
+	{ id: "nurse", label: "Nurse", enabled: true },
+	{ id: "office", label: "Office", enabled: true },
+	{ id: "outdoor", label: "Outdoor", enabled: true },
+	{ id: "pov", label: "POV", enabled: true },
+	{ id: "public", label: "Public", enabled: true },
+	{ id: "shemale", label: "Shemale", enabled: true },
+	{ id: "sleep", label: "Sleep", enabled: true },
+	{ id: "small-tits", label: "Small Tits", enabled: true },
+	{ id: "squirt", label: "Squirt", enabled: true },
 ]);
 
 const maxOrder = computed(() => {
-  return Math.max(...preferences.value.map(p => p.order));
+	return Math.max(...preferences.value.map((p) => p.order));
 });
 
 function getSectionOrder(sectionId) {
-  const pref = preferences.value.find(p => p.id === sectionId);
-  return pref ? pref.order : 0;
+	const pref = preferences.value.find((p) => p.id === sectionId);
+	return pref ? pref.order : 0;
 }
 
 function getIcon(iconName) {
-  const icons = {
-    Film,
-    Clock,
-    TrendingUp,
-    Calendar,
-    Crown,
-    Star,
-  };
-  return icons[iconName] || Film;
+	const icons = {
+		Film,
+		Clock,
+		TrendingUp,
+		Calendar,
+		Crown,
+		Star,
+	};
+	return icons[iconName] || Film;
 }
 
 function loadPreferences() {
-  // Load sidebar preference
-  const sidebarPref = localStorage.getItem('categorySidebarEnabled');
-  sidebarEnabled.value = sidebarPref !== null ? sidebarPref === 'true' : true;
-  
-  // Load navbar preference
-  const navbarPref = localStorage.getItem('navbarEnabled');
-  navbarEnabled.value = navbarPref !== null ? navbarPref === 'true' : true;
-  
-  // Load category preferences
-  const categoryPrefs = localStorage.getItem('featuredCategoriesEnabled');
-  if (categoryPrefs) {
-    try {
-      const saved = JSON.parse(categoryPrefs);
-      featuredCategories.value.forEach(cat => {
-        const savedCat = saved.find(s => s.id === cat.id);
-        if (savedCat) {
-          cat.enabled = savedCat.enabled;
-        }
-      });
-    } catch (e) {
-      console.error('Error loading category preferences:', e);
-    }
-  }
+	// Load sidebar preference
+	const sidebarPref = localStorage.getItem("categorySidebarEnabled");
+	sidebarEnabled.value = sidebarPref !== null ? sidebarPref === "true" : true;
+
+	// Load navbar preference
+	const navbarPref = localStorage.getItem("navbarEnabled");
+	navbarEnabled.value = navbarPref !== null ? navbarPref === "true" : true;
+
+	// Load category preferences
+	const categoryPrefs = localStorage.getItem("featuredCategoriesEnabled");
+	if (categoryPrefs) {
+		try {
+			const saved = JSON.parse(categoryPrefs);
+			featuredCategories.value.forEach((cat) => {
+				const savedCat = saved.find((s) => s.id === cat.id);
+				if (savedCat) {
+					cat.enabled = savedCat.enabled;
+				}
+			});
+		} catch (e) {
+			console.error("Error loading category preferences:", e);
+		}
+	}
 }
 
 function saveSidebarPreference() {
-  localStorage.setItem('categorySidebarEnabled', sidebarEnabled.value.toString());
-  // Emit event to update sidebar visibility
-  window.dispatchEvent(new CustomEvent('sidebarPreferenceChanged', { 
-    detail: { enabled: sidebarEnabled.value } 
-  }));
+	localStorage.setItem(
+		"categorySidebarEnabled",
+		sidebarEnabled.value.toString(),
+	);
+	// Emit event to update sidebar visibility
+	window.dispatchEvent(
+		new CustomEvent("sidebarPreferenceChanged", {
+			detail: { enabled: sidebarEnabled.value },
+		}),
+	);
 }
 
 function saveNavbarPreference() {
-  localStorage.setItem('navbarEnabled', navbarEnabled.value.toString());
-  // Emit event to update navbar visibility
-  window.dispatchEvent(new CustomEvent('navbarPreferenceChanged', { 
-    detail: { enabled: navbarEnabled.value } 
-  }));
+	localStorage.setItem("navbarEnabled", navbarEnabled.value.toString());
+	// Emit event to update navbar visibility
+	window.dispatchEvent(
+		new CustomEvent("navbarPreferenceChanged", {
+			detail: { enabled: navbarEnabled.value },
+		}),
+	);
 }
 
 function saveCategoryPreferences() {
-  localStorage.setItem('featuredCategoriesEnabled', JSON.stringify(featuredCategories.value));
-  // Emit event to update categories
-  window.dispatchEvent(new CustomEvent('categoryPreferencesChanged', { 
-    detail: { categories: featuredCategories.value } 
-  }));
+	localStorage.setItem(
+		"featuredCategoriesEnabled",
+		JSON.stringify(featuredCategories.value),
+	);
+	// Emit event to update categories
+	window.dispatchEvent(
+		new CustomEvent("categoryPreferencesChanged", {
+			detail: { categories: featuredCategories.value },
+		}),
+	);
 }
 
 function saveAndClose() {
-  saveSidebarPreference();
-  saveNavbarPreference();
-  saveCategoryPreferences();
-  emit('close');
+	saveSidebarPreference();
+	saveNavbarPreference();
+	saveCategoryPreferences();
+	emit("close");
 }
 
 function resetToDefaults() {
-  if (confirm('Are you sure you want to reset all layout preferences to defaults?')) {
-    // Reset sections
-    resetSectionsToDefaults();
-    
-    // Reset sidebar and navbar
-    sidebarEnabled.value = true;
-    navbarEnabled.value = true;
-    
-    // Reset categories
-    featuredCategories.value.forEach(cat => {
-      cat.enabled = true;
-    });
-    
-    // Save all
-    saveAndClose();
-  }
+	if (
+		confirm(
+			"Are you sure you want to reset all layout preferences to defaults?",
+		)
+	) {
+		// Reset sections
+		resetSectionsToDefaults();
+
+		// Reset sidebar and navbar
+		sidebarEnabled.value = true;
+		navbarEnabled.value = true;
+
+		// Reset categories
+		featuredCategories.value.forEach((cat) => {
+			cat.enabled = true;
+		});
+
+		// Save all
+		saveAndClose();
+	}
 }
 
 onMounted(() => {
-  loadPreferences();
+	loadPreferences();
 });
 </script>
 

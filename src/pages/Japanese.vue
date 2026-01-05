@@ -104,140 +104,144 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useEporner } from '../composables/useEporner';
-import SkeletonSection from '../components/SkeletonSection.vue';
-import VideoCard from '../components/VideoCard.vue';
-import { Video, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { ChevronLeft, ChevronRight, Search, Video } from "lucide-vue-next";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import SkeletonSection from "../components/SkeletonSection.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { useEporner } from "../composables/useEporner";
 
 const router = useRouter();
 const route = useRoute();
 const {
-  videos,
-  loading,
-  error,
-  currentPage,
-  totalPages,
-  totalCount,
-  searchQuery,
-  sortOrder,
-  searchVideos,
-  getPopularVideos,
-  setSortOrder,
+	videos,
+	loading,
+	error,
+	currentPage,
+	totalPages,
+	totalCount,
+	searchQuery,
+	sortOrder,
+	searchVideos,
+	getPopularVideos,
+	setSortOrder,
 } = useEporner();
 
-const searchInput = ref('japanese');
+const searchInput = ref("japanese");
 
 const displayTotalPages = computed(() => {
-  const total = totalPages.value;
-  if (total > 1000) {
-    return '1000+';
-  }
-  return total.toString();
+	const total = totalPages.value;
+	if (total > 1000) {
+		return "1000+";
+	}
+	return total.toString();
 });
 
 const visiblePages = computed(() => {
-  const pages = [];
-  const total = Math.min(totalPages.value, 1000);
-  const current = currentPage.value;
+	const pages = [];
+	const total = Math.min(totalPages.value, 1000);
+	const current = currentPage.value;
 
-  if (total > 1000) {
-    pages.push(1);
-    if (current > 3) pages.push('...');
-    const start = Math.max(2, current - 2);
-    const end = Math.min(1000, current + 2);
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (current < 998) {
-      pages.push('...');
-      pages.push(1000);
-    }
-  } else if (total <= 7) {
-    for (let i = 1; i <= total; i++) pages.push(i);
-  } else {
-    pages.push(1);
-    if (current > 3) pages.push('...');
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (current < total - 2) pages.push('...');
-    pages.push(total);
-  }
+	if (total > 1000) {
+		pages.push(1);
+		if (current > 3) pages.push("...");
+		const start = Math.max(2, current - 2);
+		const end = Math.min(1000, current + 2);
+		for (let i = start; i <= end; i++) pages.push(i);
+		if (current < 998) {
+			pages.push("...");
+			pages.push(1000);
+		}
+	} else if (total <= 7) {
+		for (let i = 1; i <= total; i++) pages.push(i);
+	} else {
+		pages.push(1);
+		if (current > 3) pages.push("...");
+		const start = Math.max(2, current - 1);
+		const end = Math.min(total - 1, current + 1);
+		for (let i = start; i <= end; i++) pages.push(i);
+		if (current < total - 2) pages.push("...");
+		pages.push(total);
+	}
 
-  return pages;
+	return pages;
 });
 
 const maxThumbnailsPerPage = 20;
 
 function handleSearch() {
-  const query = (searchInput.value.trim() || 'japanese') + ' japanese';
-  searchVideos(query, 1, { order: sortOrder.value });
+	const query = (searchInput.value.trim() || "japanese") + " japanese";
+	searchVideos(query, 1, { order: sortOrder.value });
 }
 
 function handleSortChange() {
-  setSortOrder(sortOrder.value);
-  const query = (searchInput.value.trim() || 'japanese') + ' japanese';
-  searchVideos(query, 1, { order: sortOrder.value });
+	setSortOrder(sortOrder.value);
+	const query = (searchInput.value.trim() || "japanese") + " japanese";
+	searchVideos(query, 1, { order: sortOrder.value });
 }
 
-import { generateWatchUrl } from '../utils/slug';
+import { generateWatchUrl } from "../utils/slug";
 
 function navigateToVideo(video) {
-  const url = generateWatchUrl(video, { source: 'eporner' });
-  router.push(url);
+	const url = generateWatchUrl(video, { source: "eporner" });
+	router.push(url);
 }
 
 // Update URL with page parameter
 function updateUrlPage(page) {
-  const query = { ...route.query };
-  
-  if (page === 1) {
-    delete query.page;
-  } else {
-    query.page = page.toString();
-  }
-  
-  router.push({ 
-    path: '/japanese',
-    query: query
-  });
+	const query = { ...route.query };
+
+	if (page === 1) {
+		delete query.page;
+	} else {
+		query.page = page.toString();
+	}
+
+	router.push({
+		path: "/japanese",
+		query: query,
+	});
 }
 
 function goToPage(page) {
-  if (page === '...' || page < 1 || page > totalPages.value) return;
-  
-  // Update URL first
-  updateUrlPage(page);
-  
-  // Then load videos
-  const query = (searchInput.value.trim() || 'japanese') + ' japanese';
-  searchVideos(query, page, { order: sortOrder.value });
+	if (page === "..." || page < 1 || page > totalPages.value) return;
+
+	// Update URL first
+	updateUrlPage(page);
+
+	// Then load videos
+	const query = (searchInput.value.trim() || "japanese") + " japanese";
+	searchVideos(query, page, { order: sortOrder.value });
 }
 
 onMounted(() => {
-  setSortOrder('most-popular');
-  // Get page from URL or default to 1
-  const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
-  const page = (urlPage > 0 && !isNaN(urlPage)) ? urlPage : 1;
-  // Initial load focused on Japanese
-  searchVideos('japanese', page, { order: 'most-popular' });
+	setSortOrder("most-popular");
+	// Get page from URL or default to 1
+	const urlPage = route.query.page ? parseInt(route.query.page, 10) : 1;
+	const page = urlPage > 0 && !isNaN(urlPage) ? urlPage : 1;
+	// Initial load focused on Japanese
+	searchVideos("japanese", page, { order: "most-popular" });
 });
 
 // Watch for page parameter changes (browser back/forward)
-watch(() => route.query.page, (newPageParam) => {
-  if (newPageParam) {
-    const page = parseInt(newPageParam, 10);
-    if (page > 0 && !isNaN(page) && page !== currentPage.value) {
-      const query = (searchInput.value.trim() || 'japanese') + ' japanese';
-      searchVideos(query, page, { order: sortOrder.value });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  } else if (currentPage.value !== 1) {
-    // If no page param and we're not on page 1, reset to 1
-    const query = (searchInput.value.trim() || 'japanese') + ' japanese';
-    searchVideos(query, 1, { order: sortOrder.value });
-  }
-}, { immediate: false });
+watch(
+	() => route.query.page,
+	(newPageParam) => {
+		if (newPageParam) {
+			const page = parseInt(newPageParam, 10);
+			if (page > 0 && !isNaN(page) && page !== currentPage.value) {
+				const query = (searchInput.value.trim() || "japanese") + " japanese";
+				searchVideos(query, page, { order: sortOrder.value });
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			}
+		} else if (currentPage.value !== 1) {
+			// If no page param and we're not on page 1, reset to 1
+			const query = (searchInput.value.trim() || "japanese") + " japanese";
+			searchVideos(query, 1, { order: sortOrder.value });
+		}
+	},
+	{ immediate: false },
+);
 </script>
 
 <style scoped>

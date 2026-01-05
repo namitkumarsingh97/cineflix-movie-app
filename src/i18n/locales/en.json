@@ -1,155 +1,154 @@
 {
-  "common": {
-    "home": "Home",
-    "videos": "Videos",
-    "categories": "Categories",
-    "stories": "Stories",
-    "search": "Search movies...",
-    "admin": "Admin",
-    "refresh": "Refresh",
-    "loading": "Loading...",
-    "noResults": "No results found",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "close": "Close",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
-    "random": "Random",
-    "filters": "Filters",
-    "clear": "Clear",
-    "apply": "Apply"
-  },
-  "home": {
-    "title": "Home",
-    "trending": "Trending Now",
-    "recentlyAdded": "Recently Added",
-    "continueWatching": "Continue Watching",
-    "allMovies": "All Movies",
-    "featured": "Featured",
-    "watchNow": "Watch now in high quality",
-    "movieCount": "{count} movies",
-    "showing": "Showing {start}-{end} of {total} movies"
-  },
-  "watch": {
-    "views": "view | views",
-    "likes": "Likes",
-    "dislikes": "Dislikes",
-    "share": "Share",
-    "download": "Download",
-    "comments": "Comment | Comments",
-    "addComment": "Add a comment...",
-    "yourName": "Your name (optional)",
-    "postComment": "Comment",
-    "posting": "Posting...",
-    "noComments": "No comments yet. Be the first to comment!",
-    "relatedContent": "Related Content",
-    "upNext": "Up next",
-    "playbackSpeed": "Speed",
-    "browse": "Browse"
-  },
-  "categories": {
-    "title": "Categories",
-    "subtitle": "Browse movies by category",
-    "noCategories": "No categories found",
-    "noCategoriesDesc": "Categories will appear here once movies are added.",
-    "movies": "movie | movies"
-  },
-  "category": {
-    "title": "Category",
-    "moviesInCategory": "movie in this category | movies in this category",
-    "backToCategories": "Back to Categories",
-    "noMovies": "No movies found",
-    "noMoviesDesc": "There are no movies in this category yet."
-  },
-  "search": {
-    "filters": "Advanced Filters",
-    "category": "Category",
-    "allCategories": "All Categories",
-    "star": "Star/Actor",
-    "allStars": "All Stars",
-    "sortBy": "Sort By",
-    "recent": "Recently Added",
-    "alphabetical": "Title (A-Z)",
-    "popular": "Most Popular",
-    "views": "Most Viewed",
-    "dateRange": "Date Range",
-    "allTime": "All Time",
-    "today": "Today",
-    "thisWeek": "This Week",
-    "thisMonth": "This Month",
-    "thisYear": "This Year"
-  },
-  "stars": {
-    "title": "Stars & Actors",
-    "subtitle": "Browse movies by your favorite stars",
-    "noStars": "No stars found",
-    "noStarsDesc": "Stars will appear here once movies with star information are added.",
-    "movies": "movie | movies"
-  },
-  "star": {
-    "title": "Star",
-    "moviesWithStar": "movie with this star | movies with this star",
-    "backToStars": "Back to Stars",
-    "noMovies": "No movies found",
-    "noMoviesDesc": "There are no movies with this star yet."
-  },
-  "ageVerification": {
-    "title": "Age Verification Required",
-    "subtitle": "This website contains adult content. You must be 18 years or older to access.",
-    "question": "To verify your age, please solve this simple math problem:",
-    "enterAnswer": "Enter your answer",
-    "verify": "Verify Age",
-    "verifying": "Verifying...",
-    "error": "Incorrect answer. Please try again.",
-    "footer": "By entering this site, you confirm that you are at least 18 years of age and agree to view adult content."
-  },
-  "download": {
-    "title": "Download",
-    "downloading": "Downloading...",
-    "downloadComplete": "Download Complete",
-    "downloadFailed": "Download Failed",
-    "downloadQueue": "Download Queue",
-    "noDownloads": "No downloads",
-    "remove": "Remove",
-    "open": "Open",
-    "downloadForOffline": "Download for Offline Viewing"
-  },
-  "preferences": {
-    "title": "Preferences",
-    "language": "Language",
-    "categoryPreferences": "Category Preferences",
-    "selectCategories": "Select your preferred categories",
-    "savePreferences": "Save Preferences",
-    "preferencesSaved": "Preferences saved successfully"
-  },
-  "homeLayout": {
-    "customize": "Customize Layout",
-    "hint": "Toggle sections on/off and reorder them to personalize your homepage",
-    "reset": "Reset to Defaults"
-  },
-  "accessibility": {
-    "title": "Accessibility Settings",
-    "reducedMotion": "Reduce Motion",
-    "reducedMotionDesc": "Minimize animations and transitions",
-    "highContrast": "High Contrast",
-    "highContrastDesc": "Increase contrast for better visibility",
-    "largeText": "Large Text",
-    "largeTextDesc": "Increase text size for better readability",
-    "focusVisible": "Focus Indicators",
-    "focusVisibleDesc": "Show visible focus indicators for keyboard navigation",
-    "keyboardShortcuts": "Keyboard Shortcuts",
-    "skipToContent": "Skip to main content",
-    "closeModal": "Close modal or dialog"
-  },
-  "pwa": {
-    "installTitle": "Install App",
-    "installDescription": "Install Cineflix for a better experience",
-    "install": "Install"
-  }
+	"common": {
+		"home": "Home",
+		"videos": "Videos",
+		"categories": "Categories",
+		"stories": "Stories",
+		"search": "Search movies...",
+		"admin": "Admin",
+		"refresh": "Refresh",
+		"loading": "Loading...",
+		"noResults": "No results found",
+		"error": "Error",
+		"success": "Success",
+		"cancel": "Cancel",
+		"save": "Save",
+		"delete": "Delete",
+		"edit": "Edit",
+		"close": "Close",
+		"back": "Back",
+		"next": "Next",
+		"previous": "Previous",
+		"random": "Random",
+		"filters": "Filters",
+		"clear": "Clear",
+		"apply": "Apply"
+	},
+	"home": {
+		"title": "Home",
+		"trending": "Trending Now",
+		"recentlyAdded": "Recently Added",
+		"continueWatching": "Continue Watching",
+		"allMovies": "All Movies",
+		"featured": "Featured",
+		"watchNow": "Watch now in high quality",
+		"movieCount": "{count} movies",
+		"showing": "Showing {start}-{end} of {total} movies"
+	},
+	"watch": {
+		"views": "view | views",
+		"likes": "Likes",
+		"dislikes": "Dislikes",
+		"share": "Share",
+		"download": "Download",
+		"comments": "Comment | Comments",
+		"addComment": "Add a comment...",
+		"yourName": "Your name (optional)",
+		"postComment": "Comment",
+		"posting": "Posting...",
+		"noComments": "No comments yet. Be the first to comment!",
+		"relatedContent": "Related Content",
+		"upNext": "Up next",
+		"playbackSpeed": "Speed",
+		"browse": "Browse"
+	},
+	"categories": {
+		"title": "Categories",
+		"subtitle": "Browse movies by category",
+		"noCategories": "No categories found",
+		"noCategoriesDesc": "Categories will appear here once movies are added.",
+		"movies": "movie | movies"
+	},
+	"category": {
+		"title": "Category",
+		"moviesInCategory": "movie in this category | movies in this category",
+		"backToCategories": "Back to Categories",
+		"noMovies": "No movies found",
+		"noMoviesDesc": "There are no movies in this category yet."
+	},
+	"search": {
+		"filters": "Advanced Filters",
+		"category": "Category",
+		"allCategories": "All Categories",
+		"star": "Star/Actor",
+		"allStars": "All Stars",
+		"sortBy": "Sort By",
+		"recent": "Recently Added",
+		"alphabetical": "Title (A-Z)",
+		"popular": "Most Popular",
+		"views": "Most Viewed",
+		"dateRange": "Date Range",
+		"allTime": "All Time",
+		"today": "Today",
+		"thisWeek": "This Week",
+		"thisMonth": "This Month",
+		"thisYear": "This Year"
+	},
+	"stars": {
+		"title": "Stars & Actors",
+		"subtitle": "Browse movies by your favorite stars",
+		"noStars": "No stars found",
+		"noStarsDesc": "Stars will appear here once movies with star information are added.",
+		"movies": "movie | movies"
+	},
+	"star": {
+		"title": "Star",
+		"moviesWithStar": "movie with this star | movies with this star",
+		"backToStars": "Back to Stars",
+		"noMovies": "No movies found",
+		"noMoviesDesc": "There are no movies with this star yet."
+	},
+	"ageVerification": {
+		"title": "Age Verification Required",
+		"subtitle": "This website contains adult content. You must be 18 years or older to access.",
+		"question": "To verify your age, please solve this simple math problem:",
+		"enterAnswer": "Enter your answer",
+		"verify": "Verify Age",
+		"verifying": "Verifying...",
+		"error": "Incorrect answer. Please try again.",
+		"footer": "By entering this site, you confirm that you are at least 18 years of age and agree to view adult content."
+	},
+	"download": {
+		"title": "Download",
+		"downloading": "Downloading...",
+		"downloadComplete": "Download Complete",
+		"downloadFailed": "Download Failed",
+		"downloadQueue": "Download Queue",
+		"noDownloads": "No downloads",
+		"remove": "Remove",
+		"open": "Open",
+		"downloadForOffline": "Download for Offline Viewing"
+	},
+	"preferences": {
+		"title": "Preferences",
+		"language": "Language",
+		"categoryPreferences": "Category Preferences",
+		"selectCategories": "Select your preferred categories",
+		"savePreferences": "Save Preferences",
+		"preferencesSaved": "Preferences saved successfully"
+	},
+	"homeLayout": {
+		"customize": "Customize Layout",
+		"hint": "Toggle sections on/off and reorder them to personalize your homepage",
+		"reset": "Reset to Defaults"
+	},
+	"accessibility": {
+		"title": "Accessibility Settings",
+		"reducedMotion": "Reduce Motion",
+		"reducedMotionDesc": "Minimize animations and transitions",
+		"highContrast": "High Contrast",
+		"highContrastDesc": "Increase contrast for better visibility",
+		"largeText": "Large Text",
+		"largeTextDesc": "Increase text size for better readability",
+		"focusVisible": "Focus Indicators",
+		"focusVisibleDesc": "Show visible focus indicators for keyboard navigation",
+		"keyboardShortcuts": "Keyboard Shortcuts",
+		"skipToContent": "Skip to main content",
+		"closeModal": "Close modal or dialog"
+	},
+	"pwa": {
+		"installTitle": "Install App",
+		"installDescription": "Install Cineflix for a better experience",
+		"install": "Install"
+	}
 }
-

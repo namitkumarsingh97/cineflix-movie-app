@@ -44,47 +44,71 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { usePreferences } from '../composables/usePreferences';
-import { X } from 'lucide-vue-next';
+import { X } from "lucide-vue-next";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { usePreferences } from "../composables/usePreferences";
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false
-  },
-  categories: {
-    type: Array,
-    default: () => []
-  }
+	show: {
+		type: Boolean,
+		default: false,
+	},
+	categories: {
+		type: Array,
+		default: () => [],
+	},
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 const router = useRouter();
-const { toggleCategory, isCategoryPreferred, savePreferences, updateCategoryPreferences, getPreferredCategories } = usePreferences();
+const {
+	toggleCategory,
+	isCategoryPreferred,
+	savePreferences,
+	updateCategoryPreferences,
+	getPreferredCategories,
+} = usePreferences();
 const popularTags = [
-  'pov','interracial','rough','ebony','stepmom','stepsis','indian','massage','fetish','bondage',
-  'petite','redhead','double penetration','solo','toys','outdoor','schoolgirl','russian','cowgirl','cumshot'
+	"pov",
+	"interracial",
+	"rough",
+	"ebony",
+	"stepmom",
+	"stepsis",
+	"indian",
+	"massage",
+	"fetish",
+	"bondage",
+	"petite",
+	"redhead",
+	"double penetration",
+	"solo",
+	"toys",
+	"outdoor",
+	"schoolgirl",
+	"russian",
+	"cowgirl",
+	"cumshot",
 ];
 
 function close() {
-  emit('close');
+	emit("close");
 }
 
 function saveAndClose() {
-  savePreferences({});
-  const prefs = getPreferredCategories();
-  if (prefs && prefs.length > 0) {
-    router.push(`/videos?q=${encodeURIComponent(prefs[0])}`);
-  } else {
-    router.push('/videos');
-  }
-  close();
+	savePreferences({});
+	const prefs = getPreferredCategories();
+	if (prefs && prefs.length > 0) {
+		router.push(`/videos?q=${encodeURIComponent(prefs[0])}`);
+	} else {
+		router.push("/videos");
+	}
+	close();
 }
 
 function clearCategories() {
-  updateCategoryPreferences([]);
+	updateCategoryPreferences([]);
 }
 </script>
 

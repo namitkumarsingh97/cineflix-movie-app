@@ -37,15 +37,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { usePlaylists } from '../composables/usePlaylists';
-import { useMovies } from '../composables/useMovies';
-import { useEporner } from '../composables/useEporner';
-import { useVideos } from '../composables/useVideos';
-import VideoCard from '../components/VideoCard.vue';
-import MovieCard from '../components/MovieCard.vue';
-import { Play, Music } from 'lucide-vue-next';
+import { Music, Play } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import MovieCard from "../components/MovieCard.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { useEporner } from "../composables/useEporner";
+import { useMovies } from "../composables/useMovies";
+import { usePlaylists } from "../composables/usePlaylists";
+import { useVideos } from "../composables/useVideos";
 
 const route = useRoute();
 const router = useRouter();
@@ -59,20 +59,46 @@ const { videos } = useVideos();
 const items = ref([]);
 
 const moodConfig = {
-  energetic: { name: 'Energetic', emoji: '⚡', description: 'Fast-paced, intense content' },
-  relaxed: { name: 'Relaxed', emoji: '🌙', description: 'Slow, sensual, romantic' },
-  adventurous: { name: 'Adventurous', emoji: '🏔️', description: 'Outdoor, wild, exciting' },
-  intimate: { name: 'Intimate', emoji: '💕', description: 'Romantic, private, close' },
-  quick: { name: 'Quick Mix', emoji: '⚡', description: 'Short, quick sessions' },
-  marathon: { name: 'Marathon', emoji: '🎬', description: 'Long-form extended content' },
+	energetic: {
+		name: "Energetic",
+		emoji: "⚡",
+		description: "Fast-paced, intense content",
+	},
+	relaxed: {
+		name: "Relaxed",
+		emoji: "🌙",
+		description: "Slow, sensual, romantic",
+	},
+	adventurous: {
+		name: "Adventurous",
+		emoji: "🏔️",
+		description: "Outdoor, wild, exciting",
+	},
+	intimate: {
+		name: "Intimate",
+		emoji: "💕",
+		description: "Romantic, private, close",
+	},
+	quick: {
+		name: "Quick Mix",
+		emoji: "⚡",
+		description: "Short, quick sessions",
+	},
+	marathon: {
+		name: "Marathon",
+		emoji: "🎬",
+		description: "Long-form extended content",
+	},
 };
 
 const moodData = computed(() => {
-  return moodConfig[mood.value] || {
-    name: mood.value,
-    emoji: '🎵',
-    description: 'Curated mix',
-  };
+	return (
+		moodConfig[mood.value] || {
+			name: mood.value,
+			emoji: "🎵",
+			description: "Curated mix",
+		}
+	);
 });
 
 const moodName = computed(() => moodData.value.name);
@@ -80,27 +106,27 @@ const moodEmoji = computed(() => moodData.value.emoji);
 const moodDescription = computed(() => moodData.value.description);
 
 const navigateToVideo = (item) => {
-  if (item._id) {
-    router.push(`/watch/${item._id}`);
-  } else if (item.id) {
-    router.push(`/watch/${item.id}?source=eporner`);
-  }
+	if (item._id) {
+		router.push(`/watch/${item._id}`);
+	} else if (item.id) {
+		router.push(`/watch/${item.id}?source=eporner`);
+	}
 };
 
 const playAll = () => {
-  if (items.value.length > 0) {
-    navigateToVideo(items.value[0]);
-  }
+	if (items.value.length > 0) {
+		navigateToVideo(items.value[0]);
+	}
 };
 
 onMounted(() => {
-  const allItems = [
-    ...movies.value,
-    ...epornerVideos.value,
-    ...(videos.value || []),
-  ];
-  
-  items.value = getMoodMix(mood.value) || [];
+	const allItems = [
+		...movies.value,
+		...epornerVideos.value,
+		...(videos.value || []),
+	];
+
+	items.value = getMoodMix(mood.value) || [];
 });
 </script>
 

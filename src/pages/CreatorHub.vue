@@ -87,22 +87,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useCreators } from '../composables/useCreators';
-import { useMovies } from '../composables/useMovies';
-import { useEporner } from '../composables/useEporner';
-import { useVideos } from '../composables/useVideos';
-import VideoCard from '../components/VideoCard.vue';
-import MovieCard from '../components/MovieCard.vue';
-import Loader from '../components/Loader.vue';
-import { Star, User } from 'lucide-vue-next';
+import { Star, User } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Loader from "../components/Loader.vue";
+import MovieCard from "../components/MovieCard.vue";
+import VideoCard from "../components/VideoCard.vue";
+import { useCreators } from "../composables/useCreators";
+import { useEporner } from "../composables/useEporner";
+import { useMovies } from "../composables/useMovies";
+import { useVideos } from "../composables/useVideos";
 
 const route = useRoute();
 const router = useRouter();
 const creatorId = computed(() => route.params.id);
 
-const { getCreatorHub, followCreator, unfollowCreator, isCreatorFollowed } = useCreators();
+const { getCreatorHub, followCreator, unfollowCreator, isCreatorFollowed } =
+	useCreators();
 const { movies } = useMovies();
 const { videos: epornerVideos } = useEporner();
 const { videos } = useVideos();
@@ -111,72 +112,75 @@ const creatorHub = ref(null);
 const loading = ref(true);
 
 const isFollowed = computed(() => {
-  if (!creatorHub.value) return false;
-  return isCreatorFollowed(creatorHub.value.id);
+	if (!creatorHub.value) return false;
+	return isCreatorFollowed(creatorHub.value.id);
 });
 
 const formatViews = (count) => {
-  if (!count) return '0';
-  if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
-  return count.toString();
+	if (!count) return "0";
+	if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+	if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
+	return count.toString();
 };
 
 const formatTimeAgo = (date) => {
-  if (!date) return '';
-  const now = new Date();
-  const videoDate = new Date(date);
-  const diffInSeconds = Math.floor((now - videoDate) / 1000);
-  
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+	if (!date) return "";
+	const now = new Date();
+	const videoDate = new Date(date);
+	const diffInSeconds = Math.floor((now - videoDate) / 1000);
+
+	if (diffInSeconds < 60) return "just now";
+	if (diffInSeconds < 3600)
+		return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+	if (diffInSeconds < 86400)
+		return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+	if (diffInSeconds < 604800)
+		return `${Math.floor(diffInSeconds / 86400)} days ago`;
+	return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
 };
 
 const getInitials = (name) => {
-  if (!name) return '??';
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+	if (!name) return "??";
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
 };
 
 const toggleFollow = () => {
-  if (!creatorHub.value) return;
-  
-  if (isFollowed.value) {
-    unfollowCreator(creatorHub.value.id);
-  } else {
-    followCreator(creatorHub.value);
-  }
+	if (!creatorHub.value) return;
+
+	if (isFollowed.value) {
+		unfollowCreator(creatorHub.value.id);
+	} else {
+		followCreator(creatorHub.value);
+	}
 };
 
 const navigateToVideo = (item) => {
-  if (item._id) {
-    router.push(`/watch/${item._id}`);
-  } else if (item.id) {
-    router.push(`/watch/${item.id}?source=eporner`);
-  }
+	if (item._id) {
+		router.push(`/watch/${item._id}`);
+	} else if (item.id) {
+		router.push(`/watch/${item.id}?source=eporner`);
+	}
 };
 
 onMounted(async () => {
-  loading.value = true;
-  
-  // Get all videos
-  const allVideos = [
-    ...movies.value,
-    ...epornerVideos.value,
-    ...(videos.value || []),
-  ];
-  
-  // Get creator hub
-  creatorHub.value = getCreatorHub(creatorId.value, allVideos);
-  
-  loading.value = false;
+	loading.value = true;
+
+	// Get all videos
+	const allVideos = [
+		...movies.value,
+		...epornerVideos.value,
+		...(videos.value || []),
+	];
+
+	// Get creator hub
+	creatorHub.value = getCreatorHub(creatorId.value, allVideos);
+
+	loading.value = false;
 });
 </script>
 

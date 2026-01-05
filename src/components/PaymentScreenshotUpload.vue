@@ -111,115 +111,126 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Upload, FileText, X, Loader2, AlertCircle, CheckCircle } from 'lucide-vue-next';
-import { paymentVerificationApi } from '../api/paymentVerification';
+import {
+	AlertCircle,
+	CheckCircle,
+	FileText,
+	Loader2,
+	Upload,
+	X,
+} from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { paymentVerificationApi } from "../api/paymentVerification";
 
-const emit = defineEmits(['uploaded']);
+const emit = defineEmits(["uploaded"]);
 
 const formData = ref({
-  planId: '',
-  type: '',
-  amount: null,
+	planId: "",
+	type: "",
+	amount: null,
 });
 
 const selectedFile = ref(null);
 const uploading = ref(false);
-const error = ref('');
-const success = ref('');
+const error = ref("");
+const success = ref("");
 const verifications = ref([]);
 
 const planTypes = {
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-  lifetime: 'Lifetime',
+	monthly: "Monthly",
+	yearly: "Yearly",
+	lifetime: "Lifetime",
 };
 
 function formatPlanType(type) {
-  return planTypes[type] || type;
+	return planTypes[type] || type;
 }
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+	return new Date(date).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
 }
 
 function handleFileSelect(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 10 * 1024 * 1024) {
-      error.value = 'File size must be less than 10MB';
-      return;
-    }
-    selectedFile.value = file;
-    error.value = '';
-  }
+	const file = event.target.files[0];
+	if (file) {
+		if (file.size > 10 * 1024 * 1024) {
+			error.value = "File size must be less than 10MB";
+			return;
+		}
+		selectedFile.value = file;
+		error.value = "";
+	}
 }
 
 function clearFile() {
-  selectedFile.value = null;
-  const input = document.getElementById('screenshot');
-  if (input) input.value = '';
+	selectedFile.value = null;
+	const input = document.getElementById("screenshot");
+	if (input) input.value = "";
 }
 
 async function handleUpload() {
-  if (!selectedFile.value) {
-    error.value = 'Please select a payment screenshot';
-    return;
-  }
+	if (!selectedFile.value) {
+		error.value = "Please select a payment screenshot";
+		return;
+	}
 
-  uploading.value = true;
-  error.value = '';
-  success.value = '';
+	uploading.value = true;
+	error.value = "";
+	success.value = "";
 
-  try {
-    // Set type based on planId
-    formData.value.type = formData.value.planId;
+	try {
+		// Set type based on planId
+		formData.value.type = formData.value.planId;
 
-    const uploadFormData = new FormData();
-    uploadFormData.append('paymentScreenshot', selectedFile.value);
-    uploadFormData.append('planId', formData.value.planId);
-    uploadFormData.append('type', formData.value.type);
-    uploadFormData.append('amount', formData.value.amount);
+		const uploadFormData = new FormData();
+		uploadFormData.append("paymentScreenshot", selectedFile.value);
+		uploadFormData.append("planId", formData.value.planId);
+		uploadFormData.append("type", formData.value.type);
+		uploadFormData.append("amount", formData.value.amount);
 
-    const response = await paymentVerificationApi.uploadScreenshot(uploadFormData);
+		const response =
+			await paymentVerificationApi.uploadScreenshot(uploadFormData);
 
-    if (response.success) {
-      success.value = response.message || 'Payment screenshot uploaded successfully! Admin will review it soon.';
-      clearFile();
-      formData.value = {
-        planId: '',
-        type: '',
-        amount: null,
-      };
-      await loadVerifications();
-      emit('uploaded');
-    } else {
-      error.value = response.error || 'Failed to upload screenshot';
-    }
-  } catch (err) {
-    error.value = err.response?.data?.error || err.message || 'Failed to upload screenshot';
-  } finally {
-    uploading.value = false;
-  }
+		if (response.success) {
+			success.value =
+				response.message ||
+				"Payment screenshot uploaded successfully! Admin will review it soon.";
+			clearFile();
+			formData.value = {
+				planId: "",
+				type: "",
+				amount: null,
+			};
+			await loadVerifications();
+			emit("uploaded");
+		} else {
+			error.value = response.error || "Failed to upload screenshot";
+		}
+	} catch (err) {
+		error.value =
+			err.response?.data?.error || err.message || "Failed to upload screenshot";
+	} finally {
+		uploading.value = false;
+	}
 }
 
 async function loadVerifications() {
-  try {
-    const response = await paymentVerificationApi.getMyVerifications();
-    if (response.success) {
-      verifications.value = response.verifications || [];
-    }
-  } catch (err) {
-    console.error('Error loading verifications:', err);
-  }
+	try {
+		const response = await paymentVerificationApi.getMyVerifications();
+		if (response.success) {
+			verifications.value = response.verifications || [];
+		}
+	} catch (err) {
+		console.error("Error loading verifications:", err);
+	}
 }
 
 onMounted(() => {
-  loadVerifications();
+	loadVerifications();
 });
 </script>
 
