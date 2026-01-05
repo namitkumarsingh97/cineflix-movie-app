@@ -107,7 +107,7 @@
               <li class="navbar-nav-item">
                 <router-link
                   to="/premium"
-                  class="navbar-link premium-nav-link"
+                  class="navbar-link premium-nav-link hide-on-sm"
                   active-class="active"
                   @click="closeMobileMenu"
                 >
@@ -247,7 +247,7 @@
                   </router-link>
                   <router-link
                     to="/premium"
-                    class="user-menu-item"
+                    class="user-menu-item hide-on-sm"
                     @click="closeUserMenu"
                   >
                     <Crown :size="18" />
@@ -444,7 +444,7 @@
           -->
           <router-link
             to="/premium"
-            class="mobile-menu-link premium-nav-link"
+            class="mobile-menu-link premium-nav-link hide-on-sm"
             active-class="active"
             @click="closeMobileMenu"
           >
