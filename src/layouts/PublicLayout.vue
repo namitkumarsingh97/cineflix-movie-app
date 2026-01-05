@@ -268,7 +268,7 @@
             <router-link
               v-if="!isAuthenticated && !isAdminLoggedIn"
               to="/login"
-              class="navbar-btn login-btn"
+              class="navbar-btn login-btn hide-on-sm"
               title="Sign In"
             >
               <LogIn :size="18" />
@@ -1708,3 +1708,11 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+  @media (max-width: 640px) {
+  .hide-on-sm {
+    display: none !important;
+  }
+}
+</style>
