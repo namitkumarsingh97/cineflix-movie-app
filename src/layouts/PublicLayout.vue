@@ -120,7 +120,7 @@
 
           <div class="navbar-center">
             <div
-              class="navbar-search"
+              class="navbar-search hide-on-sm"
               :class="{
                 'has-suggestions': showSuggestions && suggestions.length > 0,
               }"
@@ -1711,8 +1711,8 @@ onMounted(async () => {
 
 <style scoped>
   @media (max-width: 640px) {
-  .hide-on-sm {
-    display: none !important;
-  }
+    .hide-on-sm {
+      display: none !important;
+    }
 }
 </style>
