@@ -2,53 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
-    />
-    <meta
-      name="description"
-      content="Stream your favorite movies and videos - Cineflix Movie Hub"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="description" content="Stream your favorite movies and videos - Cineflix Movie Hub" />
     <meta name="theme-color" content="#0a0e27" />
     <meta name="color-scheme" content="dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Cineflix" />
-
-    <meta
-      http-equiv="Permissions-Policy"
-      content="xr-spatial-tracking=(), geolocation=(), camera=(), microphone=()"
-    />
-
+    
+    <!-- Permissions Policy to suppress XR warnings -->
+    <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(), geolocation=(), camera=(), microphone=()" />
+    
+    <!-- CDN and Performance Optimizations -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
+    
+    <!-- Icons are loaded via manifest.json, no need to preload -->
+    
+    <!-- Resource hints for CDN -->
     <meta http-equiv="x-dns-prefetch-control" content="on" />
-
+    
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
-
+    
+    <!-- Google Sign-In -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+    
     <title>Cineflix - Movie Hub</title>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
     <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((registration) => console.log("SW registered:", registration))
-            .catch((error) => console.log("SW registration failed:", error));
+      // Register service worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => console.log('SW registered:', registration))
+            .catch(error => console.log('SW registration failed:', error));
         });
       }
     </script>
   </body>
 </html>
+
