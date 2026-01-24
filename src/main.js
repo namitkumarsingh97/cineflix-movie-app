@@ -5,6 +5,10 @@ import './style.css'
 // Authentication disabled - using Eporner API directly
 // import { useAuth } from './composables/useAuth'
 
+// Initialize Eporner store to load cached data on app start
+import { epornerStore } from './store/epornerStore'
+epornerStore.loadFromStorage()
+
 const app = createApp(App).use(router)
 
 // Authentication disabled - using Eporner API directly

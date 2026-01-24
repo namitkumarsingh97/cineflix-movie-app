@@ -59,7 +59,7 @@ export function useAuth() {
    */
   async function checkAuth() {
     // Auth disabled - always return false, no API call
-    return false;
+        return false;
     // try {
     //   const response = await authApi.getCurrentUser();
     //   // Backend returns { success: true, user: {...} }

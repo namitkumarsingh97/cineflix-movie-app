@@ -14,7 +14,7 @@ defineProps({
   },
   columns: {
     type: Number,
-    default: 4,
+    default: 5,
   },
 });
 </script>
@@ -57,6 +57,12 @@ defineProps({
   
   .skeleton-grid.grid-cols-5 {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .skeleton-grid.grid-cols-5 {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

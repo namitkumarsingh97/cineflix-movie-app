@@ -214,8 +214,8 @@ export const epornerApi = {
         return await response.text();
       } else {
         // Default: JSON format
-        const data = await response.json();
-        return data;
+      const data = await response.json();
+      return data;
       }
     } catch (error) {
       console.error('Eporner API getRemoved error:', error);

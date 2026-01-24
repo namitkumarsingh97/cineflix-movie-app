@@ -17,7 +17,7 @@
         <SkeletonSection
           v-if="loading"
           :count="maxThumbnailsPerPage"
-          :columns="4"
+          :columns="5"
         />
 
         <div v-else-if="videos.length > 0" class="videos-content">

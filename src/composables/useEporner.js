@@ -1,9 +1,11 @@
 import { ref, computed } from 'vue';
 import { epornerApi } from '../api/eporner';
 import { useNetworkQuality } from './useNetworkQuality';
+import { epornerStore } from '../store/epornerStore';
 
 /**
  * Composable for Eporner API integration
+ * Now uses global store for caching - loads once, stores, and reuses
  */
 export function useEporner() {
   const videos = ref([]);
@@ -21,6 +23,9 @@ export function useEporner() {
   const queryCache = new Map();
   const videoCache = new Map();
   const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+  
+  // Global store for persistent caching (singleton)
+  const store = epornerStore;
   
   // Network quality detection
   const { thumbnailDensity, maxThumbnailsPerPage, shouldPreloadThumbnails } = useNetworkQuality();
@@ -142,6 +147,7 @@ export function useEporner() {
 
   /**
    * Search videos
+   * Uses store cache for search results - loads once, stores, and reuses
    */
   const searchVideos = async (query = 'all', page = 1, options = {}) => {
     loading.value = true;
@@ -165,6 +171,20 @@ export function useEporner() {
         format: 'json',
       };
 
+      // Check store cache first
+      const storeCacheKey = `${query}|${page}|${params.order}`;
+      const storeCached = store.getCachedSearch(query, page, params.order);
+      if (storeCached) {
+        videos.value = storeCached.videos || [];
+        currentPage.value = storeCached.page || page;
+        totalCount.value = storeCached.totalCount || 0;
+        totalPages.value = storeCached.totalPages || 1;
+        searchQuery.value = query;
+        loading.value = false;
+        return;
+      }
+
+      // Check in-memory cache
       const cacheKey = buildQueryCacheKey(params);
       const cached = getCachedResult(cacheKey);
       if (cached) {
@@ -204,7 +224,16 @@ export function useEporner() {
           totalPages.value = 1;
         }
 
+        // Cache in memory
         cacheResult(cacheKey, {
+          videos: [...videos.value],
+          page: currentPage.value,
+          totalPages: totalPages.value,
+          totalCount: totalCount.value,
+        });
+        
+        // Also cache in store for persistence
+        store.setCachedSearch(query, page, params.order, {
           videos: [...videos.value],
           page: currentPage.value,
           totalPages: totalPages.value,
@@ -235,6 +264,7 @@ export function useEporner() {
 
   /**
    * Get video by ID
+   * Uses store cache - loads once, stores, and reuses
    */
   const getVideoById = async (id) => {
     loading.value = true;
@@ -242,6 +272,15 @@ export function useEporner() {
 
     try {
       console.log('useEporner.getVideoById called with ID:', id);
+      
+      // Check store cache first
+      const storeCached = store.getCachedVideoDetails(id);
+      if (storeCached) {
+        loading.value = false;
+        return storeCached;
+      }
+      
+      // Check in-memory cache
       const cached = videoCache.get(id);
       if (cached && Date.now() - cached.ts <= CACHE_TTL_MS) {
         return cached.video;
@@ -253,7 +292,13 @@ export function useEporner() {
       if (networkVideo) {
         const transformed = transformVideo(networkVideo);
         console.log('useEporner.getVideoById transformed video:', transformed);
+        
+        // Cache in memory
         videoCache.set(id, { ts: Date.now(), video: transformed });
+        
+        // Also cache in store for persistence
+        store.setCachedVideoDetails(id, transformed);
+        
         return transformed;
       }
 
@@ -280,11 +325,31 @@ export function useEporner() {
 
   /**
    * Load videos (default: latest)
+   * Uses store cache for latest videos - loads once, stores, and reuses
    */
   const loadVideos = async (page = 1) => {
+    // If loading latest videos, check store first
+    if (sortOrder.value === 'latest' && page === 1 && !store.needsLoad('latest')) {
+      const cached = store.getLatestVideos.value;
+      if (cached && cached.length > 0) {
+        videos.value = cached;
+        currentPage.value = 1;
+        totalCount.value = cached.length;
+        totalPages.value = 1;
+        searchQuery.value = 'all';
+        return;
+      }
+    }
+    
+    // Load from API if not cached or different order/page
     await searchVideos('all', page, {
       order: sortOrder.value,
     });
+    
+    // Save to store if latest videos and page 1
+    if (sortOrder.value === 'latest' && page === 1 && videos.value.length > 0) {
+      store.setLatestVideos(videos.value);
+    }
   };
 
   /**
@@ -305,38 +370,118 @@ export function useEporner() {
 
   /**
    * Get popular videos
+   * Uses store cache - loads once, stores, and reuses
    */
   const getPopularVideos = async (page = 1) => {
+    // Check store first
+    if (page === 1 && !store.needsLoad('popular')) {
+      const cached = store.getPopularVideos.value;
+      if (cached && cached.length > 0) {
+        videos.value = cached;
+        currentPage.value = 1;
+        totalCount.value = cached.length;
+        totalPages.value = 1;
+        searchQuery.value = 'all';
+        return;
+      }
+    }
+    
+    // Load from API if not cached or page > 1
     await searchVideos('all', page, {
       order: 'most-popular',
     });
+    
+    // Save to store if page 1
+    if (page === 1 && videos.value.length > 0) {
+      store.setPopularVideos(videos.value);
+    }
   };
 
   /**
    * Get top weekly videos
+   * Uses store cache - loads once, stores, and reuses
    */
   const getTopWeeklyVideos = async (page = 1) => {
+    // Check store first
+    if (page === 1 && !store.needsLoad('topWeekly')) {
+      const cached = store.getTopWeeklyVideos.value;
+      if (cached && cached.length > 0) {
+        videos.value = cached;
+        currentPage.value = 1;
+        totalCount.value = cached.length;
+        totalPages.value = 1;
+        searchQuery.value = 'all';
+        return;
+      }
+    }
+    
+    // Load from API if not cached or page > 1
     await searchVideos('all', page, {
       order: 'top-weekly',
     });
+    
+    // Save to store if page 1
+    if (page === 1 && videos.value.length > 0) {
+      store.setTopWeeklyVideos(videos.value);
+    }
   };
 
   /**
    * Get top monthly videos
+   * Uses store cache - loads once, stores, and reuses
    */
   const getTopMonthlyVideos = async (page = 1) => {
+    // Check store first
+    if (page === 1 && !store.needsLoad('topMonthly')) {
+      const cached = store.getTopMonthlyVideos.value;
+      if (cached && cached.length > 0) {
+        videos.value = cached;
+        currentPage.value = 1;
+        totalCount.value = cached.length;
+        totalPages.value = 1;
+        searchQuery.value = 'all';
+        return;
+      }
+    }
+    
+    // Load from API if not cached or page > 1
     await searchVideos('all', page, {
       order: 'top-monthly',
     });
+    
+    // Save to store if page 1
+    if (page === 1 && videos.value.length > 0) {
+      store.setTopMonthlyVideos(videos.value);
+    }
   };
 
   /**
    * Get top rated videos
+   * Uses store cache - loads once, stores, and reuses
    */
   const getTopRatedVideos = async (page = 1) => {
+    // Check store first
+    if (page === 1 && !store.needsLoad('topRated')) {
+      const cached = store.getTopRatedVideos.value;
+      if (cached && cached.length > 0) {
+        videos.value = cached;
+        currentPage.value = 1;
+        totalCount.value = cached.length;
+        totalPages.value = 1;
+        searchQuery.value = 'all';
+        return;
+      }
+    }
+    
+    // Load from API if not cached or page > 1
     await searchVideos('all', page, {
       order: 'top-rated',
     });
+    
+    // Save to store if page 1
+    if (page === 1 && videos.value.length > 0) {
+      store.setTopRatedVideos(videos.value);
+    }
   };
 
   // Computed properties

@@ -165,7 +165,7 @@
       <SkeletonSection 
         v-if="epornerLoading && indianVideos.length === 0" 
         :count="maxThumbnailsPerPage" 
-        :columns="4"
+        :columns="5"
         :show-header="false"
       />
       <div v-else-if="indianVideos.length > 0" class="youtube-videos-grid">
@@ -197,7 +197,7 @@
       <SkeletonSection 
         v-if="epornerLoading && povVideos.length === 0" 
         :count="maxThumbnailsPerPage" 
-        :columns="4"
+        :columns="5"
         :show-header="false"
       />
       <div v-else-if="povVideos.length > 0" class="youtube-videos-grid">
@@ -229,7 +229,7 @@
       <SkeletonSection 
         v-if="epornerLoading && familyVideos.length === 0" 
         :count="maxThumbnailsPerPage" 
-        :columns="4"
+        :columns="5"
         :show-header="false"
       />
       <div v-else-if="familyVideos.length > 0" class="youtube-videos-grid">
@@ -264,7 +264,7 @@
       <SkeletonSection 
         v-if="epornerLoading && trendingVideos.length === 0" 
         :count="12" 
-        :columns="4"
+        :columns="5"
         :show-header="false"
       />
       <div v-else-if="trendingVideos.length > 0" class="youtube-videos-grid">
@@ -296,7 +296,7 @@
       <SkeletonSection 
         v-if="epornerLoading && recentlyAddedVideos.length === 0" 
         :count="12" 
-        :columns="4"
+        :columns="5"
         :show-header="false"
       />
       <div v-else-if="recentlyAddedVideos.length > 0" class="youtube-videos-grid">
@@ -360,7 +360,7 @@
       <SkeletonSection 
         v-if="loading && movies.length === 0" 
         :count="maxThumbnailsPerPage" 
-        :columns="4"
+        :columns="5"
         :show-header="false"
       />
 

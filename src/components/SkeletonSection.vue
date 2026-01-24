@@ -18,7 +18,7 @@ defineProps({
   },
   columns: {
     type: Number,
-    default: 4,
+    default: 5,
   },
   showHeader: {
     type: Boolean,

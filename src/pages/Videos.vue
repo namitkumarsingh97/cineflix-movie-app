@@ -89,7 +89,7 @@
     <SkeletonSection 
       v-if="loading" 
       :count="maxThumbnailsPerPage" 
-      :columns="4"
+      :columns="5"
     />
 
     <!-- Videos Grid -->

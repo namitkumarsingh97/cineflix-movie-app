@@ -10,20 +10,56 @@
     <div class="actors-content">
       <div class="actors-page">
         <div class="page-header">
-          <h1 class="page-title">Actors</h1>
-          <p class="page-subtitle">Browse all actors and performers</p>
+          <div class="header-content">
+            <div>
+              <h1 class="page-title">Pornstars</h1>
+              <p class="page-subtitle">Browse thousands of adult performers</p>
+            </div>
+          </div>
+          
+          <!-- Search and Filter Bar -->
+          <div class="filters-bar">
+            <div class="search-box">
+              <Search :size="20" class="search-icon" />
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search pornstars..."
+                class="search-input"
+                @input="handleSearch"
+              />
+            </div>
+            
+            <!-- Alphabet Filter -->
+            <div class="alphabet-filter">
+              <button
+                :class="['alphabet-btn', { active: selectedLetter === 'all' }]"
+                @click="filterByLetter('all')"
+              >
+                All
+              </button>
+              <button
+                v-for="letter in alphabet"
+                :key="letter"
+                :class="['alphabet-btn', { active: selectedLetter === letter }]"
+                @click="filterByLetter(letter)"
+              >
+                {{ letter }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <SkeletonSection
           v-if="loading"
           :count="maxActorsPerPage"
-          :columns="4"
+          :columns="6"
         />
 
-        <div v-else-if="displayedActors.length > 0" class="actors-content-section">
+        <div v-else-if="filteredActors.length > 0" class="actors-content-section">
           <div class="actors-info">
             <p class="actors-count">
-              Showing {{ displayedActors.length }} of {{ totalActorsCount }} actors
+              Showing {{ displayedActors.length }} of {{ filteredActors.length }} performers
               <span v-if="currentPage > 1">(Page {{ currentPage }})</span>
             </p>
           </div>
@@ -105,8 +141,11 @@
 
         <div v-else class="empty-state">
           <Star :size="80" class="empty-icon" />
-          <h3>No actors found</h3>
-          <p>Try again later</p>
+          <h3>No performers found</h3>
+          <p v-if="searchQuery || selectedLetter !== 'all'">
+            Try adjusting your search or filter
+          </p>
+          <p v-else>Try again later</p>
         </div>
       </div>
     </div>
@@ -114,12 +153,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEporner } from '../composables/useEporner';
 import SkeletonSection from '../components/SkeletonSection.vue';
 import CategorySidebar from '../components/CategorySidebar.vue';
-import { Star, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { Star, ChevronLeft, ChevronRight, Search } from 'lucide-vue-next';
 
 const router = useRouter();
 const { searchVideos, videos: epornerVideos, totalCount: epornerTotalCount } = useEporner();
@@ -127,8 +166,11 @@ const { searchVideos, videos: epornerVideos, totalCount: epornerTotalCount } = u
 const sidebarOpen = ref(true);
 const loading = ref(true); // Start with loading to show skeleton while fetching thumbnail
 const currentPage = ref(1);
-const actorsPerPage = 24; // 4 columns x 6 rows
+const actorsPerPage = 30; // 6 columns x 5 rows for better desktop layout
 const maxActorsPerPage = actorsPerPage;
+const searchQuery = ref('');
+const selectedLetter = ref('all');
+const alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
 function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
@@ -188,8 +230,31 @@ const allActors = ref([
   { name: 'Valentina Nappi', videoCount: null, thumbnail: null },
 ]);
 
-// Computed for total actors count
-const totalActorsCount = computed(() => allActors.value.length);
+// Filter actors by search query and letter
+const filteredActors = computed(() => {
+  let filtered = [...allActors.value];
+  
+  // Filter by letter
+  if (selectedLetter.value !== 'all') {
+    filtered = filtered.filter(actor => 
+      actor.name.charAt(0).toUpperCase() === selectedLetter.value
+    );
+  }
+  
+  // Filter by search query
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter(actor =>
+      actor.name.toLowerCase().includes(query)
+    );
+  }
+  
+  // Sort alphabetically
+  return filtered.sort((a, b) => a.name.localeCompare(b.name));
+});
+
+// Computed for total actors count (filtered)
+const totalActorsCount = computed(() => filteredActors.value.length);
 
 // Computed for total pages
 const totalPages = computed(() => {
@@ -209,7 +274,25 @@ const displayTotalPages = computed(() => {
 const displayedActors = computed(() => {
   const start = (currentPage.value - 1) * actorsPerPage;
   const end = start + actorsPerPage;
-  return allActors.value.slice(start, end);
+  return filteredActors.value.slice(start, end);
+});
+
+// Handle search
+function handleSearch() {
+  currentPage.value = 1; // Reset to first page on search
+}
+
+// Filter by letter
+function filterByLetter(letter) {
+  selectedLetter.value = letter;
+  currentPage.value = 1; // Reset to first page
+}
+
+// Watch for filter changes to reset page
+watch([selectedLetter, searchQuery], () => {
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = 1;
+  }
 });
 
 // Calculate visible pages for pagination
@@ -449,10 +532,18 @@ onMounted(async () => {
   max-width: 1600px;
 }
 
-/* Large screens (1024px - 1399px) */
-@media (max-width: 1399px) {
+/* Large screens (1200px - 1399px) */
+@media (max-width: 1399px) and (min-width: 1200px) {
   .actors-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+/* Medium screens (1024px - 1199px) */
+@media (max-width: 1199px) and (min-width: 1024px) {
+  .actors-grid {
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
   }
 }
@@ -464,7 +555,30 @@ onMounted(async () => {
   }
 
   .actors-page {
-    padding: 30px;
+    padding: 30px 24px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .filters-bar {
+    gap: 1.25rem;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .alphabet-filter {
+    gap: 6px;
+  }
+
+  .alphabet-btn {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
   }
 
   .actors-grid {
@@ -479,26 +593,110 @@ onMounted(async () => {
   .actor-card-thumbnail-wrapper {
     min-height: 240px;
   }
-
-  .page-title {
-    font-size: 1.75rem;
-  }
 }
 
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.header-content {
+  margin-bottom: 1.5rem;
 }
 
 .page-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
 }
 
 .page-subtitle {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 1.1rem;
+}
+
+/* Search and Filter Bar */
+.filters-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--text-secondary);
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  background: var(--dark-lighter);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--dark-light);
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Alphabet Filter */
+.alphabet-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.alphabet-btn {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--dark-lighter);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alphabet-btn:hover {
+  background: var(--dark-light);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.alphabet-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
 }
 
 .actors-content-section {
@@ -516,40 +714,54 @@ onMounted(async () => {
 
 .actors-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.25rem;
   margin-bottom: 2rem;
 }
 
+/* Desktop: 6 columns */
+@media (min-width: 1400px) {
+  .actors-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
+  }
+}
+
 .actor-card {
-  background: var(--dark-lighter, #2a2a3e);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--dark-lighter);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 24px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   overflow: hidden;
   position: relative;
+  aspect-ratio: 3/4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .actor-card:hover {
-  background: var(--dark-light, #3a3a4e);
-  border-color: var(--primary, #ff4500);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(255, 69, 0, 0.2);
+  background: var(--dark-light);
+  border-color: var(--primary);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(255, 69, 0, 0.25);
 }
 
 .actor-card-with-thumbnail {
   padding: 0;
-  min-height: 280px;
+  min-height: 320px;
+  aspect-ratio: 3/4;
 }
 
 .actor-card-thumbnail-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 280px;
+  min-height: 320px;
   overflow: hidden;
   border-radius: 12px;
 }
@@ -558,11 +770,12 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
 }
 
 .actor-card:hover .actor-thumbnail {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .actor-thumbnail-overlay {
@@ -570,62 +783,81 @@ onMounted(async () => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);
-  padding: 20px;
-  padding-top: 40px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.8) 40%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .actor-card-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 0;
 }
 
 .actor-avatar {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
   color: white;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.actor-card:hover .actor-avatar {
+  transform: scale(1.1);
 }
 
 .actor-name {
   font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary, #ffffff);
+  font-weight: 700;
+  color: var(--text-primary);
   margin: 0;
   text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
 .actor-card-with-thumbnail .actor-name {
   color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  font-size: 17px;
+  margin-bottom: 4px;
 }
 
 .actor-card-with-thumbnail .actor-video-count {
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  font-weight: 500;
 }
 
 .actor-video-count {
   font-size: 13px;
-  color: var(--text-secondary, #b0b0b0);
+  color: var(--text-secondary);
   margin: 0;
+  font-weight: 500;
 }
 
 .pagination-wrapper {
   margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .pagination-info {
@@ -724,7 +956,7 @@ onMounted(async () => {
 /* Tablet (768px - 1023px) */
 @media (max-width: 768px) {
   .actors-page {
-    padding: 20px;
+    padding: 24px 20px;
   }
 
   .page-header {
@@ -732,11 +964,27 @@ onMounted(async () => {
   }
 
   .page-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .page-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  .filters-bar {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .alphabet-filter {
+    gap: 5px;
+  }
+
+  .alphabet-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
   }
 
   .actors-content-section {
@@ -752,8 +1000,8 @@ onMounted(async () => {
   }
 
   .actors-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.875rem;
     margin-bottom: 1.5rem;
   }
 
@@ -840,7 +1088,7 @@ onMounted(async () => {
   }
 
   .actors-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
     margin-bottom: 1.25rem;
   }

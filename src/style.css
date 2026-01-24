@@ -3959,43 +3959,45 @@ body {
   }
 }
 
-/* YouTube-style Video Grid */
+/* YouTube-style Video Grid - 5 columns on desktop */
 .youtube-videos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   padding: 0;
 }
 
 @media (min-width: 1400px) {
   .youtube-videos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
   }
 }
 
 @media (min-width: 1024px) and (max-width: 1399px) {
   .youtube-videos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
   .youtube-videos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
 }
 
 @media (max-width: 767px) {
   .youtube-videos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .youtube-videos-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 }
