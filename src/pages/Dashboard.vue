@@ -265,9 +265,9 @@
                   to="/premium"
                   class="upgrade-link"
                   v-if="!isPremium"
-                > -->
+                >
                   Upgrade Now
-                </router-link>
+                </router-link> -->
               </div>
             </div>
             <div class="card-content">
