@@ -68,7 +68,8 @@
                   <span>Indian</span>
                 </router-link>
               </li>
-              <li class="navbar-nav-item">
+              <!-- Actors page removed - causing issues -->
+              <!-- <li class="navbar-nav-item">
                 <router-link
                   to="/actors"
                   class="navbar-link"
@@ -78,7 +79,7 @@
                   <Star :size="16" />
                   <span>Actors</span>
                 </router-link>
-              </li>
+              </li> -->
               <!-- Categories temporarily hidden -->
               <!--
               <li class="navbar-nav-item">
@@ -460,8 +461,8 @@
           <!-- Category Sidebar Content for Mobile -->
           <div class="mobile-menu-divider"></div>
 
-          <!-- Actors Section -->
-          <div class="mobile-menu-section">
+          <!-- Actors Section - REMOVED (causing issues) -->
+          <!-- <div class="mobile-menu-section">
             <h3 class="mobile-menu-section-header">ACTORS</h3>
             <router-link
               to="/actors"
@@ -472,7 +473,7 @@
               <Star :size="20" />
               <span>Actors</span>
             </router-link>
-          </div>
+          </div> -->
 
           <div class="mobile-menu-divider"></div>
 

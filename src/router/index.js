@@ -547,15 +547,6 @@ const routes = [
     }
   },
   {
-    path: '/actors',
-    name: 'Actors',
-    component: () => import('../pages/Actors.vue'),
-    meta: {
-      preload: false,
-      title: 'Actors'
-    }
-  },
-  {
     path: '/abella-danger',
     name: 'AbellaDanger',
     component: () => import('../pages/AbellaDanger.vue'),
