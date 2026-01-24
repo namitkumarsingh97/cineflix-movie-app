@@ -2,13 +2,14 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import './style.css'
-import { useAuth } from './composables/useAuth'
+// Authentication disabled - using Eporner API directly
+// import { useAuth } from './composables/useAuth'
 
 const app = createApp(App).use(router)
 
-// Initialize authentication
-const { init } = useAuth()
-init()
+// Authentication disabled - using Eporner API directly
+// const { init } = useAuth()
+// init()
 
 // Setup service worker message handler for background sync
 if ('serviceWorker' in navigator) {

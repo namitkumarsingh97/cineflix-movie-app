@@ -55,24 +55,26 @@ export function useAuth() {
   }
 
   /**
-   * Check if user is authenticated
+   * Check if user is authenticated - DISABLED: Auth disabled, using Eporner API directly
    */
   async function checkAuth() {
-    try {
-      const response = await authApi.getCurrentUser();
-      // Backend returns { success: true, user: {...} }
-      if (response && response.user) {
-        user.value = response.user;
-        localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-        return true;
-      } else {
-        clearAuth();
-        return false;
-      }
-    } catch (err) {
-      clearAuth();
-      return false;
-    }
+    // Auth disabled - always return false, no API call
+    return false;
+    // try {
+    //   const response = await authApi.getCurrentUser();
+    //   // Backend returns { success: true, user: {...} }
+    //   if (response && response.user) {
+    //     user.value = response.user;
+    //     localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+    //     return true;
+    //   } else {
+    //     clearAuth();
+    //     return false;
+    //   }
+    // } catch (err) {
+    //   clearAuth();
+    //   return false;
+    // }
   }
 
   /**

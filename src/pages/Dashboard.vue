@@ -76,9 +76,10 @@
                 <Crown :size="24" />
                 <h2 class="card-title">Subscription Status</h2>
               </div>
-              <router-link to="/premium" class="upgrade-link" v-if="!isPremium">
+              <!-- Premium route removed - using Eporner API directly, no premium required -->
+              <!-- <router-link to="/premium" class="upgrade-link" v-if="!isPremium">
                 Upgrade Now
-              </router-link>
+              </router-link> -->
             </div>
             <div class="card-content">
               <div v-if="subscriptionLoading" class="loading-state">
@@ -138,19 +139,21 @@
                   >
                     Cancel Subscription
                   </button>
-                  <router-link to="/premium" class="action-btn extend-btn">
+                  <!-- Premium route removed - using Eporner API directly, no premium required -->
+                  <!-- <router-link to="/premium" class="action-btn extend-btn">
                     Extend Subscription
-                  </router-link>
+                  </router-link> -->
                 </div>
               </div>
               <div v-else class="no-subscription">
                 <Crown :size="48" />
                 <h3>No Active Subscription</h3>
                 <p>Upgrade to premium to unlock exclusive content</p>
-                <router-link to="/premium" class="upgrade-cta-btn">
+                <!-- Premium route removed - using Eporner API directly, no premium required -->
+                <!-- <router-link to="/premium" class="upgrade-cta-btn">
                   <Crown :size="18" />
                   <span>Upgrade to Premium</span>
-                </router-link>
+                </router-link> -->
               </div>
             </div>
           </div>
@@ -257,11 +260,12 @@
                   />
                   <span>Refresh</span>
                 </button>
-                <router-link
+                <!-- Premium route removed - using Eporner API directly, no premium required -->
+                <!-- <router-link
                   to="/premium"
                   class="upgrade-link"
                   v-if="!isPremium"
-                >
+                > -->
                   Upgrade Now
                 </router-link>
               </div>
@@ -324,19 +328,21 @@
                   >
                     Cancel Subscription
                   </button>
-                  <router-link to="/premium" class="action-btn extend-btn">
+                  <!-- Premium route removed - using Eporner API directly, no premium required -->
+                  <!-- <router-link to="/premium" class="action-btn extend-btn">
                     Extend Subscription
-                  </router-link>
+                  </router-link> -->
                 </div>
               </div>
               <div v-else class="no-subscription">
                 <Crown :size="48" />
                 <h3>No Active Subscription</h3>
                 <p>Upgrade to premium to unlock exclusive content</p>
-                <router-link to="/premium" class="upgrade-cta-btn">
+                <!-- Premium route removed - using Eporner API directly, no premium required -->
+                <!-- <router-link to="/premium" class="upgrade-cta-btn">
                   <Crown :size="18" />
                   <span>Upgrade to Premium</span>
-                </router-link>
+                </router-link> -->
               </div>
             </div>
           </div>

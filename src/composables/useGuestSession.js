@@ -3,22 +3,48 @@ import { ref, computed } from 'vue';
 /**
  * Guest Session Management
  * Handles data storage and session management for non-authenticated users
- * Uses localStorage with guest session IDs
+ * Uses sessionStorage for session-specific data (cleared when browser tab closes)
  */
 const GUEST_SESSION_KEY = 'guestSessionId';
 const GUEST_SESSION_DATA_KEY = 'guestSessionData';
 const SESSION_EXPIRY_DAYS = 30; // Guest sessions expire after 30 days
 
+// Helper functions to use sessionStorage instead of localStorage
+const getSessionStorage = (key) => {
+  try {
+    return sessionStorage.getItem(key);
+  } catch (error) {
+    console.error('Error reading from sessionStorage:', error);
+    return null;
+  }
+};
+
+const setSessionStorage = (key, value) => {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch (error) {
+    console.error('Error writing to sessionStorage:', error);
+  }
+};
+
+const removeSessionStorage = (key) => {
+  try {
+    sessionStorage.removeItem(key);
+  } catch (error) {
+    console.error('Error removing from sessionStorage:', error);
+  }
+};
+
 export function useGuestSession() {
   // Get or create guest session ID
   const getGuestSessionId = () => {
     try {
-      let sessionId = localStorage.getItem(GUEST_SESSION_KEY);
+      let sessionId = getSessionStorage(GUEST_SESSION_KEY);
       
       if (!sessionId) {
         // Create new guest session ID
         sessionId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem(GUEST_SESSION_KEY, sessionId);
+        setSessionStorage(GUEST_SESSION_KEY, sessionId);
         
         // Initialize session data
         const sessionData = {
@@ -27,7 +53,7 @@ export function useGuestSession() {
           lastActivity: new Date().toISOString(),
           deviceInfo: getDeviceInfo(),
         };
-        localStorage.setItem(GUEST_SESSION_DATA_KEY, JSON.stringify(sessionData));
+        setSessionStorage(GUEST_SESSION_DATA_KEY, JSON.stringify(sessionData));
       } else {
         // Update last activity
         updateLastActivity();
@@ -55,11 +81,21 @@ export function useGuestSession() {
   // Update last activity timestamp
   const updateLastActivity = () => {
     try {
-      const sessionDataStr = localStorage.getItem(GUEST_SESSION_DATA_KEY);
+      const sessionDataStr = getSessionStorage(GUEST_SESSION_DATA_KEY);
       if (sessionDataStr) {
         const sessionData = JSON.parse(sessionDataStr);
         sessionData.lastActivity = new Date().toISOString();
-        localStorage.setItem(GUEST_SESSION_DATA_KEY, JSON.stringify(sessionData));
+        setSessionStorage(GUEST_SESSION_DATA_KEY, JSON.stringify(sessionData));
+      } else {
+        // Create session data if it doesn't exist
+        const sessionId = getGuestSessionId();
+        const sessionData = {
+          sessionId,
+          createdAt: new Date().toISOString(),
+          lastActivity: new Date().toISOString(),
+          deviceInfo: getDeviceInfo(),
+        };
+        setSessionStorage(GUEST_SESSION_DATA_KEY, JSON.stringify(sessionData));
       }
     } catch (error) {
       console.error('Error updating last activity:', error);
@@ -69,7 +105,7 @@ export function useGuestSession() {
   // Check if session is expired
   const isSessionExpired = () => {
     try {
-      const sessionDataStr = localStorage.getItem(GUEST_SESSION_DATA_KEY);
+      const sessionDataStr = getSessionStorage(GUEST_SESSION_DATA_KEY);
       if (!sessionDataStr) return true;
       
       const sessionData = JSON.parse(sessionDataStr);
@@ -86,12 +122,12 @@ export function useGuestSession() {
   const clearExpiredSession = () => {
     try {
       if (isSessionExpired()) {
-        localStorage.removeItem(GUEST_SESSION_KEY);
-        localStorage.removeItem(GUEST_SESSION_DATA_KEY);
-        // Clear all guest-related data
-        localStorage.removeItem('watchHistory');
-        localStorage.removeItem('favorites');
-        localStorage.removeItem('watchLater');
+        removeSessionStorage(GUEST_SESSION_KEY);
+        removeSessionStorage(GUEST_SESSION_DATA_KEY);
+        // Clear all guest-related data (watchHistory, favorites, watchLater stay in localStorage for persistence)
+        // localStorage.removeItem('watchHistory');
+        // localStorage.removeItem('favorites');
+        // localStorage.removeItem('watchLater');
         return true;
       }
       return false;
@@ -105,7 +141,7 @@ export function useGuestSession() {
   const getSessionInfo = () => {
     try {
       const sessionId = getGuestSessionId();
-      const sessionDataStr = localStorage.getItem(GUEST_SESSION_DATA_KEY);
+      const sessionDataStr = getSessionStorage(GUEST_SESSION_DATA_KEY);
       
       if (sessionDataStr) {
         const sessionData = JSON.parse(sessionDataStr);

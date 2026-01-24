@@ -44,6 +44,16 @@ export const getOptimalFormat = () => {
 export const generateSrcSet = (baseUrl, widths = [320, 640, 960, 1280, 1920], format = null) => {
   if (!baseUrl) return '';
   
+  // Skip srcset generation for Eporner CDN - they don't support responsive images
+  try {
+    const urlObj = new URL(baseUrl);
+    if (urlObj.hostname.includes('eporner.com')) {
+      return ''; // Return empty srcset, use original URL directly
+    }
+  } catch (e) {
+    // If URL parsing fails, continue with normal processing
+  }
+  
   const optimalFormat = format || getOptimalFormat();
   const srcset = widths
     .map(width => {
@@ -70,6 +80,12 @@ export const optimizeImageUrl = (url, width = null, format = null, quality = 85)
   try {
     const urlObj = new URL(url);
     
+    // Skip optimization for Eporner CDN - they don't support query parameters
+    // Eporner CDN domains: static-ca-cdn.eporner.com, static-eu-cdn.eporner.com, etc.
+    if (urlObj.hostname.includes('eporner.com')) {
+      return url; // Return original URL without modification
+    }
+    
     // Example: Cloudinary CDN
     if (urlObj.hostname.includes('cloudinary.com') || urlObj.hostname.includes('res.cloudinary.com')) {
       const pathParts = urlObj.pathname.split('/');
@@ -94,12 +110,11 @@ export const optimizeImageUrl = (url, width = null, format = null, quality = 85)
       return urlObj.toString();
     }
     
-    // Generic optimization (add query params)
-    if (width) urlObj.searchParams.set('w', width);
-    if (format) urlObj.searchParams.set('fm', format);
-    urlObj.searchParams.set('q', quality);
-    
-    return urlObj.toString();
+    // Generic optimization (add query params) - only for CDNs that support it
+    // Skip for unknown CDNs to avoid breaking images
+    // Only apply if we're certain the CDN supports these parameters
+    // For now, skip generic optimization to prevent 404 errors
+    return url;
   } catch (e) {
     // If URL parsing fails, return original
     return url;
@@ -109,6 +124,16 @@ export const optimizeImageUrl = (url, width = null, format = null, quality = 85)
 // Generate picture element sources for modern formats
 export const generatePictureSources = (baseUrl, widths = [320, 640, 960, 1280, 1920]) => {
   if (!baseUrl) return [];
+  
+  // Skip picture sources for Eporner CDN - they don't support format conversion
+  try {
+    const urlObj = new URL(baseUrl);
+    if (urlObj.hostname.includes('eporner.com')) {
+      return []; // Return empty array, use original image directly
+    }
+  } catch (e) {
+    // If URL parsing fails, continue with normal processing
+  }
   
   const sources = [];
   

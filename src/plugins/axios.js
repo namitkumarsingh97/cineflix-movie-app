@@ -1,12 +1,18 @@
 import axios from "axios";
 
 // Create axios instance with default config
+const baseURL = import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:5000/api"
+    : "https://cineflix-api-rho.vercel.app/api");
+
+// Log API URL in development for debugging
+if (import.meta.env.DEV) {
+  console.log('🔗 API Base URL:', baseURL);
+}
+
 const apiClient = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV
-      ? "http://localhost:5000/api"
-      : "https://cineflix-api-rho.vercel.app/api"),
+  baseURL,
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",

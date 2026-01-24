@@ -1426,9 +1426,10 @@ function navigateToVideo(video) {
   router.push(`/watch/${video.id || video._id}${source}`);
 }
 
-function goToPremium() {
-  router.push('/premium');
-}
+// Premium route removed - using Eporner API directly, no premium required
+// function goToPremium() {
+//   router.push('/premium');
+// }
 
 // Check if video has a direct video URL (not an embed URL or page URL)
 function hasDirectVideoUrl(video) {

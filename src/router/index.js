@@ -789,15 +789,16 @@ const routes = [
       title: 'Alexa Grace'
     }
   },
-  {
-    path: '/premium',
-    name: 'Premium',
-    component: () => import('../pages/Premium.vue'),
-    meta: {
-      preload: false,
-      title: 'Premium'
-    }
-  },
+  // Premium route removed - using Eporner API directly, no premium required
+  // {
+  //   path: '/premium',
+  //   name: 'Premium',
+  //   component: () => import('../pages/Premium.vue'),
+  //   meta: {
+  //     preload: false,
+  //     title: 'Premium'
+  //   }
+  // },
   {
     path: '/login',
     name: 'Login',
@@ -1031,23 +1032,24 @@ router.beforeEach((to, from, next) => {
     }
   }
   
-  // Check user authentication (for dashboard, account pages)
-  if (to.meta.requiresAuth && !to.path.startsWith('/admin')) {
-    const token = localStorage.getItem('cineflix_auth_token');
-    if (!token) {
-      next({ name: 'Login', query: { redirect: to.fullPath } });
-      return;
-    }
-  }
+  // Authentication disabled - using Eporner API directly
+  // Check user authentication (for dashboard, account pages) - DISABLED
+  // if (to.meta.requiresAuth && !to.path.startsWith('/admin')) {
+  //   const token = localStorage.getItem('cineflix_auth_token');
+  //   if (!token) {
+  //     next({ name: 'Login', query: { redirect: to.fullPath } });
+  //     return;
+  //   }
+  // }
   
-  // Check guest routes (login, signup - redirect if already logged in)
-  if (to.meta.requiresGuest) {
-    const token = localStorage.getItem('cineflix_auth_token');
-    if (token) {
-      next({ name: 'Dashboard' });
-      return;
-    }
-  }
+  // Check guest routes (login, signup - redirect if already logged in) - DISABLED
+  // if (to.meta.requiresGuest) {
+  //   const token = localStorage.getItem('cineflix_auth_token');
+  //   if (token) {
+  //     next({ name: 'Dashboard' });
+  //     return;
+  //   }
+  // }
   
   // Check admin auth (for admin panel)
   if (to.meta.requiresAuth && to.path.startsWith('/admin')) {

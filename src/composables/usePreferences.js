@@ -2,12 +2,17 @@ import { ref, computed } from 'vue';
 
 const PREFERENCES_KEY = 'userPreferences';
 
+/**
+ * User Preferences Management
+ * Uses sessionStorage for session-specific preferences (cleared when browser tab closes)
+ */
 export function usePreferences() {
   const preferences = ref(getPreferences());
 
   function getPreferences() {
     try {
-      const stored = localStorage.getItem(PREFERENCES_KEY);
+      // Use sessionStorage instead of localStorage for session-specific preferences
+      const stored = sessionStorage.getItem(PREFERENCES_KEY);
       return stored ? JSON.parse(stored) : {
         language: 'en',
         preferredCategories: [],
@@ -30,7 +35,8 @@ export function usePreferences() {
   function savePreferences(newPreferences) {
     try {
       preferences.value = { ...preferences.value, ...newPreferences };
-      localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences.value));
+      // Use sessionStorage instead of localStorage for session-specific preferences
+      sessionStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences.value));
       return preferences.value;
     } catch (error) {
       console.error('Error saving preferences:', error);

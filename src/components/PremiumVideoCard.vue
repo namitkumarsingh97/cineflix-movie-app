@@ -71,10 +71,11 @@ function handleClick(event) {
     event.stopImmediatePropagation();
   }
   
+  // Premium route removed - using Eporner API directly, no premium required
   // FORCE redirect to premium page - NO other navigation allowed in this section
   // Even if user is premium, all clicks in premium section go to premium page
-  console.log('Premium section: All clicks blocked, redirecting to /premium');
-  router.push('/premium').catch(() => {});
+  // console.log('Premium section: All clicks blocked, redirecting to /premium');
+  // router.push('/premium').catch(() => {});
   return false;
 }
 

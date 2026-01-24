@@ -188,8 +188,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // API requests - use stale-while-revalidate for metadata endpoints
+  // API requests - skip service worker caching in development or for external APIs
   if (isAPI) {
+    // Skip service worker for external API calls (let axios handle them directly)
+    // This prevents service worker from intercepting requests to localhost:5000 or vercel.app
+    if (!isSameOrigin) {
+      // Let the request pass through to the network
+      return;
+    }
+    
     const isMetadataEndpoint = 
       url.pathname.includes('/categories') ||
       url.pathname.includes('/stars') ||

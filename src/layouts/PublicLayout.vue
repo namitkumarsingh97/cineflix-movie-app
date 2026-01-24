@@ -104,7 +104,8 @@
                   <span>Stories</span>
                 </router-link>
               </li> -->
-              <li class="navbar-nav-item">
+              <!-- Premium link removed - using Eporner API directly, no premium required -->
+              <!-- <li class="navbar-nav-item">
                 <router-link
                   to="/premium"
                   class="navbar-link premium-nav-link"
@@ -114,7 +115,7 @@
                   <Crown :size="16" />
                   <span>Premium</span>
                 </router-link>
-              </li>
+              </li> -->
             </ul>
           </div>
 
@@ -245,14 +246,15 @@
                     <Crown :size="18" />
                     <span>Subscription</span>
                   </router-link>
-                  <router-link
+                  <!-- Premium link removed - using Eporner API directly, no premium required -->
+                  <!-- <router-link
                     to="/premium"
                     class="user-menu-item"
                     @click="closeUserMenu"
                   >
                     <Crown :size="18" />
                     <span>Premium</span>
-                  </router-link>
+                  </router-link> -->
                   <div class="user-menu-divider"></div>
                   <button
                     class="user-menu-item logout-item"
@@ -264,8 +266,8 @@
                 </div>
               </Transition>
             </div>
-            <!-- Login Button (if not logged in and not admin) -->
-            <router-link
+            <!-- Login Button - DISABLED: Auth disabled, using Eporner API directly -->
+            <!-- <router-link
               v-if="!isAuthenticated && !isAdminLoggedIn"
               to="/login"
               class="navbar-btn login-btn"
@@ -273,7 +275,7 @@
             >
               <LogIn :size="18" />
               <span>Sign In</span>
-            </router-link>
+            </router-link> -->
             <!-- Watch Later Badge -->
             <!-- <router-link
               to="/home"
@@ -294,22 +296,24 @@
               <Star :size="20" />
               <BadgeCount :count="followedStarsCount" />
             </router-link> -->
-            <button
+            <!-- Preferences button - DISABLED -->
+            <!-- <button
               class="navbar-btn preferences-btn"
               @click="showPreferences = true"
               title="Preferences"
               aria-label="Open preferences"
             >
               <Settings :size="20" />
-            </button>
-            <button
+            </button> -->
+            <!-- Accessibility button - DISABLED -->
+            <!-- <button
               class="navbar-btn accessibility-btn"
               @click="showAccessibility = true"
               title="Accessibility Settings"
               aria-label="Open accessibility settings"
             >
               <Accessibility :size="20" />
-            </button>
+            </button> -->
             <button
               class="navbar-btn refresh-btn"
               @click="$emit('refresh')"
@@ -442,7 +446,8 @@
             <span>Categories</span>
           </router-link>
           -->
-          <router-link
+          <!-- Premium link removed - using Eporner API directly, no premium required -->
+          <!-- <router-link
             to="/premium"
             class="mobile-menu-link premium-nav-link"
             active-class="active"
@@ -450,7 +455,7 @@
           >
             <Crown :size="20" />
             <span>Premium</span>
-          </router-link>
+          </router-link> -->
 
           <!-- Category Sidebar Content for Mobile -->
           <div class="mobile-menu-divider"></div>
@@ -920,7 +925,8 @@ import BadgeCount from "../components/BadgeCount.vue";
 import { useAccessibility } from "../composables/useAccessibility";
 import { useBadgeCounts } from "../composables/useBadgeCounts";
 import { usePushNotifications } from "../composables/usePushNotifications";
-import { useAuth } from "../composables/useAuth";
+// Authentication disabled - using Eporner API directly
+// import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
 const route = useRoute();
@@ -941,8 +947,12 @@ const adminId = ref("");
 const showPreferences = ref(false);
 const showAccessibility = ref(false);
 
-// User authentication
-const { user, isAuthenticated, logout: authLogout, checkAuth } = useAuth();
+// User authentication - DISABLED: Using Eporner API directly
+// const { user, isAuthenticated, logout: authLogout, checkAuth } = useAuth();
+const user = ref(null);
+const isAuthenticated = computed(() => false); // Always false - auth disabled
+const authLogout = async () => {}; // No-op function
+const checkAuth = async () => {}; // No-op function
 const userMenuOpen = ref(false);
 
 function toggleUserMenu() {
@@ -956,11 +966,13 @@ function closeUserMenu() {
   userMenuOpen.value = false;
 }
 
+// Logout disabled - auth disabled
 async function handleLogout() {
-  if (confirm("Are you sure you want to logout?")) {
-    await authLogout();
-    closeUserMenu();
-  }
+  // Auth disabled - no logout functionality
+  // if (confirm("Are you sure you want to logout?")) {
+  //   await authLogout();
+  //   closeUserMenu();
+  // }
 }
 const { skipToMain } = useAccessibility();
 const { watchLaterCount, followedStarsCount } = useBadgeCounts();
@@ -1163,17 +1175,17 @@ const isAdminRoute = computed(() => {
   return route.path.startsWith("/admin");
 });
 
-// Watch for auth state changes to update UI immediately
-watch(
-  isAuthenticated,
-  async (newValue) => {
-    if (newValue) {
-      // User just logged in, refresh auth state
-      await checkAuth();
-    }
-  },
-  { immediate: true }
-);
+// Watch for auth state changes - DISABLED: Auth disabled
+// watch(
+//   isAuthenticated,
+//   async (newValue) => {
+//     if (newValue) {
+//       // User just logged in, refresh auth state
+//       await checkAuth();
+//     }
+//   },
+//   { immediate: true }
+// );
 
 onMounted(async () => {
   checkAdminStatus();
@@ -1181,8 +1193,8 @@ onMounted(async () => {
   const interval = setInterval(checkAdminStatus, 1000);
   window._adminStatusInterval = interval;
 
-  // Check auth status on mount to ensure UI updates
-  await checkAuth();
+  // Check auth status on mount - DISABLED: Auth disabled
+  // await checkAuth();
 
   // Load production counts for mobile
   try {

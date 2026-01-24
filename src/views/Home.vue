@@ -203,9 +203,10 @@ import {
   Loader2,
 } from "lucide-vue-next";
 
-const API_URL = import.meta.env.DEV
-  ? "https://cineflix-api-rho.vercel.app/api"
-  : import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.DEV 
+    ? "http://localhost:5000/api" 
+    : "https://cineflix-api-rho.vercel.app/api");
 
 export default {
   name: "Home",

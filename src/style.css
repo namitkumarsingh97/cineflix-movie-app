@@ -2,6 +2,16 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  outline: none !important; /* Remove all focus outlines */
+}
+
+/* Remove text selection highlight */
+*::selection {
+  background: transparent;
+}
+
+*::-moz-selection {
+  background: transparent;
 }
 
 :root {
@@ -4051,10 +4061,10 @@ body {
   font-size: 1.2em;
 }
 
-/* Focus Visible */
+/* Focus Visible - Disabled */
 .focus-visible *:focus {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
+  outline-offset: 0;
 }
 
 .focus-visible button:focus,
@@ -4062,8 +4072,8 @@ body {
 .focus-visible input:focus,
 .focus-visible select:focus,
 .focus-visible textarea:focus {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
+  outline-offset: 0;
 }
 
 /* Responsive Improvements */
@@ -4090,10 +4100,10 @@ body {
   }
 }
 
-/* Improved keyboard navigation */
+/* Improved keyboard navigation - Focus outline disabled */
 *:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+  outline: none;
+  outline-offset: 0;
 }
 
 /* Better contrast for links */

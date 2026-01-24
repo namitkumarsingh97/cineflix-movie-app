@@ -24,6 +24,7 @@
           <div class="actors-info">
             <p class="actors-count">
               Showing {{ displayedActors.length }} of {{ totalActorsCount }} actors
+              <span v-if="currentPage > 1">(Page {{ currentPage }})</span>
             </p>
           </div>
 
@@ -133,7 +134,7 @@ function handleFilterChange(filter) {
   console.log('Filter changed:', filter);
 }
 
-// Define actors list (you can expand this later or fetch from API)
+// Define actors list - expanded list for pagination
 const allActors = ref([
   { name: 'Abella Danger', videoCount: null, thumbnail: null },
   { name: 'AJ Applegate', videoCount: null, thumbnail: null },
@@ -161,6 +162,30 @@ const allActors = ref([
   { name: 'Alex Victor', videoCount: null, thumbnail: null },
   { name: 'Alexa Flexy', videoCount: null, thumbnail: null },
   { name: 'Alexa Grace', videoCount: null, thumbnail: null },
+  { name: 'Angela White', videoCount: null, thumbnail: null },
+  { name: 'Anissa Kate', videoCount: null, thumbnail: null },
+  { name: 'Anna Bell Peaks', videoCount: null, thumbnail: null },
+  { name: 'Ariana Marie', videoCount: null, thumbnail: null },
+  { name: 'Asa Akira', videoCount: null, thumbnail: null },
+  { name: 'Ava Addams', videoCount: null, thumbnail: null },
+  { name: 'Brandi Love', videoCount: null, thumbnail: null },
+  { name: 'Brianna Beach', videoCount: null, thumbnail: null },
+  { name: 'Carter Cruise', videoCount: null, thumbnail: null },
+  { name: 'Chloe Amour', videoCount: null, thumbnail: null },
+  { name: 'Dani Daniels', videoCount: null, thumbnail: null },
+  { name: 'Diamond Jackson', videoCount: null, thumbnail: null },
+  { name: 'Eva Lovia', videoCount: null, thumbnail: null },
+  { name: 'Gianna Michaels', videoCount: null, thumbnail: null },
+  { name: 'Jada Stevens', videoCount: null, thumbnail: null },
+  { name: 'Jenna Jameson', videoCount: null, thumbnail: null },
+  { name: 'Kendra Lust', videoCount: null, thumbnail: null },
+  { name: 'Lisa Ann', videoCount: null, thumbnail: null },
+  { name: 'Mia Khalifa', videoCount: null, thumbnail: null },
+  { name: 'Nicole Aniston', videoCount: null, thumbnail: null },
+  { name: 'Riley Reid', videoCount: null, thumbnail: null },
+  { name: 'Sasha Grey', videoCount: null, thumbnail: null },
+  { name: 'Tori Black', videoCount: null, thumbnail: null },
+  { name: 'Valentina Nappi', videoCount: null, thumbnail: null },
 ]);
 
 // Computed for total actors count
@@ -262,6 +287,9 @@ function handleThumbnailError(event) {
 
 // Fetch actor's most viewed video thumbnail with retry logic
 async function loadActorThumbnail(actorName, retries = 3) {
+  const actor = allActors.value.find(a => a.name === actorName);
+  if (!actor) return;
+  
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
       // Search for actor videos, sorted by most popular (most views)
@@ -274,24 +302,20 @@ async function loadActorThumbnail(actorName, retries = 3) {
       // Get the first (most viewed) video
       if (epornerVideos.value && epornerVideos.value.length > 0) {
         const mostViewedVideo = epornerVideos.value[0];
-        const actor = allActors.value.find(a => a.name === actorName);
-        if (actor) {
-          // Get total count if available
-          if (epornerTotalCount.value) {
-            actor.videoCount = epornerTotalCount.value;
-            // If video count is less than 100, remove the actor
-            if (epornerTotalCount.value < 100) {
-              const index = allActors.value.findIndex(a => a.name === actorName);
-              if (index > -1) {
-                allActors.value.splice(index, 1);
-              }
-              return; // Don't set thumbnail for removed actor
-            }
+        
+        // Get total count if available
+        if (epornerTotalCount.value) {
+          actor.videoCount = epornerTotalCount.value;
+          // If video count is less than 100, mark for removal (but don't remove immediately to avoid UI flicker)
+          if (epornerTotalCount.value < 100) {
+            // We'll filter these out later, but for now just don't set thumbnail
+            return;
           }
-          // Only set thumbnail if actor still exists (wasn't removed)
-          if (mostViewedVideo.thumbnail && allActors.value.find(a => a.name === actorName)) {
-            actor.thumbnail = mostViewedVideo.thumbnail;
-          }
+        }
+        
+        // Set thumbnail if available
+        if (mostViewedVideo.thumbnail) {
+          actor.thumbnail = mostViewedVideo.thumbnail;
         }
       }
       return; // Success, exit retry loop
@@ -322,51 +346,68 @@ async function loadAbellaDangerThumbnail() {
 }
 
 // Go to page
-function goToPage(page) {
+async function goToPage(page) {
   if (page === '...' || page < 1 || page > totalPages.value) return;
   currentPage.value = page;
+  // Load thumbnails for actors on the new page
+  await loadPageActors(page);
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Load actors on mount
-onMounted(async () => {
-  // Actors list is already initialized
-  // Load thumbnails in the background
-  loading.value = true;
-  try {
-    // Load thumbnails for all actors (in smaller batches with delays to avoid rate limiting)
-    const allActorNames = allActors.value.map(a => a.name);
+// Load thumbnails for actors on a specific page
+async function loadPageActors(page) {
+  const start = (page - 1) * actorsPerPage;
+  const end = start + actorsPerPage;
+  const pageActors = allActors.value.slice(start, end);
+  
+  // Only load thumbnails for actors that don't have them yet
+  const actorsToLoad = pageActors.filter(actor => !actor.thumbnail && !actor.loading);
+  
+  if (actorsToLoad.length === 0) return;
+  
+  // Mark actors as loading
+  actorsToLoad.forEach(actor => actor.loading = true);
+  
+  // Load thumbnails in small batches
+  const BATCH_SIZE = 3;
+  const DELAY_BETWEEN_REQUESTS = 800;
+  
+  for (let i = 0; i < actorsToLoad.length; i += BATCH_SIZE) {
+    const batch = actorsToLoad.slice(i, i + BATCH_SIZE);
     
-    // Process actors sequentially in small batches to avoid overwhelming the API
-    const BATCH_SIZE = 3; // Reduced from 10 to 3
-    const DELAY_BETWEEN_REQUESTS = 800; // Delay between individual requests (ms)
-    const DELAY_BETWEEN_BATCHES = 2000; // Delay between batches (ms)
-    
-    for (let i = 0; i < allActorNames.length; i += BATCH_SIZE) {
-      const batch = allActorNames.slice(i, i + BATCH_SIZE);
+    // Process batch sequentially
+    for (let j = 0; j < batch.length; j++) {
+      const actor = batch[j];
+      await loadActorThumbnail(actor.name).catch(() => {
+        return null; // Continue even if one fails
+      });
       
-      // Process batch sequentially (not in parallel) to reduce concurrent requests
-      for (let j = 0; j < batch.length; j++) {
-        const name = batch[j];
-        await loadActorThumbnail(name).catch(() => {
-          // Errors are already handled in loadActorThumbnail with retry logic
-          return null; // Continue even if one fails
-        });
-        
-        // Delay between individual requests within a batch (except for the last one)
-        if (j < batch.length - 1 || i + BATCH_SIZE < allActorNames.length) {
-          await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_REQUESTS));
-        }
-      }
-      
-      // Delay between batches to avoid rate limiting
-      if (i + BATCH_SIZE < allActorNames.length) {
-        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
+      // Delay between requests
+      if (j < batch.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_REQUESTS));
       }
     }
     
-    // Filter out actors with less than 100 videos
+    // Small delay between batches
+    if (i + BATCH_SIZE < actorsToLoad.length) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+  }
+  
+  // Remove loading flag
+  actorsToLoad.forEach(actor => actor.loading = false);
+}
+
+// Load actors on mount - only load first page
+onMounted(async () => {
+  loading.value = true;
+  try {
+    // Load thumbnails only for the first page
+    await loadPageActors(1);
+    
+    // Filter out actors with less than 100 videos (only for loaded actors)
+    // We'll filter dynamically as we load more pages
     allActors.value = allActors.value.filter(actor => {
       // If videoCount is null/undefined, keep the actor (count not loaded yet)
       // If videoCount exists and is < 100, remove the actor
@@ -376,14 +417,12 @@ onMounted(async () => {
       return true;
     });
   } catch (error) {
-    // Suppress expected errors - they're already handled in loadActorThumbnail
-    // Only log unexpected errors
+    // Suppress expected errors
     if (!error?.message?.includes('Failed to fetch') && 
         !error?.message?.includes('CORS') &&
         !error?.message?.includes('503')) {
       console.warn('Error loading actor thumbnails:', error);
     }
-    // Continue even if thumbnail fails - actor cards will show with avatars
   } finally {
     loading.value = false;
   }
