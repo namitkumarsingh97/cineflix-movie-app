@@ -9,8 +9,8 @@
     
     <!-- Main Content (with sidebar offset) -->
     <div class="home-content">
-    <!-- Layout Customizer Button -->
-    <div class="layout-customizer-btn-container">
+    <!-- Layout Customizer Button - REMOVED -->
+    <!-- <div class="layout-customizer-btn-container">
       <button 
         class="layout-customizer-btn" 
         @click="showLayoutCustomizer = true"
@@ -19,7 +19,7 @@
         <Layout :size="18" />
         <span>Customize Layout</span>
       </button>
-    </div>
+    </div> -->
 
     <!-- Continue Watching Section -->
     <section 
@@ -420,11 +420,11 @@
       </div>
     </section>
 
-    <!-- Layout Customizer Modal -->
-    <HomeLayoutCustomizer 
+    <!-- Layout Customizer Modal - REMOVED -->
+    <!-- <HomeLayoutCustomizer 
       :show="showLayoutCustomizer" 
       @close="showLayoutCustomizer = false" 
-    />
+    /> -->
     </div> <!-- End home-content -->
   </div> <!-- End home-page-container -->
 </template>
@@ -440,7 +440,8 @@ import Loader from "../components/Loader.vue";
 import SkeletonSection from "../components/SkeletonSection.vue";
 import MovieCard from "../components/MovieCard.vue";
 import AdvancedSearch from "../components/AdvancedSearch.vue";
-import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
+// Layout Customizer - REMOVED
+// import HomeLayoutCustomizer from "../components/HomeLayoutCustomizer.vue";
 import CategorySidebar from "../components/CategorySidebar.vue";
 import { useHomeLayout } from "../composables/useHomeLayout";
 import { useWatchLater } from "../composables/useWatchLater";
@@ -463,7 +464,7 @@ import {
   Calendar,
   Shuffle,
   Filter,
-  Layout,
+  // Layout, // Removed - customize layout button removed
   Star,
   Play,
   Crown,
@@ -526,7 +527,8 @@ const familyVideos = ref([]);
 // const { isPremium, checkPremiumStatus } = useSubscription();
 const isPremium = computed(() => false); // Always false - premium disabled
 
-const showLayoutCustomizer = ref(false);
+// Layout Customizer - REMOVED
+// const showLayoutCustomizer = ref(false);
 const sidebarOpen = ref(true);
 
 // Sidebar visibility preference
