@@ -3976,7 +3976,7 @@ body {
 
 @media (min-width: 1024px) and (max-width: 1399px) {
   .youtube-videos-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 14px;
   }
 }

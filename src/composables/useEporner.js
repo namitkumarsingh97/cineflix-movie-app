@@ -12,7 +12,7 @@ export function useEporner() {
   const loading = ref(false);
   const error = ref(null);
   const currentPage = ref(1);
-  const perPage = ref(30);
+  const perPage = ref(50); // Increased from 30 to 50 for better default experience
   const totalPages = ref(1);
   const totalCount = ref(0);
   const searchQuery = ref('');
